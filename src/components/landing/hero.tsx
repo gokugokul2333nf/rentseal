@@ -1,0 +1,391 @@
+"use client";
+
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CheckCircle2,
+  FileSignature,
+  MapPin,
+  PlayCircle,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Stamp,
+  Truck,
+} from "lucide-react";
+import { ButtonLink } from "@/components/ui/button";
+import { Badge } from "@/components/ui/card";
+import { LEAD_ANCHOR } from "@/lib/site";
+import { cn } from "@/lib/utils";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const AVATARS = [
+  { name: "LN", tint: "bg-brand-600" },
+  { name: "PR", tint: "bg-emerald-500" },
+  { name: "MI", tint: "bg-amber-500" },
+  { name: "SK", tint: "bg-violet-500" },
+];
+
+const PROOF_POINTS = [
+  { icon: Truck, label: "Same-day delivery in Chennai" },
+  { icon: MapPin, label: "All 38 districts covered" },
+  { icon: Stamp, label: "Face value, no markup" },
+  { icon: FileSignature, label: "Agreements in 10 minutes" },
+];
+
+/** The document mock that anchors the hero — an agreement mid-generation. */
+function AgreementMock() {
+  return (
+    <div className="relative rounded-2xl border border-line bg-white p-6 shadow-lift sm:p-7">
+      {/* window chrome */}
+      <div className="mb-5 flex items-center justify-between border-b border-line pb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex gap-1.5">
+            <span className="size-2.5 rounded-full bg-rose-400/70" />
+            <span className="size-2.5 rounded-full bg-amber-400/70" />
+            <span className="size-2.5 rounded-full bg-emerald-400/70" />
+          </div>
+          <span className="ml-1.5 text-[11.5px] font-semibold tracking-wide text-navy-400">
+            RS-2026-448120 · Draft
+          </span>
+        </div>
+        <Badge tone="emerald" className="gap-1">
+          <span className="size-1.5 rounded-full bg-emerald-500" />
+          Auto-saved
+        </Badge>
+      </div>
+
+      {/* title block */}
+      <div className="text-center">
+        <p className="text-[9px] font-bold tracking-[0.22em] text-navy-400 uppercase">
+          Government of Tamil Nadu · e-Stamp
+        </p>
+        <h3 className="mt-2 font-display text-[15px] font-extrabold tracking-tight text-navy-950">
+          RESIDENTIAL RENTAL AGREEMENT
+        </h3>
+        <p className="mt-1 text-[10.5px] text-navy-400">
+          Executed at Chennai on 12 August 2026
+        </p>
+      </div>
+
+      {/* body lines */}
+      <div className="mt-5 space-y-4">
+        {[
+          { label: "1. Grant of Tenancy", widths: [100, 94, 68] },
+          { label: "2. Rent", widths: [100, 82] },
+          { label: "3. Security Deposit", widths: [100, 97, 55] },
+        ].map((block) => (
+          <div key={block.label}>
+            <p className="mb-1.5 text-[10.5px] font-bold tracking-tight text-navy-800">
+              {block.label}
+            </p>
+            <div className="space-y-1.5">
+              {block.widths.map((w, i) => (
+                <motion.div
+                  key={i}
+                  className="h-1.5 rounded-full bg-navy-100"
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: `${w}%`, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.5 + i * 0.09, ease: EASE }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* a clause appearing live */}
+      <motion.div
+        initial={{ opacity: 0, y: 10, height: 0 }}
+        animate={{ opacity: 1, y: 0, height: "auto" }}
+        transition={{ duration: 0.6, delay: 1.5, ease: EASE }}
+        className="mt-4 overflow-hidden"
+      >
+        <div className="rounded-xl border border-dashed border-brand-300 bg-brand-50/60 p-3">
+          <p className="flex items-center gap-1.5 text-[10px] font-bold text-brand-700">
+            <Sparkles className="size-3" />
+            CLAUSE ADDED — Pets allowed
+          </p>
+          <div className="mt-2 space-y-1.5">
+            <div className="h-1.5 w-full rounded-full bg-brand-200/70" />
+            <div className="h-1.5 w-[72%] rounded-full bg-brand-200/70" />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* signature row */}
+      <div className="mt-6 flex items-end justify-between border-t border-dashed border-line pt-4">
+        {["Landlord", "Tenant"].map((role, i) => (
+          <div key={role} className="w-[42%]">
+            <svg viewBox="0 0 120 28" className="h-7 w-full text-navy-800" aria-hidden="true">
+              <motion.path
+                d={
+                  i === 0
+                    ? "M4 20c8-14 14 6 20-2s8-12 14-4 10 12 18 2 14-8 22-2 12 4 18 0"
+                    : "M4 18c6-10 12 8 18 0s10-14 16-6 8 14 16 4 12-6 20-2 16 2 22-2"
+                }
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.4, delay: 2 + i * 0.35, ease: "easeInOut" }}
+              />
+            </svg>
+            <div className="mt-1 border-t border-navy-300 pt-1.5">
+              <p className="text-[9.5px] font-semibold text-navy-500">{role}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* stamp */}
+      <motion.div
+        initial={{ opacity: 0, scale: 1.6, rotate: -24 }}
+        animate={{ opacity: 1, scale: 1, rotate: -14 }}
+        transition={{ duration: 0.55, delay: 2.9, ease: [0.34, 1.56, 0.64, 1] }}
+        className="absolute right-5 bottom-16 sm:right-7"
+      >
+        <div className="grid size-[76px] place-items-center rounded-full border-[2.5px] border-emerald-600/60 text-center">
+          <div className="grid size-[64px] place-items-center rounded-full border border-emerald-600/40">
+            <div>
+              <BadgeCheck className="mx-auto size-4 text-emerald-600" />
+              <p className="mt-0.5 text-[7px] font-bold tracking-[0.1em] text-emerald-700 uppercase">
+                e-Stamped
+              </p>
+              <p className="text-[6.5px] font-semibold text-emerald-600/80">TN · ₹3,200</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/** Floating chip that orbits the document. */
+function FloatChip({
+  className,
+  delay,
+  icon: Icon,
+  title,
+  sub,
+  tint,
+}: {
+  className?: string;
+  delay: number;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  sub: string;
+  tint: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.7, delay, ease: EASE }}
+      className={cn("absolute z-10 hidden sm:block", className)}
+    >
+      <div className="animate-float rounded-xl border border-line bg-white/95 p-3 shadow-lift backdrop-blur-sm">
+        <div className="flex items-center gap-2.5">
+          <span className={cn("grid size-8 shrink-0 place-items-center rounded-lg text-white", tint)}>
+            <Icon className="size-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[12px] leading-tight font-bold text-navy-950">{title}</p>
+            <p className="text-[10.5px] leading-tight text-navy-500">{sub}</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export function Hero() {
+  return (
+    <section className="relative overflow-hidden pt-14 pb-20 md:pt-20 md:pb-28">
+      {/* backdrop */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-mesh" />
+        <div className="absolute inset-0 bg-grid" />
+        <div className="absolute -top-32 -right-40 size-[620px] rounded-full bg-brand-400/12 blur-[120px]" />
+        <div className="absolute -bottom-52 -left-40 size-[560px] rounded-full bg-emerald-400/10 blur-[120px]" />
+      </div>
+
+      <div className="container-page">
+        <div className="grid items-center gap-16 lg:grid-cols-[1.02fr_1fr] lg:gap-12 xl:gap-20">
+          {/* ── Copy ───────────────────────────────────────────── */}
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: EASE }}
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/80 py-1.5 pr-4 pl-1.5 text-[13px] font-medium text-navy-600 shadow-soft backdrop-blur">
+                <span className="rounded-full bg-navy-950 px-2.5 py-1 text-[11px] font-bold text-white">
+                  NEW
+                </span>
+                Same-day stamp paper delivery across Chennai
+                <ArrowRight className="size-3.5 text-navy-400" />
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.08, ease: EASE }}
+              className="mt-6 text-[clamp(2.2rem,5.6vw,3.7rem)] leading-[1.06] font-extrabold tracking-[-0.035em] text-navy-950"
+            >
+              Stamp paper and rental
+              <br className="hidden sm:block" /> agreements,{" "}
+              <span className="relative inline-block whitespace-nowrap">
+                <span className="text-gradient">delivered</span>
+                <motion.svg
+                  viewBox="0 0 240 12"
+                  fill="none"
+                  className="absolute -bottom-1.5 left-0 w-full text-brand-500/50"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <motion.path
+                    d="M2 8.5C40 3.5 90 2 120 4.5c30 2.5 78 4 118 0"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1, delay: 0.75, ease: EASE }}
+                  />
+                </motion.svg>
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
+              className="mt-7 max-w-xl text-[17.5px] leading-[1.65] text-navy-600"
+            >
+              Licensed non-judicial stamp paper and e-Stamp certificates at face value,
+              brought to your door anywhere in Tamil Nadu — same day in Chennai. And when you
+              need the agreement written too, we draft, stamp and get it signed without you
+              visiting a single office.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.26, ease: EASE }}
+              className="mt-9 flex flex-col gap-3 sm:flex-row"
+            >
+              <ButtonLink href={LEAD_ANCHOR} size="xl" className="group">
+                Order stamp paper
+                <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />
+              </ButtonLink>
+              <ButtonLink href="/#stamp-paper" variant="secondary" size="xl">
+                <PlayCircle className="size-[18px] text-navy-400" />
+                See denominations
+              </ButtonLink>
+            </motion.div>
+
+            {/* proof points */}
+            <motion.ul
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.36 }}
+              className="mt-8 flex flex-wrap gap-x-6 gap-y-3"
+            >
+              {PROOF_POINTS.map((point) => (
+                <li key={point.label} className="flex items-center gap-2 text-[13.5px] font-medium text-navy-600">
+                  <CheckCircle2 className="size-4 text-emerald-500" />
+                  {point.label}
+                </li>
+              ))}
+            </motion.ul>
+
+            {/* social proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.44, ease: EASE }}
+              className="mt-9 flex items-center gap-4 border-t border-line pt-7"
+            >
+              <div className="flex -space-x-2.5">
+                {AVATARS.map((a) => (
+                  <span
+                    key={a.name}
+                    className={cn(
+                      "grid size-9 place-items-center rounded-full border-2 border-canvas text-[11px] font-bold text-white",
+                      a.tint,
+                    )}
+                  >
+                    {a.name}
+                  </span>
+                ))}
+                <span className="grid size-9 place-items-center rounded-full border-2 border-canvas bg-navy-950 text-[10px] font-bold text-white">
+                  42k+
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                  <span className="ml-1 text-[13px] font-bold text-navy-950">4.9</span>
+                </div>
+                <p className="mt-0.5 text-[12.5px] text-navy-500">
+                  from 6,400 landlords and tenants across Tamil Nadu
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* ── Visual ─────────────────────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
+            className="relative mx-auto w-full max-w-[440px] lg:max-w-none"
+          >
+            {/* glow behind document */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-6 top-10 bottom-10 rounded-[36px] bg-brand-600/20 blur-3xl"
+            />
+
+            <div className="relative">
+              <AgreementMock />
+
+              <FloatChip
+                className="-top-6 -left-8 lg:-left-14"
+                delay={1.2}
+                icon={Stamp}
+                title="e-Stamp affixed"
+                sub="₹3,200 paid to Govt. of TN"
+                tint="bg-brand-600"
+              />
+              <FloatChip
+                className="-right-6 bottom-32 lg:-right-12"
+                delay={2.4}
+                icon={Truck}
+                title="Out for delivery"
+                sub="Adyar, Chennai — arriving by 4pm"
+                tint="bg-emerald-500"
+              />
+              <FloatChip
+                className="-bottom-8 left-2 lg:-left-10"
+                delay={3.2}
+                icon={ShieldCheck}
+                title="Advocate verified"
+                sub="A. Ravichandran, Bar Council TN"
+                tint="bg-navy-950"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

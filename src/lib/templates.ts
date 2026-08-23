@@ -1,0 +1,258 @@
+import type { AgreementType } from "./types";
+
+export interface AgreementTemplate {
+  id: string;
+  name: string;
+  description: string;
+  /** Which of the four service pages this template is drafted under. */
+  baseType: AgreementType;
+  category: "Residential" | "Commercial" | "Lease deed" | "Leave & licence";
+  term: string;
+  icon: string;
+  popular?: boolean;
+}
+
+export const SERVICE_SLUG_BY_TYPE: Record<AgreementType, string> = {
+  residential: "residential-rental-agreement",
+  commercial: "commercial-rental-agreement",
+  lease: "lease-agreement",
+  "leave-license": "leave-and-license",
+};
+
+export const TEMPLATES: AgreementTemplate[] = [
+  /* ───────────── Residential ───────────── */
+  {
+    id: "residential-11-month",
+    name: "11-Month Residential Rental Agreement",
+    description: "The standard Tamil Nadu letting — stays outside compulsory registration and renews as often as you like.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "Home",
+    popular: true,
+  },
+  {
+    id: "flat-rental",
+    name: "Flat / Apartment Rental Agreement",
+    description: "For apartments in societies — carries association charges, common-area maintenance and parking allotment.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "Building",
+  },
+  {
+    id: "independent-house-rental",
+    name: "Independent House Rental Agreement",
+    description: "For standalone houses where the tenant takes the whole premises, compound and utilities.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "House",
+  },
+  {
+    id: "villa-rental",
+    name: "Villa Rental Agreement",
+    description: "Gated-community villas with clubhouse access, landscaping upkeep and community rules annexed.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "TreePalm",
+  },
+  {
+    id: "single-room-rental",
+    name: "Single Room Rental Agreement",
+    description: "Lets one room or a portion of a house, with shared facilities described precisely in Schedule A.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "DoorOpen",
+  },
+  {
+    id: "furnished-house-rental",
+    name: "Furnished House Rental Agreement",
+    description: "Adds a signed Schedule B inventory of every article — the document that settles deposit disputes.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "Sofa",
+  },
+  {
+    id: "rental-renewal",
+    name: "Rental Renewal Agreement",
+    description: "Renews an expiring agreement with the revised rent and escalation, carrying forward the original terms.",
+    baseType: "residential",
+    category: "Residential",
+    term: "11 months",
+    icon: "RefreshCw",
+  },
+  /* ───────────── Commercial ───────────── */
+  {
+    id: "shop-rental",
+    name: "Shop Rental Agreement",
+    description: "Retail premises with permitted trade named, signage rights and reinstatement on exit.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "Store",
+    popular: true,
+  },
+  {
+    id: "office-rental",
+    name: "Office Space Rental Agreement",
+    description: "Offices and coworking floors — GST, Shops & Establishments registration and fit-out clauses included.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "Briefcase",
+  },
+  {
+    id: "showroom-rental",
+    name: "Showroom Rental Agreement",
+    description: "High-street display premises with glass-front alterations, branding and hoarding rights spelt out.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "PanelsTopLeft",
+  },
+  {
+    id: "warehouse-rental",
+    name: "Warehouse / Godown Rental Agreement",
+    description: "Storage and logistics use with loading access, weighbridge, insurance and hazardous-goods limits.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "Warehouse",
+  },
+  {
+    id: "restaurant-rental",
+    name: "Restaurant & Café Premises Agreement",
+    description: "Food-service premises with FSSAI licensing, kitchen fit-out, exhaust and fire-clearance obligations.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "UtensilsCrossed",
+  },
+  {
+    id: "clinic-rental",
+    name: "Clinic / Diagnostic Centre Agreement",
+    description: "Healthcare premises with clinical-establishment registration and biomedical waste responsibilities.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "Stethoscope",
+  },
+  {
+    id: "industrial-shed-rental",
+    name: "Industrial Shed Rental Agreement",
+    description: "Factory sheds and SIPCOT units — power load, pollution-control consent and machinery installation terms.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "36 months",
+    icon: "Factory",
+  },
+  {
+    id: "kiosk-rental",
+    name: "Kiosk / Stall Rental Agreement",
+    description: "Small-format retail inside malls, complexes or premises frontage, with defined operating hours.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "12 months",
+    icon: "ShoppingBag",
+  },
+  {
+    id: "atm-space-rental",
+    name: "ATM Space Rental Agreement",
+    description: "Bank ATM installations with 24×7 access, power backup and security obligations allocated.",
+    baseType: "commercial",
+    category: "Commercial",
+    term: "60 months",
+    icon: "Landmark",
+  },
+  /* ───────────── Lease deed ───────────── */
+  {
+    id: "long-term-lease",
+    name: "Long-Term Lease Deed",
+    description: "For any term of 12 months or more, where registration at the Sub-Registrar Office is compulsory.",
+    baseType: "lease",
+    category: "Lease deed",
+    term: "12 months +",
+    icon: "FileSignature",
+  },
+  {
+    id: "commercial-lease-deed",
+    name: "Commercial Lease Deed",
+    description: "Registered three-to-nine-year business leases with escalation fixed across the whole term.",
+    baseType: "lease",
+    category: "Lease deed",
+    term: "36–108 months",
+    icon: "Building2",
+  },
+  {
+    id: "land-lease",
+    name: "Land Lease Agreement",
+    description: "Vacant plots leased for parking yards, storage or development, with boundaries fixed in Schedule A.",
+    baseType: "lease",
+    category: "Lease deed",
+    term: "12 months +",
+    icon: "Map",
+  },
+  {
+    id: "agricultural-land-lease",
+    name: "Agricultural Land Lease",
+    description: "Farmland let for cultivation with crop pattern, water rights and produce-sharing terms recorded.",
+    baseType: "lease",
+    category: "Lease deed",
+    term: "12 months +",
+    icon: "Sprout",
+  },
+  /* ───────────── Leave & licence ───────────── */
+  {
+    id: "leave-licence-11-month",
+    name: "Leave & Licence Agreement",
+    description: "Permission to occupy without creating a tenancy — the cleaner route back to possession for owners.",
+    baseType: "leave-license",
+    category: "Leave & licence",
+    term: "11 months",
+    icon: "KeyRound",
+  },
+  {
+    id: "pg-hostel-stay",
+    name: "PG / Hostel Stay Agreement",
+    description: "Paying-guest and hostel residents onboarded on licence terms, with house rules annexed.",
+    baseType: "leave-license",
+    category: "Leave & licence",
+    term: "11 months",
+    icon: "BedDouble",
+  },
+  {
+    id: "coliving-serviced",
+    name: "Co-living / Serviced Apartment Agreement",
+    description: "Managed-stay operators at volume — drafted so the licence stays a licence, not an accidental tenancy.",
+    baseType: "leave-license",
+    category: "Leave & licence",
+    term: "3–11 months",
+    icon: "Users",
+  },
+  {
+    id: "parking-space-licence",
+    name: "Parking Space Licence Agreement",
+    description: "Car parks, two-wheeler bays and EV-charging slots licensed without granting exclusive possession.",
+    baseType: "leave-license",
+    category: "Leave & licence",
+    term: "11 months",
+    icon: "CircleParking",
+  },
+];
+
+export function getTemplatesByCategory() {
+  const order: AgreementTemplate["category"][] = [
+    "Residential",
+    "Commercial",
+    "Lease deed",
+    "Leave & licence",
+  ];
+  return order.map((category) => ({
+    category,
+    templates: TEMPLATES.filter((t) => t.category === category),
+  }));
+}

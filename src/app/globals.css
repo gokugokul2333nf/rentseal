@@ -1,26 +1,285 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   RentSeal Design System — tokens
+   ============================================================ */
+@theme {
+  /* Brand */
+  --color-navy-50: #f6f7f9;
+  --color-navy-100: #eceef2;
+  --color-navy-200: #d5dae3;
+  --color-navy-300: #b0bbcb;
+  --color-navy-400: #8496ae;
+  --color-navy-500: #647894;
+  --color-navy-600: #4f607b;
+  --color-navy-700: #414e64;
+  --color-navy-800: #394354;
+  --color-navy-900: #1e293b;
+  --color-navy-950: #0f172a;
+
+  --color-brand-50: #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+
+  /* Semantic surfaces */
+  --color-canvas: #f8fafc;
+  --color-card: #ffffff;
+  --color-line: #e2e8f0;
+
+  /* Type */
+  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii */
+  --radius-4xl: 2rem;
+
+  /* Elevation — soft, layered, never harsh */
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px -2px rgb(15 23 42 / 0.06);
+  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.05), 0 12px 28px -8px rgb(15 23 42 / 0.10);
+  --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.05), 0 24px 48px -12px rgb(15 23 42 / 0.16);
+  --shadow-glow: 0 8px 32px -8px rgb(37 99 235 / 0.45);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-navy-950);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible, on-brand focus for keyboard users only */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-brand-600) 18%, transparent);
+    color: var(--color-navy-950);
+  }
+
+  /* Numeric fields: no spinners */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   Utilities
+   ============================================================ */
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+  @media (min-width: 640px) {
+    padding-inline: 2rem;
+  }
+  @media (min-width: 1024px) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Frosted panel used over gradient/mesh backgrounds */
+@utility glass {
+  background-color: rgb(255 255 255 / 0.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / 0.6);
+}
+
+@utility glass-dark {
+  background-color: rgb(15 23 42 / 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(120deg, #0f172a 0%, #1e3a8a 42%, #2563eb 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section rhythm — consistent vertical cadence sitewide */
+@utility section {
+  padding-block: 4.5rem;
+  @media (min-width: 768px) {
+    padding-block: 6.5rem;
+  }
+}
+
+/* ============================================================
+   Decorative background layers
+   ============================================================ */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(15 23 42 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(15 23 42 / 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 45%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 45%, transparent 100%);
+}
+
+.bg-mesh {
+  background-image:
+    radial-gradient(at 8% 4%, rgb(37 99 235 / 0.14) 0px, transparent 55%),
+    radial-gradient(at 92% 0%, rgb(16 185 129 / 0.13) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgb(37 99 235 / 0.07) 0px, transparent 55%);
+}
+
+.bg-dots {
+  background-image: radial-gradient(rgb(15 23 42 / 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-navy-100);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 38s linear infinite; }
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { opacity: 0; }
+}
+.pulse-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: currentColor;
+  animation: pulse-ring 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+/* Custom scrollbars inside app panels */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-navy-200) transparent;
+}
+.scroll-slim::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-slim::-webkit-scrollbar-track { background: transparent; }
+.scroll-slim::-webkit-scrollbar-thumb {
+  background-color: var(--color-navy-200);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* ============================================================
+   Accessibility — respect reduced motion everywhere
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Print — the generated agreement must print like a legal doc
+   ============================================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+  html, body {
+    background: #fff !important;
+  }
+  .no-print { display: none !important; }
+  .print-sheet {
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    font-size: 11.5pt;
+    line-height: 1.75;
+    color: #000;
+  }
+  .print-break { break-before: page; }
+  .avoid-break { break-inside: avoid; }
 }
