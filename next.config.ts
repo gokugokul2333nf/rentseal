@@ -11,6 +11,27 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   compress: true,
+  /**
+   * The location pages moved from a mixed city/district list to the 38 official
+   * districts. These two slugs were towns, not districts — keep the old URLs
+   * alive so nothing already indexed 404s.
+   */
+  async redirects() {
+    const moved: Array<[string, string]> = [
+      ["trichy", "tiruchirappalli"],
+      ["hosur", "krishnagiri"],
+      ["ooty", "nilgiris"],
+      ["nagercoil", "kanyakumari"],
+      ["karaikudi", "sivaganga"],
+      ["villupuram", "viluppuram"],
+      ["kanchipuram", "kancheepuram"],
+      ["tirupattur", "tirupathur"],
+    ];
+    return moved.flatMap(([from, to]) => [
+      { source: `/rental-agreement/${from}`, destination: `/rental-agreement/${to}`, permanent: true },
+      { source: `/stamp-paper/${from}`, destination: `/stamp-paper/${to}`, permanent: true },
+    ]);
+  },
   async headers() {
     return [
       {

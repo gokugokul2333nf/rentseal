@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Clock3, MapPin, PackageCheck, Truck } from "lucide-react";
-import { CITIES, EXTRA_DISTRICTS, LEAD_ANCHOR } from "@/lib/site";
+import { NOTABLE_TOWNS } from "@/lib/districts";
+import { FEATURED_DISTRICTS, LEAD_ANCHOR } from "@/lib/site";
 import { DELIVERY_RULES, DELIVERY_ZONES } from "@/lib/stamp-paper";
 import { ButtonLink } from "@/components/ui/button";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
@@ -89,7 +90,7 @@ export function Cities() {
           </Reveal>
 
           <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5" amount={0.05}>
-            {CITIES.map((city) => (
+            {FEATURED_DISTRICTS.map((city) => (
               <StaggerItem key={city.slug}>
                 <Link
                   href={`/rental-agreement/${city.slug}`}
@@ -101,9 +102,9 @@ export function Cities() {
                     </h4>
                     <ArrowUpRight className="size-4 shrink-0 text-navy-300 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-600" />
                   </div>
-                  <p className="mt-1 text-[12.5px] text-navy-400">{city.district} District</p>
+                  <p className="mt-1 text-[12.5px] text-navy-400">HQ {city.hq}</p>
                   <p className="mt-4 text-[13px] font-semibold text-brand-700">
-                    {city.agreements}
+                    {city.orders}
                     <span className="ml-1 font-normal text-navy-400">orders</span>
                   </p>
                 </Link>
@@ -117,14 +118,35 @@ export function Cities() {
                 Also delivering to
               </p>
               <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2.5">
-                {EXTRA_DISTRICTS.map((district) => (
-                  <span key={district} className="text-[13.5px] text-navy-500">
-                    {district}
-                  </span>
+                {NOTABLE_TOWNS.map((town) => (
+                  <Link
+                    key={town.town}
+                    href={`/stamp-paper/${town.slug}`}
+                    className="text-[13.5px] text-navy-500 transition-colors hover:text-brand-700"
+                  >
+                    {town.town}
+                  </Link>
                 ))}
                 <span className="text-[13.5px] font-semibold text-navy-800">
                   and every other taluk in the state.
                 </span>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-5">
+                <Link
+                  href="/stamp-paper"
+                  className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700 underline underline-offset-4"
+                >
+                  Stamp paper in all 38 districts
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
+                <Link
+                  href="/rental-agreement"
+                  className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700 underline underline-offset-4"
+                >
+                  Rental agreements in all 38 districts
+                  <ArrowUpRight className="size-3.5" />
+                </Link>
               </div>
             </div>
           </Reveal>

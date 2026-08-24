@@ -1,0 +1,348 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Clock3,
+  FileCheck2,
+  MapPin,
+  PackageCheck,
+  Stamp,
+  Truck,
+} from "lucide-react";
+import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
+import { FaqSection } from "@/components/landing/faq-section";
+import { ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Counter, Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { DISTRICTS, ZONE_META, getDistrict, nearbyDistricts } from "@/lib/districts";
+import { DENOMINATIONS, DELIVERY_RULES, STAMP_USE_CASES } from "@/lib/stamp-paper";
+import { LEAD_ANCHOR, SITE } from "@/lib/site";
+import { inr } from "@/lib/utils";
+
+export function generateStaticParams() {
+  return DISTRICTS.map((d) => ({ district: d.slug }));
+}
+
+export const dynamicParams = false;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ district: string }>;
+}): Promise<Metadata> {
+  const { district: slug } = await params;
+  const district = getDistrict(slug);
+  if (!district) return {};
+
+  const zone = ZONE_META[district.zone];
+  const title = `Stamp Paper in ${district.name} — ${zone.shortEta}`;
+  const description = `Buy non-judicial stamp paper and e-Stamp certificates in ${district.name} district at face value, delivered ${zone.eta.toLowerCase()}. ₹20 to ₹500 denominations plus e-Stamps for any value. ${district.orders} orders delivered.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/stamp-paper/${district.slug}` },
+    openGraph: { title, description },
+    keywords: [
+      `stamp paper ${district.name}`,
+      `e-stamp paper ${district.name}`,
+      `buy stamp paper in ${district.hq}`,
+      `non judicial stamp paper ${district.name}`,
+      `stamp paper delivery ${district.name}`,
+      ...district.towns.map((t) => `stamp paper ${t}`),
+    ],
+  };
+}
+
+export default async function StampPaperDistrictPage({
+  params,
+}: {
+  params: Promise<{ district: string }>;
+}) {
+  const { district: slug } = await params;
+  const district = getDistrict(slug);
+  if (!district) notFound();
+
+  const zone = ZONE_META[district.zone];
+  const nearby = nearbyDistricts(district);
+
+  const crumbs = [
+    { label: "Home", href: "/" },
+    { label: "Stamp paper", href: "/stamp-paper" },
+    { label: district.name },
+  ];
+
+  return (
+    <>
+      <PageHero
+        eyebrow={`${district.name} District · ${zone.label}`}
+        icon={Stamp}
+        crumbs={crumbs}
+        title={`Stamp paper in ${district.name}, delivered to your door`}
+        body={`Licensed non-judicial stamp paper and e-Stamp certificates at face value, anywhere in ${district.name} district. ${zone.eta} delivery${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}. No queue at the vendor, no markup on the denomination.`}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
+            Order stamp paper in {district.name}
+            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </ButtonLink>
+          <ButtonLink
+            href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, "")}`}
+            variant="secondary"
+            size="lg"
+          >
+            Ask on WhatsApp
+          </ButtonLink>
+        </div>
+      </PageHero>
+
+      {/* Delivery facts */}
+      <section className="section">
+        <div className="container-page">
+          <Stagger className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" amount={0.1}>
+            {[
+              {
+                icon: Clock3,
+                label: `Delivery to ${district.name}`,
+                value: zone.eta,
+                sub: zone.cutOff ?? `${zone.label} zone`,
+              },
+              {
+                icon: Truck,
+                label: "Delivery charge",
+                value: inr(zone.charge),
+                sub: `free above ${inr(DELIVERY_RULES.freeAbove)} of stamp value`,
+              },
+              {
+                icon: PackageCheck,
+                label: "Bulk orders",
+                value: `${DELIVERY_RULES.bulkFreeFrom}+ sheets`,
+                sub: "ship free anywhere in the district",
+              },
+              {
+                icon: BadgeCheck,
+                label: "Orders delivered",
+                value: district.orders,
+                sub: `across ${district.name} since 2021`,
+              },
+            ].map((stat) => (
+              <StaggerItem key={stat.label}>
+                <Card className="h-full p-6">
+                  <stat.icon className="size-5 text-brand-600" />
+                  <p className="mt-4 text-[12px] font-bold tracking-[0.12em] text-navy-400 uppercase">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1.5 font-display text-[26px] font-extrabold tracking-tight text-navy-950">
+                    <Counter value={stat.value} />
+                  </p>
+                  <p className="mt-1 text-[12.5px] leading-snug text-navy-500">{stat.sub}</p>
+                </Card>
+              </StaggerItem>
+            ))}
+          </Stagger>
+
+          <Reveal delay={0.1}>
+            <div className="mt-12 rounded-2xl border border-line bg-white p-7 sm:p-9">
+              <h2 className="font-display text-[20px] font-bold text-navy-950">
+                What {district.name} buys stamp paper for
+              </h2>
+              <p className="mt-4 text-[15px] leading-[1.75] text-navy-600">{district.economy}</p>
+              <p className="mt-3 text-[15px] leading-[1.75] text-navy-600">{district.demand}</p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Denominations */}
+      <section className="section border-y border-line bg-white">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow={`In stock for ${district.name}`}
+            icon={Stamp}
+            title="Every denomination, at exactly the printed value"
+            body="You pay the face value on the sheet and a flat delivery charge stated before you confirm. We never mark up the paper itself."
+          />
+
+          <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.08}>
+            {DENOMINATIONS.map((d) => (
+              <StaggerItem key={d.label}>
+                <div className="flex h-full flex-col rounded-2xl border border-line bg-canvas/60 p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-display text-[24px] font-extrabold tracking-tight text-navy-950">
+                      {d.label}
+                    </p>
+                    {d.popular ? (
+                      <span className="shrink-0 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold tracking-wide text-white uppercase">
+                        Most used
+                      </span>
+                    ) : null}
+                  </div>
+                  <ul className="mt-4 flex flex-1 flex-wrap items-start content-start gap-1.5">
+                    {d.uses.map((use) => (
+                      <li
+                        key={use}
+                        className="rounded-full bg-white px-2.5 py-1 text-[12px] font-medium text-navy-600"
+                      >
+                        {use}
+                      </li>
+                    ))}
+                  </ul>
+                  {d.note ? (
+                    <p className="mt-4 border-t border-line pt-4 text-[13px] leading-relaxed text-navy-500">
+                      {d.note}
+                    </p>
+                  ) : null}
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* Use cases */}
+      <section className="section">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow="Which one do you need?"
+            icon={FileCheck2}
+            title={`Common instruments we stamp for ${district.name}`}
+            body="Tell us what you are executing and we will tell you the denomination before you order — including when only an e-Stamp for the exact duty will do."
+          />
+
+          <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.08}>
+            {STAMP_USE_CASES.map((useCase) => (
+              <StaggerItem key={useCase.title}>
+                <Card className="h-full p-6">
+                  <span className="inline-flex rounded-full border border-brand-200/80 bg-brand-50/70 px-3 py-1 text-[11.5px] font-bold tracking-wide text-brand-700 uppercase">
+                    {useCase.denomination}
+                  </span>
+                  <h3 className="mt-4 font-display text-[16.5px] font-bold text-navy-950">
+                    {useCase.title}
+                  </h3>
+                  <p className="mt-2 text-[14px] leading-[1.7] text-navy-500">{useCase.body}</p>
+                </Card>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* Where we deliver inside the district */}
+      <section className="section border-y border-line bg-white">
+        <div className="container-page">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Reveal>
+              <div className="h-full rounded-2xl border border-line bg-canvas/60 p-7">
+                <h2 className="flex items-center gap-2.5 font-display text-[18px] font-bold text-navy-950">
+                  <MapPin className="size-5 text-brand-600" />
+                  Delivering across {district.name}
+                </h2>
+                <p className="mt-3 text-[14.5px] leading-[1.7] text-navy-600">
+                  We reach every taluk in the district. These are the towns we deliver to most
+                  often — if yours is not listed, it is still covered.
+                </p>
+                <ul className="mt-5 flex flex-wrap gap-2">
+                  {[...district.towns, ...district.sroTowns]
+                    .filter((t, i, arr) => arr.indexOf(t) === i)
+                    .map((town) => (
+                      <li
+                        key={town}
+                        className="rounded-full border border-line bg-white px-3.5 py-2 text-[13px] font-medium text-navy-600"
+                      >
+                        {town}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <div className="h-full rounded-2xl border border-line bg-canvas/60 p-7">
+                <h2 className="flex items-center gap-2.5 font-display text-[18px] font-bold text-navy-950">
+                  <BadgeCheck className="size-5 text-brand-600" />
+                  Verify what we deliver
+                </h2>
+                <p className="mt-3 text-[14.5px] leading-[1.7] text-navy-600">
+                  Everything is procured through licensed stamp vendors and the state&apos;s
+                  authorised e-Stamping channel. Every sheet or certificate carries a serial number
+                  you can check yourself against the Registration Department&apos;s records — we
+                  print it on your invoice so you never have to ask us for it.
+                </p>
+                <p className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] leading-relaxed text-emerald-900">
+                  Need it faster than {zone.eta.toLowerCase()}? An e-Stamp certificate is emailed
+                  within minutes — where your instrument allows one, there is nothing to deliver
+                  and no delivery charge at all.
+                </p>
+                <Link
+                  href={`/rental-agreement/${district.slug}`}
+                  className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700 underline underline-offset-4"
+                >
+                  Need the agreement drafted too?
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      <FaqSection limit={8} />
+
+      {/* Nearby districts */}
+      <section className="section border-t border-line bg-white">
+        <div className="container-page">
+          <SectionHeading title={`Stamp paper elsewhere in ${district.region}`} align="left" />
+          <div className="mt-8 flex flex-wrap gap-2.5">
+            {nearby.map((other) => (
+              <Link
+                key={other.slug}
+                href={`/stamp-paper/${other.slug}`}
+                className="rounded-full border border-line bg-canvas px-4 py-2.5 text-[14px] font-medium text-navy-600 transition-all hover:border-brand-300 hover:bg-white hover:text-brand-700"
+              >
+                Stamp paper in {other.name}
+              </Link>
+            ))}
+          </div>
+          <Link
+            href="/stamp-paper"
+            className="mt-7 inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-brand-700 underline underline-offset-4"
+          >
+            See all 38 districts
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+      </section>
+
+      <BreadcrumbSchema crumbs={crumbs} baseUrl={SITE.url} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            name: `${SITE.name} Stamp Paper — ${district.name}`,
+            description: `Non-judicial stamp paper and e-Stamp certificate supply and delivery across ${district.name} district, Tamil Nadu.`,
+            url: `${SITE.url}/stamp-paper/${district.slug}`,
+            telephone: SITE.phone,
+            priceRange: "₹20 – ₹500",
+            areaServed: {
+              "@type": "AdministrativeArea",
+              name: `${district.name} district`,
+              containedInPlace: { "@type": "State", name: "Tamil Nadu" },
+            },
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: district.hq,
+              addressRegion: "Tamil Nadu",
+              addressCountry: "IN",
+            },
+            parentOrganization: { "@id": `${SITE.url}/#organization` },
+          }),
+        }}
+      />
+    </>
+  );
+}

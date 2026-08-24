@@ -1,0 +1,884 @@
+/**
+ * The 38 districts of Tamil Nadu — the single source of truth for every
+ * location page on the site.
+ *
+ * Two page families are generated from this list:
+ *   /rental-agreement/[district]   — agreement drafting, e-stamping, e-signing
+ *   /stamp-paper/[district]        — non-judicial paper and e-Stamp delivery
+ *
+ * `zone` ties a district to a DELIVERY_ZONE in ./stamp-paper.ts, so ETA and
+ * delivery charge on a location page always match the coverage section on the
+ * landing page. Change a district's zone here and both update together.
+ *
+ * `sroTowns` are the taluk headquarters, which is where the Registration
+ * Department's Sub-Registrar Offices sit. `towns` are the localities our
+ * orders actually come from, and drive the "popular areas" block.
+ */
+
+export type ZoneId = "metro" | "major" | "state";
+
+export type Region =
+  | "Chennai & suburbs"
+  | "Northern Tamil Nadu"
+  | "Kongu Nadu"
+  | "Cauvery delta"
+  | "Southern Tamil Nadu"
+  | "Western ghats";
+
+export interface District {
+  /** Official district name, as the Registration Department writes it. */
+  name: string;
+  /** URL segment. Stable — never change one without adding a redirect. */
+  slug: string;
+  /** District headquarters town. */
+  hq: string;
+  region: Region;
+  zone: ZoneId;
+  /** Taluk headquarters — where the Sub-Registrar Offices are located. */
+  sroTowns: string[];
+  /** Localities and towns our orders come from. */
+  towns: string[];
+  /** Orders delivered here since 2021. */
+  orders: string;
+  /** What the district does — one line, used to keep every page distinct. */
+  economy: string;
+  /** What drives rental and stamp paper demand here specifically. */
+  demand: string;
+}
+
+export const DISTRICTS: District[] = [
+  {
+    name: "Ariyalur",
+    slug: "ariyalur",
+    hq: "Ariyalur",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: ["Ariyalur", "Jayankondam", "Udayarpalayam", "Sendurai", "Andimadam"],
+    towns: ["Ariyalur town", "Jayankondam", "Sendurai", "Andimadam"],
+    orders: "170+",
+    economy:
+      "The state's cement and limestone belt, with quarries and plants clustered around Ariyalur and Jayankondam town.",
+    demand:
+      "Most agreements here are staff quarters taken by cement and quarry companies, and shop leases along the Ariyalur–Jayankondam road. Stamp paper demand runs to ₹20 affidavits and ₹100 rental paper.",
+  },
+  {
+    name: "Chengalpattu",
+    slug: "chengalpattu",
+    hq: "Chengalpattu",
+    region: "Chennai & suburbs",
+    zone: "metro",
+    sroTowns: [
+      "Chengalpattu",
+      "Tambaram",
+      "Pallavaram",
+      "Vandalur",
+      "Thiruporur",
+      "Tirukalukundram",
+      "Maduranthakam",
+      "Cheyyur",
+    ],
+    towns: ["Tambaram", "Chromepet", "Guduvancheri", "Kelambakkam", "Maraimalai Nagar", "Pallavaram"],
+    orders: "2,400+",
+    economy:
+      "The OMR and GST Road corridor — IT parks at Siruseri and Navalur, and the automotive belt around Maraimalai Nagar and Oragadam.",
+    demand:
+      "The fastest-moving rental market in the state after Chennai proper. Young IT tenants on OMR, and factory staff housing along GST Road, turn over agreements every eleven months like clockwork.",
+  },
+  {
+    name: "Chennai",
+    slug: "chennai",
+    hq: "Chennai",
+    region: "Chennai & suburbs",
+    zone: "metro",
+    sroTowns: [
+      "Chennai Central",
+      "Mylapore",
+      "T. Nagar",
+      "Adyar",
+      "Velachery",
+      "Ambattur",
+      "Alandur",
+      "Sholinganallur",
+      "Perambur",
+      "Madhavaram",
+    ],
+    towns: ["Adyar", "Anna Nagar", "Velachery", "T. Nagar", "Porur", "Sholinganallur"],
+    orders: "18,400+",
+    economy:
+      "The state capital and its registration heartland — more instruments are registered here than in any other district in Tamil Nadu.",
+    demand:
+      "Every kind of instrument, at volume: 11-month residential lets across the suburbs, commercial leases in T. Nagar and Guindy, and a steady run of affidavits for passports, name changes and college admissions.",
+  },
+  {
+    name: "Coimbatore",
+    slug: "coimbatore",
+    hq: "Coimbatore",
+    region: "Kongu Nadu",
+    zone: "major",
+    sroTowns: [
+      "Coimbatore North",
+      "Coimbatore South",
+      "Peelamedu",
+      "Mettupalayam",
+      "Pollachi",
+      "Sulur",
+      "Annur",
+      "Kinathukadavu",
+      "Valparai",
+    ],
+    towns: ["R.S. Puram", "Peelamedu", "Saibaba Colony", "Gandhipuram", "Vadavalli", "Singanallur"],
+    orders: "6,200+",
+    economy:
+      "Pumps, motors and textile machinery, plus a large engineering-college population and a growing IT presence at Peelamedu.",
+    demand:
+      "Student and working-professional lets around Peelamedu and Saibaba Colony, and industrial shed leases in the Ganapathy and Kurichi belts that need commercial drafting, not a residential template.",
+  },
+  {
+    name: "Cuddalore",
+    slug: "cuddalore",
+    hq: "Cuddalore",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Cuddalore",
+      "Chidambaram",
+      "Panruti",
+      "Virudhachalam",
+      "Kattumannarkoil",
+      "Bhuvanagiri",
+      "Kurinjipadi",
+      "Titagudi",
+    ],
+    towns: ["Cuddalore OT", "Neyveli", "Chidambaram", "Panruti"],
+    orders: "690+",
+    economy:
+      "The Neyveli lignite complex, the SIPCOT chemical estate, and Annamalai University at Chidambaram.",
+    demand:
+      "Contractor staff housing around Neyveli and SIPCOT, and a steady student rental market at Chidambaram that peaks every June.",
+  },
+  {
+    name: "Dharmapuri",
+    slug: "dharmapuri",
+    hq: "Dharmapuri",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: ["Dharmapuri", "Palacode", "Pennagaram", "Harur", "Pappireddipatti", "Karimangalam", "Nallampalli"],
+    towns: ["Dharmapuri town", "Harur", "Pennagaram", "Palacode"],
+    orders: "330+",
+    economy:
+      "Mango and granite country, with the Hogenakkal belt and a growing spread of agri-processing units.",
+    demand:
+      "Agricultural land leases, godown rentals for mango and granite traders, and the ₹20 affidavits that go with revenue and patta work.",
+  },
+  {
+    name: "Dindigul",
+    slug: "dindigul",
+    hq: "Dindigul",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Dindigul East",
+      "Dindigul West",
+      "Palani",
+      "Kodaikanal",
+      "Vedasandur",
+      "Natham",
+      "Nilakottai",
+      "Oddanchatram",
+      "Guziliyamparai",
+    ],
+    towns: ["Dindigul town", "Palani", "Kodaikanal", "Oddanchatram"],
+    orders: "780+",
+    economy: "Locks, leather and spinning mills, with Kodaikanal running a tourism economy of its own.",
+    demand:
+      "Two very different markets in one district — ordinary town lets in Dindigul and Palani, and short-season holiday-property licences in Kodaikanal that need a leave and licence, not a tenancy.",
+  },
+  {
+    name: "Erode",
+    slug: "erode",
+    hq: "Erode",
+    region: "Kongu Nadu",
+    zone: "major",
+    sroTowns: [
+      "Erode",
+      "Perundurai",
+      "Bhavani",
+      "Gobichettipalayam",
+      "Sathyamangalam",
+      "Kodumudi",
+      "Modakurichi",
+      "Anthiyur",
+      "Nambiyur",
+    ],
+    towns: ["Perundurai Road", "Brough Road", "Surampatti", "Veerappanchatram"],
+    orders: "1,450+",
+    economy:
+      "India's largest handloom and powerloom cluster, plus turmeric trading and the SIPCOT estate at Perundurai.",
+    demand:
+      "Loom shed and godown leases dominate, which are commercial instruments with fit-out and power-supply clauses. Residential lets cluster along Perundurai Road.",
+  },
+  {
+    name: "Kallakurichi",
+    slug: "kallakurichi",
+    hq: "Kallakurichi",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: ["Kallakurichi", "Chinnasalem", "Sankarapuram", "Ulundurpet", "Tirukoilur"],
+    towns: ["Kallakurichi town", "Ulundurpet", "Tirukoilur", "Chinnasalem"],
+    orders: "260+",
+    economy:
+      "Sugar mills and cashew processing, in a district carved out of Viluppuram in 2019 and still building its town centres.",
+    demand:
+      "Mill staff quarters and small commercial shops on the Chennai–Trichy highway. A young district, so a good share of our work here is first-time agreements rather than renewals.",
+  },
+  {
+    name: "Kancheepuram",
+    slug: "kancheepuram",
+    hq: "Kancheepuram",
+    region: "Chennai & suburbs",
+    zone: "metro",
+    sroTowns: ["Kancheepuram", "Sriperumbudur", "Uthiramerur", "Walajabad", "Kundrathur"],
+    towns: ["Kancheepuram town", "Sriperumbudur", "Oragadam", "Kundrathur"],
+    orders: "1,600+",
+    economy:
+      "Silk weaving in the temple town, and the Sriperumbudur–Oragadam manufacturing corridor with its electronics and automotive plants.",
+    demand:
+      "Company-leased staff accommodation around Sriperumbudur at real scale — often forty or fifty agreements signed in a batch — alongside traditional weaver-house lets in Kancheepuram itself.",
+  },
+  {
+    name: "Kanyakumari",
+    slug: "kanyakumari",
+    hq: "Nagercoil",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: ["Agastheeswaram", "Thovalai", "Kalkulam", "Vilavancode", "Killiyoor", "Thiruvattar"],
+    towns: ["Nagercoil", "Marthandam", "Kanyakumari", "Colachel"],
+    orders: "740+",
+    economy:
+      "Rubber, tourism and the highest literacy rate in the state, with a very large share of families holding NRI income from the Gulf.",
+    demand:
+      "A notable volume of power of attorney and property instruments executed for owners living abroad, plus ordinary lets in Nagercoil and Marthandam.",
+  },
+  {
+    name: "Karur",
+    slug: "karur",
+    hq: "Karur",
+    region: "Kongu Nadu",
+    zone: "state",
+    sroTowns: ["Karur", "Kulithalai", "Krishnarayapuram", "Aravakurichi", "Manmangalam", "Pugalur", "Kadavur"],
+    towns: ["Karur town", "Kulithalai", "Pugalur", "Velayuthampalayam"],
+    orders: "540+",
+    economy: "Home textiles for export, bus body building, and a dense cluster of paper mills at Pugalur.",
+    demand:
+      "Export units take godowns and staff housing on longer commercial terms, which usually means a registered lease deed rather than an 11-month agreement.",
+  },
+  {
+    name: "Krishnagiri",
+    slug: "krishnagiri",
+    hq: "Krishnagiri",
+    region: "Northern Tamil Nadu",
+    zone: "major",
+    sroTowns: [
+      "Krishnagiri",
+      "Hosur",
+      "Denkanikottai",
+      "Pochampalli",
+      "Uthangarai",
+      "Bargur",
+      "Shoolagiri",
+      "Kaveripattinam",
+    ],
+    towns: ["Hosur", "Sipcot Hosur", "Mathigiri", "Bagalur Road", "Krishnagiri town"],
+    orders: "1,300+",
+    economy:
+      "Hosur's electronics and automotive belt, close enough to Bengaluru that it functions as part of that labour market.",
+    demand:
+      "The busiest non-metro rental market we serve. Hosur factory staff turn over constantly, and a good share of tenants are Kannada speakers working in Tamil Nadu — so we draft in plain English and explain the stamp duty in both languages.",
+  },
+  {
+    name: "Madurai",
+    slug: "madurai",
+    hq: "Madurai",
+    region: "Southern Tamil Nadu",
+    zone: "major",
+    sroTowns: [
+      "Madurai North",
+      "Madurai South",
+      "Madurai East",
+      "Madurai West",
+      "Melur",
+      "Vadipatti",
+      "Usilampatti",
+      "Thirumangalam",
+      "Peraiyur",
+    ],
+    towns: ["Anna Nagar", "K.K. Nagar", "Villapuram", "Thirunagar", "Bypass Road"],
+    orders: "3,900+",
+    economy:
+      "The commercial capital of southern Tamil Nadu — temple tourism, a large medical-education sector, and wholesale trade for six surrounding districts.",
+    demand:
+      "Steady residential demand from medical and engineering students, and commercial shop leases around the Masi streets where the paperwork has to be right because the rents are high.",
+  },
+  {
+    name: "Mayiladuthurai",
+    slug: "mayiladuthurai",
+    hq: "Mayiladuthurai",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: ["Mayiladuthurai", "Sirkazhi", "Tharangambadi", "Kuthalam"],
+    towns: ["Mayiladuthurai town", "Sirkazhi", "Poompuhar", "Tharangambadi"],
+    orders: "240+",
+    economy:
+      "Delta paddy country with a heritage-tourism strip along the coast, split off from Nagapattinam in 2020.",
+    demand:
+      "Agricultural leases and small-town shop rentals. Being a new district, plenty of our work here is helping people work out which Sub-Registrar Office now has jurisdiction.",
+  },
+  {
+    name: "Nagapattinam",
+    slug: "nagapattinam",
+    hq: "Nagapattinam",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: ["Nagapattinam", "Kilvelur", "Vedaranyam", "Thirukkuvalai"],
+    towns: ["Nagapattinam town", "Velankanni", "Vedaranyam", "Sikkal"],
+    orders: "280+",
+    economy: "A fishing and port district, with the Velankanni pilgrimage economy and salt pans at Vedaranyam.",
+    demand:
+      "Lodging and shop licences around Velankanni that run seasonally, which is exactly the case for a leave and licence rather than a tenancy.",
+  },
+  {
+    name: "Namakkal",
+    slug: "namakkal",
+    hq: "Namakkal",
+    region: "Kongu Nadu",
+    zone: "state",
+    sroTowns: [
+      "Namakkal",
+      "Rasipuram",
+      "Tiruchengode",
+      "Paramathi Velur",
+      "Sendamangalam",
+      "Mohanur",
+      "Kumarapalayam",
+    ],
+    towns: ["Namakkal town", "Tiruchengode", "Rasipuram", "Komarapalayam"],
+    orders: "660+",
+    economy:
+      "The poultry capital of India, plus a nationally significant lorry-body and transport industry at Tiruchengode.",
+    demand:
+      "Poultry farm and feed godown leases on agricultural land, which need careful drafting on permitted use, and transport-yard rentals around Tiruchengode.",
+  },
+  {
+    name: "Nilgiris",
+    slug: "nilgiris",
+    hq: "Udhagamandalam",
+    region: "Western ghats",
+    zone: "state",
+    sroTowns: ["Udhagamandalam", "Coonoor", "Kotagiri", "Gudalur", "Pandalur", "Kundah"],
+    towns: ["Ooty", "Coonoor", "Kotagiri", "Gudalur"],
+    orders: "360+",
+    economy: "Tea estates and hill-station tourism, with a property market shaped by heavy restrictions on land transfer.",
+    demand:
+      "Homestay and holiday-let licences, which must be drafted as licences — handing a season-long tenant exclusive possession of a hill property is how owners lose control of it.",
+  },
+  {
+    name: "Perambalur",
+    slug: "perambalur",
+    hq: "Perambalur",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: ["Perambalur", "Kunnam", "Veppanthattai", "Alathur"],
+    towns: ["Perambalur town", "Kunnam", "Alathur", "Veppanthattai"],
+    orders: "180+",
+    economy: "Onion and maize farming, and the smallest district in the state by population.",
+    demand:
+      "Mostly agricultural leases and single-shop rentals. Our lowest volume district, which means every order here gets handled by a named person rather than a queue.",
+  },
+  {
+    name: "Pudukkottai",
+    slug: "pudukkottai",
+    hq: "Pudukkottai",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: [
+      "Pudukkottai",
+      "Aranthangi",
+      "Alangudi",
+      "Illuppur",
+      "Karambakudi",
+      "Kulathur",
+      "Ponnamaravathi",
+      "Thirumayam",
+      "Gandarvakottai",
+      "Avudaiyarkoil",
+    ],
+    towns: ["Pudukkottai town", "Aranthangi", "Keeranur", "Alangudi"],
+    orders: "370+",
+    economy: "A former princely state, now farming and quarrying, with a very high share of Gulf remittance income.",
+    demand:
+      "Power of attorney instruments for families with a member working abroad, and ordinary town lets in Pudukkottai and Aranthangi.",
+  },
+  {
+    name: "Ramanathapuram",
+    slug: "ramanathapuram",
+    hq: "Ramanathapuram",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Ramanathapuram",
+      "Paramakudi",
+      "Rameswaram",
+      "Mudukulathur",
+      "Kadaladi",
+      "Kamuthi",
+      "Tiruvadanai",
+    ],
+    towns: ["Ramanathapuram town", "Paramakudi", "Rameswaram", "Kamuthi"],
+    orders: "300+",
+    economy: "Fishing, salt and chilli trade, with the Rameswaram pilgrimage circuit running year round.",
+    demand:
+      "Lodge and shop licences at Rameswaram, and salt-pan leases that are long-term agricultural instruments needing registration.",
+  },
+  {
+    name: "Ranipet",
+    slug: "ranipet",
+    hq: "Ranipet",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: ["Ranipet", "Arakkonam", "Arcot", "Walajah", "Sholingur", "Nemili", "Kalavai"],
+    towns: ["Ranipet town", "Arakkonam", "Arcot", "Sholingur"],
+    orders: "340+",
+    economy:
+      "Leather tanning and the SIPCOT industrial estate, plus the railway junction and Air Force station at Arakkonam.",
+    demand:
+      "Industrial staff housing around SIPCOT and defence-adjacent lets at Arakkonam, where tenants often need an agreement accepted as address proof.",
+  },
+  {
+    name: "Salem",
+    slug: "salem",
+    hq: "Salem",
+    region: "Kongu Nadu",
+    zone: "major",
+    sroTowns: [
+      "Salem",
+      "Attur",
+      "Mettur",
+      "Omalur",
+      "Sankagiri",
+      "Edappadi",
+      "Yercaud",
+      "Gangavalli",
+      "Vazhapadi",
+      "Valapady",
+    ],
+    towns: ["Hasthampatti", "Fairlands", "Ammapet", "Suramangalam"],
+    orders: "2,100+",
+    economy: "Steel, magnesite and sago, with the Mettur dam and thermal complex anchoring the north of the district.",
+    demand:
+      "A large professional rental market around Hasthampatti and Fairlands, and industrial leases at Mettur that run long enough to require registration.",
+  },
+  {
+    name: "Sivaganga",
+    slug: "sivaganga",
+    hq: "Sivaganga",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Sivaganga",
+      "Karaikudi",
+      "Devakottai",
+      "Manamadurai",
+      "Ilayangudi",
+      "Tirupattur",
+      "Singampunari",
+      "Kalayarkoil",
+    ],
+    towns: ["Karaikudi", "Sivaganga town", "Devakottai", "Kanadukathan"],
+    orders: "380+",
+    economy:
+      "Chettinad country — heritage mansions, a strong banking and trading diaspora, and Alagappa University at Karaikudi.",
+    demand:
+      "Heritage-property licences for film shoots and boutique stays, student lets at Karaikudi, and a steady run of settlement and partition instruments in old Chettiar family properties.",
+  },
+  {
+    name: "Tenkasi",
+    slug: "tenkasi",
+    hq: "Tenkasi",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Tenkasi",
+      "Sankarankovil",
+      "Shencottai",
+      "Alangulam",
+      "Kadayanallur",
+      "Sivagiri",
+      "Thiruvengadam",
+      "Veerakeralampudur",
+    ],
+    towns: ["Tenkasi town", "Courtallam", "Sankarankovil", "Kadayanallur"],
+    orders: "320+",
+    economy:
+      "Powerlooms at Kadayanallur, wind energy along the Shencottai gap, and the Courtallam falls season from July to September.",
+    demand:
+      "Seasonal cottage licences at Courtallam, and loom-shed leases. Carved out of Tirunelveli in 2019, so jurisdiction questions come up often.",
+  },
+  {
+    name: "Thanjavur",
+    slug: "thanjavur",
+    hq: "Thanjavur",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: [
+      "Thanjavur",
+      "Kumbakonam",
+      "Papanasam",
+      "Orathanadu",
+      "Pattukkottai",
+      "Peravurani",
+      "Thiruvaiyaru",
+      "Thiruvidaimarudur",
+      "Budalur",
+    ],
+    towns: ["Thanjavur town", "Kumbakonam", "Pattukkottai", "Thiruvaiyaru"],
+    orders: "860+",
+    economy: "The rice bowl of Tamil Nadu, with a large university and medical-college population at Thanjavur.",
+    demand:
+      "Student housing around the medical and agricultural colleges, agricultural land leases across the delta, and shop rentals in the Kumbakonam temple streets.",
+  },
+  {
+    name: "Theni",
+    slug: "theni",
+    hq: "Theni",
+    region: "Western ghats",
+    zone: "state",
+    sroTowns: ["Theni", "Periyakulam", "Bodinayakanur", "Uthamapalayam", "Andipatti"],
+    towns: ["Theni town", "Bodinayakanur", "Cumbum", "Periyakulam"],
+    orders: "350+",
+    economy: "Cardamom, grapes and the Cumbum valley, sitting on the Kerala border with heavy cross-state trade.",
+    demand:
+      "Estate and godown leases for the spice trade, plus a fair number of agreements where one party is resident in Kerala — which makes Aadhaar e-signing far easier than a joint visit to an office.",
+  },
+  {
+    name: "Thoothukudi",
+    slug: "thoothukudi",
+    hq: "Thoothukudi",
+    region: "Southern Tamil Nadu",
+    zone: "major",
+    sroTowns: [
+      "Thoothukudi",
+      "Tiruchendur",
+      "Kovilpatti",
+      "Srivaikuntam",
+      "Ottapidaram",
+      "Ettayapuram",
+      "Vilathikulam",
+      "Sattankulam",
+    ],
+    towns: ["Thoothukudi town", "Kovilpatti", "Tiruchendur", "Millerpuram"],
+    orders: "920+",
+    economy: "A major port, with salt, chemicals, thermal power and the match and printing cluster at Kovilpatti.",
+    demand:
+      "Port and logistics companies take warehouse space on commercial terms, and there is steady residential demand from the power and chemical plants.",
+  },
+  {
+    name: "Tiruchirappalli",
+    slug: "tiruchirappalli",
+    hq: "Tiruchirappalli",
+    region: "Cauvery delta",
+    zone: "major",
+    sroTowns: [
+      "Tiruchirappalli East",
+      "Tiruchirappalli West",
+      "Srirangam",
+      "Lalgudi",
+      "Manapparai",
+      "Musiri",
+      "Thottiyam",
+      "Thuraiyur",
+      "Manachanallur",
+      "Marungapuri",
+    ],
+    towns: ["Thillai Nagar", "Srirangam", "Cantonment", "K.K. Nagar", "Woraiyur"],
+    orders: "2,750+",
+    economy:
+      "BHEL and the Ordnance Factory, a very large engineering and medical college population, and an international airport.",
+    demand:
+      "Thillai Nagar is one of the densest rental markets outside Chennai. Student and BHEL staff lets renew on an academic and transfer cycle, so we see clear peaks in May and June.",
+  },
+  {
+    name: "Tirunelveli",
+    slug: "tirunelveli",
+    hq: "Tirunelveli",
+    region: "Southern Tamil Nadu",
+    zone: "major",
+    sroTowns: [
+      "Tirunelveli",
+      "Palayamkottai",
+      "Ambasamudram",
+      "Nanguneri",
+      "Radhapuram",
+      "Cheranmahadevi",
+      "Manur",
+    ],
+    towns: ["Palayamkottai", "Vannarpettai", "Perumalpuram", "Tirunelveli Town"],
+    orders: "1,180+",
+    economy:
+      "The education hub of the deep south — Palayamkottai alone carries a dozen colleges — with wind energy across the Nanguneri belt.",
+    demand:
+      "Student and faculty housing dominates around Palayamkottai, and wind-energy companies take land on long leases that always require registration.",
+  },
+  {
+    name: "Tirupathur",
+    slug: "tirupathur",
+    hq: "Tirupathur",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: ["Tirupathur", "Vaniyambadi", "Ambur", "Natrampalli", "Jolarpet"],
+    towns: ["Ambur", "Vaniyambadi", "Tirupathur town", "Jolarpet"],
+    orders: "300+",
+    economy:
+      "The Ambur–Vaniyambadi leather and footwear export belt, one of the largest in the country, on the Chennai–Bengaluru highway.",
+    demand:
+      "Tannery and footwear units take industrial premises on commercial leases with pollution-clearance and effluent clauses that a residential template cannot carry.",
+  },
+  {
+    name: "Tiruppur",
+    slug: "tiruppur",
+    hq: "Tiruppur",
+    region: "Kongu Nadu",
+    zone: "major",
+    sroTowns: [
+      "Tiruppur North",
+      "Tiruppur South",
+      "Avinashi",
+      "Palladam",
+      "Udumalaipettai",
+      "Dharapuram",
+      "Kangeyam",
+      "Madathukulam",
+      "Uthukuli",
+    ],
+    towns: ["Kumaran Road", "Avinashi Road", "P.N. Road", "Perumanallur"],
+    orders: "1,850+",
+    economy: "The knitwear export capital of India, turning over thousands of crores a year in garments.",
+    demand:
+      "Enormous volumes of migrant worker accommodation and factory-shed leases. Many landlords here let ten or more units, which is why we built bulk drafting and a single dashboard for repeat landlords.",
+  },
+  {
+    name: "Tiruvallur",
+    slug: "tiruvallur",
+    hq: "Tiruvallur",
+    region: "Chennai & suburbs",
+    zone: "metro",
+    sroTowns: [
+      "Tiruvallur",
+      "Ponneri",
+      "Gummidipoondi",
+      "Poonamallee",
+      "Avadi",
+      "Ambattur",
+      "Uthukkottai",
+      "Pallipattu",
+      "Tiruttani",
+    ],
+    towns: ["Avadi", "Poonamallee", "Ponneri", "Tiruttani", "Gummidipoondi"],
+    orders: "1,900+",
+    economy:
+      "Chennai's northern and western industrial edge — Ennore port, the Gummidipoondi SIPCOT estate, and the defence establishments at Avadi.",
+    demand:
+      "Heavy demand at Avadi and Poonamallee from defence and factory staff, and warehouse leases along the Gummidipoondi corridor.",
+  },
+  {
+    name: "Tiruvannamalai",
+    slug: "tiruvannamalai",
+    hq: "Tiruvannamalai",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Tiruvannamalai",
+      "Arani",
+      "Cheyyar",
+      "Polur",
+      "Chengam",
+      "Vandavasi",
+      "Kalasapakkam",
+      "Thandarampattu",
+      "Kilpennathur",
+      "Vembakkam",
+    ],
+    towns: ["Tiruvannamalai town", "Arani", "Vandavasi", "Cheyyar"],
+    orders: "480+",
+    economy:
+      "The Arunachaleswarar temple town, which draws a large long-staying visitor population, plus silk weaving at Arani.",
+    demand:
+      "An unusual market — a real volume of long-stay lets to visitors, including foreign nationals, around the girivalam path. Those need a licence structure and a properly drafted term.",
+  },
+  {
+    name: "Tiruvarur",
+    slug: "tiruvarur",
+    hq: "Tiruvarur",
+    region: "Cauvery delta",
+    zone: "state",
+    sroTowns: [
+      "Tiruvarur",
+      "Mannargudi",
+      "Nannilam",
+      "Needamangalam",
+      "Kodavasal",
+      "Thiruthuraipoondi",
+      "Valangaiman",
+    ],
+    towns: ["Tiruvarur town", "Mannargudi", "Thiruthuraipoondi", "Kodavasal"],
+    orders: "230+",
+    economy: "Delta paddy and a central university, in one of the most agricultural districts in the state.",
+    demand:
+      "Land leases on a seasonal cycle and modest town rentals. Faculty and student housing around the central university is the growth area.",
+  },
+  {
+    name: "Vellore",
+    slug: "vellore",
+    hq: "Vellore",
+    region: "Northern Tamil Nadu",
+    zone: "major",
+    sroTowns: ["Vellore", "Katpadi", "Gudiyatham", "Anaicut", "K.V. Kuppam", "Pernambut"],
+    towns: ["Katpadi", "Sathuvachari", "Gandhi Nagar", "Bagayam", "Vellore Fort"],
+    orders: "980+",
+    economy:
+      "CMC Hospital and VIT University between them bring in a very large transient population from across India and abroad.",
+    demand:
+      "The most out-of-state tenants of any district we serve. Patients' families near CMC take short lets, and VIT students fill Katpadi — both cases where Aadhaar e-signing saves a trip nobody wants to make.",
+  },
+  {
+    name: "Viluppuram",
+    slug: "viluppuram",
+    hq: "Viluppuram",
+    region: "Northern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Viluppuram",
+      "Tindivanam",
+      "Gingee",
+      "Vanur",
+      "Marakkanam",
+      "Vikravandi",
+      "Melmalayanur",
+      "Kandachipuram",
+      "Tiruvennainallur",
+    ],
+    towns: ["Viluppuram town", "Tindivanam", "Gingee", "Marakkanam"],
+    orders: "460+",
+    economy:
+      "A major rail junction and cashew and sugar belt, with the Puducherry border and the ECR tourism strip on its eastern edge.",
+    demand:
+      "Junction-town commercial rentals at Viluppuram and Tindivanam, and beach-property licences along the Marakkanam stretch of the ECR.",
+  },
+  {
+    name: "Virudhunagar",
+    slug: "virudhunagar",
+    hq: "Virudhunagar",
+    region: "Southern Tamil Nadu",
+    zone: "state",
+    sroTowns: [
+      "Virudhunagar",
+      "Sivakasi",
+      "Sattur",
+      "Aruppukottai",
+      "Rajapalayam",
+      "Srivilliputhur",
+      "Tiruchuli",
+      "Kariapatti",
+      "Watrap",
+    ],
+    towns: ["Sivakasi", "Rajapalayam", "Aruppukottai", "Srivilliputhur"],
+    orders: "520+",
+    economy:
+      "Sivakasi's fireworks, matches and offset printing — the largest concentration of any of the three in India — with spinning mills at Rajapalayam.",
+    demand:
+      "Licensed fireworks and match units need premises leases that survive a licensing inspection, so permitted use and statutory-compliance clauses matter more here than almost anywhere else in the state.",
+  },
+];
+
+/* ─────────────────────────── Lookups ─────────────────────────── */
+
+export function getDistrict(slug: string): District | undefined {
+  return DISTRICTS.find((d) => d.slug === slug);
+}
+
+/** Districts in the same region, excluding the one given — used for internal linking. */
+export function nearbyDistricts(district: District, limit = 6): District[] {
+  const sameRegion = DISTRICTS.filter(
+    (d) => d.region === district.region && d.slug !== district.slug,
+  );
+  if (sameRegion.length >= limit) return sameRegion.slice(0, limit);
+  const rest = DISTRICTS.filter(
+    (d) => d.slug !== district.slug && !sameRegion.includes(d),
+  );
+  return [...sameRegion, ...rest].slice(0, limit);
+}
+
+export const REGIONS: Region[] = [
+  "Chennai & suburbs",
+  "Northern Tamil Nadu",
+  "Kongu Nadu",
+  "Cauvery delta",
+  "Southern Tamil Nadu",
+  "Western ghats",
+];
+
+/** Districts grouped by region, for the index pages. */
+export function districtsByRegion(): Array<{ region: Region; districts: District[] }> {
+  return REGIONS.map((region) => ({
+    region,
+    districts: DISTRICTS.filter((d) => d.region === region),
+  })).filter((group) => group.districts.length > 0);
+}
+
+/**
+ * Delivery promise for a district, kept in step with DELIVERY_ZONES.
+ * `eta` reads inside a sentence; `shortEta` is title-cased for <title> tags.
+ */
+export const ZONE_META: Record<
+  ZoneId,
+  { label: string; eta: string; shortEta: string; charge: number; cutOff?: string }
+> = {
+  metro: {
+    label: "Chennai metro",
+    eta: "Same day",
+    shortEta: "Same-Day Delivery",
+    charge: 99,
+    cutOff: "Order before 2 pm",
+  },
+  major: {
+    label: "Major cities",
+    eta: "Next working day",
+    shortEta: "Next-Day Delivery",
+    charge: 149,
+  },
+  state: {
+    label: "Statewide",
+    eta: "2 – 3 working days",
+    shortEta: "2–3 Day Delivery",
+    charge: 149,
+  },
+};
+
+/** Towns people search for that are not themselves districts. */
+export const NOTABLE_TOWNS: Array<{ town: string; district: string; slug: string }> = [
+  { town: "Hosur", district: "Krishnagiri", slug: "krishnagiri" },
+  { town: "Trichy", district: "Tiruchirappalli", slug: "tiruchirappalli" },
+  { town: "Ooty", district: "Nilgiris", slug: "nilgiris" },
+  { town: "Nagercoil", district: "Kanyakumari", slug: "kanyakumari" },
+  { town: "Karaikudi", district: "Sivaganga", slug: "sivaganga" },
+  { town: "Ambur", district: "Tirupathur", slug: "tirupathur" },
+  { town: "Kumbakonam", district: "Thanjavur", slug: "thanjavur" },
+  { town: "Sivakasi", district: "Virudhunagar", slug: "virudhunagar" },
+  { town: "Neyveli", district: "Cuddalore", slug: "cuddalore" },
+  { town: "Tambaram", district: "Chengalpattu", slug: "chengalpattu" },
+  { town: "Avadi", district: "Tiruvallur", slug: "tiruvallur" },
+  { town: "Sriperumbudur", district: "Kancheepuram", slug: "kancheepuram" },
+  { town: "Pollachi", district: "Coimbatore", slug: "coimbatore" },
+  { town: "Rajapalayam", district: "Virudhunagar", slug: "virudhunagar" },
+  { town: "Mettur", district: "Salem", slug: "salem" },
+  { town: "Arakkonam", district: "Ranipet", slug: "ranipet" },
+];

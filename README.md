@@ -47,9 +47,58 @@ is **built but switched off** — see [Re-enabling the product](#re-enabling-the
 | `/about` | Story, values, timeline, company facts |
 | `/contact` | Contact form, phone/WhatsApp/email, hours |
 | `/services/[slug]` | 4 SEO pages — residential, commercial, lease deed, leave & licence |
-| `/rental-agreement/[city]` | 10 city SEO pages with `LocalBusiness` schema |
+| `/rental-agreement` | District index — all 38, grouped by region, `ItemList` schema |
+| `/rental-agreement/[district]` | **38** district pages with `LocalBusiness` schema |
+| `/stamp-paper` | District index — all 38, grouped by region, `ItemList` schema |
+| `/stamp-paper/[district]` | **38** district pages with `LocalBusiness` schema |
 | `/legal/{terms,privacy,refund}` | Policy pages with a sticky table of contents |
 | `/sitemap.xml`, `/robots.txt` | Generated from `src/lib/site.ts` and `src/lib/services.ts` |
+
+---
+
+## The location matrix
+
+Every location page on the site is one of the **38 official districts of Tamil
+Nadu**, and they all come out of `src/lib/districts.ts` — the single source of
+truth. Two page families are generated from that one list:
+
+```
+/rental-agreement/[district]   38 pages   agreement drafting, stamping, e-signing
+/stamp-paper/[district]        38 pages   paper and e-Stamp supply + delivery
+```
+
+Plus an index for each (`/rental-agreement`, `/stamp-paper`) that groups all 38
+by region, so no district page is more than two clicks from the homepage and
+none of them is orphaned.
+
+### Adding or changing a district
+
+Edit the one entry in `src/lib/districts.ts`. Both page families, both indexes,
+the footer strips, the sitemap and the lead-form dropdown pick it up
+automatically — there is no second list to keep in sync.
+
+Each district carries the fields that keep its two pages from reading like every
+other district's:
+
+| Field | Used for |
+| --- | --- |
+| `hq`, `region` | Eyebrow, grouping on the index pages |
+| `zone` | Delivery ETA and charge — ties to `DELIVERY_ZONES` in `stamp-paper.ts` |
+| `sroTowns` | The Sub-Registrar Office chips, one per taluk headquarters |
+| `towns` | "Where our orders come from", and long-tail keywords |
+| `orders` | Stat card, and sitemap priority (1,000+ orders ⇒ 0.8, else 0.6) |
+| `economy`, `demand` | Two paragraphs of prose unique to that district |
+
+`economy` and `demand` are the important ones. Without them 76 pages would be
+the same template with a name swapped in, which is exactly the thin-content
+pattern Google demotes. Write them for any district you add.
+
+### Slug stability
+
+Slugs are the official district names. Two of the original city slugs were towns
+rather than districts (`trichy`, `hosur`), so `next.config.ts` holds permanent
+redirects mapping them — and six other common town spellings — onto their parent
+district. **Never rename a slug without adding a redirect there.**
 
 ---
 

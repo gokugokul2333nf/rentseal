@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
-import { CITIES, FOOTER_LINKS, LEAD_ANCHOR, SITE, TRUST_SIGNALS } from "@/lib/site";
+import { DISTRICTS } from "@/lib/districts";
+import { FOOTER_LINKS, LEAD_ANCHOR, SITE, TRUST_SIGNALS } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
 
@@ -136,19 +137,37 @@ export function Footer() {
 
         </div>
 
-        {/* City links — kept as a strip so the columns above divide evenly */}
+        {/* District links — the full location matrix, kept as strips so the
+            columns above still divide evenly */}
         <div className="container-page border-t border-white/10 py-8">
           <h3 className="text-[12px] font-bold tracking-[0.14em] text-white/40 uppercase">
-            Stamp paper &amp; rental agreements by city
+            Rental agreements by district
           </h3>
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2.5">
-            {CITIES.map((city) => (
+            {DISTRICTS.map((district) => (
               <Link
-                key={city.slug}
-                href={`/rental-agreement/${city.slug}`}
+                key={district.slug}
+                href={`/rental-agreement/${district.slug}`}
                 className="text-[13.5px] text-white/55 transition-colors hover:text-white"
               >
-                {city.name}
+                {district.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="container-page border-t border-white/10 py-8">
+          <h3 className="text-[12px] font-bold tracking-[0.14em] text-white/40 uppercase">
+            Stamp paper by district
+          </h3>
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2.5">
+            {DISTRICTS.map((district) => (
+              <Link
+                key={district.slug}
+                href={`/stamp-paper/${district.slug}`}
+                className="text-[13.5px] text-white/55 transition-colors hover:text-white"
+              >
+                {district.name}
               </Link>
             ))}
           </div>

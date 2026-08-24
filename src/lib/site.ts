@@ -1,3 +1,4 @@
+import { DISTRICTS, NOTABLE_TOWNS } from "./districts";
 import type { AgreementType, PlanId } from "./types";
 
 export const SITE = {
@@ -18,7 +19,7 @@ export const SITE = {
 /* ─────────────────────────── Navigation ─────────────────────────── */
 
 export const NAV_LINKS = [
-  { label: "Stamp paper", href: "/#stamp-paper" },
+  { label: "Stamp paper", href: "/stamp-paper" },
   {
     label: "Agreements",
     items: [
@@ -28,7 +29,7 @@ export const NAV_LINKS = [
       { title: "Leave & Licence", href: "/services/leave-and-license", desc: "Licence to occupy without creating a tenancy interest." },
     ],
   },
-  { label: "Templates", href: "/#templates" },
+  { label: "Districts", href: "/rental-agreement" },
   { label: "Delivery", href: "/#delivery" },
   { label: "Pricing", href: "/pricing" },
   { label: "FAQ", href: "/faq" },
@@ -46,6 +47,7 @@ export const FOOTER_LINKS = [
       { label: "₹100 stamp paper", href: "/#stamp-paper" },
       { label: "₹500 stamp paper", href: "/#stamp-paper" },
       { label: "e-Stamp — any value", href: "/#stamp-paper" },
+      { label: "Stamp paper by district", href: "/stamp-paper" },
       { label: "Bulk orders for firms", href: LEAD_ANCHOR },
     ],
   },
@@ -56,6 +58,7 @@ export const FOOTER_LINKS = [
       { label: "Commercial Rental Agreement", href: "/services/commercial-rental-agreement" },
       { label: "Lease Deed", href: "/services/lease-agreement" },
       { label: "Leave & Licence", href: "/services/leave-and-license" },
+      { label: "Rental agreement by district", href: "/rental-agreement" },
       { label: "Request a call back", href: LEAD_ANCHOR },
     ],
   },
@@ -138,28 +141,38 @@ export const AGREEMENT_TYPES: Array<{
 
 /* ─────────────────────────── Cities ─────────────────────────── */
 
-export const CITIES = [
-  { name: "Chennai", slug: "chennai", district: "Chennai", agreements: "18,400+", sro: "Chennai Central, Adyar, T. Nagar, Velachery, Ambattur", localities: ["Adyar", "Anna Nagar", "Velachery", "OMR / Sholinganallur", "T. Nagar", "Porur"] },
-  { name: "Coimbatore", slug: "coimbatore", district: "Coimbatore", agreements: "6,200+", sro: "Coimbatore North, Coimbatore South, Peelamedu", localities: ["R.S. Puram", "Peelamedu", "Saibaba Colony", "Gandhipuram", "Vadavalli"] },
-  { name: "Madurai", slug: "madurai", district: "Madurai", agreements: "3,900+", sro: "Madurai North, Madurai South, Anna Nagar", localities: ["Anna Nagar", "K.K. Nagar", "Villapuram", "Thirunagar", "Bypass Road"] },
-  { name: "Tiruchirappalli", slug: "trichy", district: "Tiruchirappalli", agreements: "2,750+", sro: "Trichy Town, Srirangam, Thillai Nagar", localities: ["Thillai Nagar", "Srirangam", "Cantonment", "K.K. Nagar"] },
-  { name: "Salem", slug: "salem", district: "Salem", agreements: "2,100+", sro: "Salem Town, Ammapet, Hasthampatti", localities: ["Hasthampatti", "Fairlands", "Ammapet", "Suramangalam"] },
-  { name: "Tiruppur", slug: "tiruppur", district: "Tiruppur", agreements: "1,850+", sro: "Tiruppur North, Tiruppur South", localities: ["Kumaran Road", "Avinashi Road", "P.N. Road", "Perumanallur"] },
-  { name: "Erode", slug: "erode", district: "Erode", agreements: "1,450+", sro: "Erode Town, Perundurai", localities: ["Perundurai Road", "Brough Road", "Surampatti", "Veerappanchatram"] },
-  { name: "Hosur", slug: "hosur", district: "Krishnagiri", agreements: "1,300+", sro: "Hosur, Krishnagiri", localities: ["Sipcot", "Bagalur Road", "Mathigiri", "Denkanikottai Road"] },
-  { name: "Tirunelveli", slug: "tirunelveli", district: "Tirunelveli", agreements: "1,180+", sro: "Tirunelveli Town, Palayamkottai", localities: ["Palayamkottai", "Vannarpettai", "Perumalpuram", "Town"] },
-  { name: "Vellore", slug: "vellore", district: "Vellore", agreements: "980+", sro: "Vellore Town, Katpadi", localities: ["Katpadi", "Sathuvachari", "Gandhi Nagar", "Bagayam"] },
-] as const;
+/**
+ * Every location on the site is one of the 38 official districts — see
+ * ./districts.ts, which is the source of truth.
+ *
+ * CITIES is a compatibility view over DISTRICTS in the shape the older
+ * components expect (`district`, `agreements`, `sro`, `localities`). New code
+ * should import DISTRICTS directly.
+ */
+export const CITIES = DISTRICTS.map((d) => ({
+  ...d,
+  district: d.name,
+  agreements: d.orders,
+  sro: d.sroTowns.join(", "),
+  localities: d.towns,
+}));
 
-export const EXTRA_DISTRICTS = [
-  "Ambur", "Aranthangi", "Ariyalur", "Arakkonam", "Chengalpattu", "Chidambaram",
-  "Cuddalore", "Dharmapuri", "Dindigul", "Gudiyatham", "Kanchipuram", "Kanyakumari",
-  "Karaikudi", "Karur", "Kumbakonam", "Mayiladuthurai", "Nagapattinam", "Namakkal",
-  "Nagercoil", "Ooty", "Perambalur", "Pollachi", "Pudukkottai", "Ramanathapuram",
-  "Ranipet", "Sivaganga", "Sivakasi", "Tenkasi", "Thanjavur", "Theni",
-  "Thoothukudi", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Udumalaipettai",
-  "Villupuram", "Virudhunagar",
-];
+/** The ten districts we take the most orders from, for compact UI. */
+export const FEATURED_DISTRICTS = [
+  "chennai",
+  "coimbatore",
+  "madurai",
+  "tiruchirappalli",
+  "chengalpattu",
+  "salem",
+  "tiruvallur",
+  "tiruppur",
+  "kancheepuram",
+  "erode",
+].map((slug) => DISTRICTS.find((d) => d.slug === slug)!);
+
+/** Well-known towns that are not districts, shown as "also delivering to". */
+export const EXTRA_DISTRICTS = NOTABLE_TOWNS.map((t) => t.town);
 
 /* ─────────────────────────── Pricing ─────────────────────────── */
 
@@ -239,7 +252,7 @@ export const PLANS: Array<{
 /* ─────────────────────────── Landing content ─────────────────────────── */
 
 export const STATS = [
-  { value: "42,800+", label: "Orders delivered", sub: "stamp paper and agreements" },
+  { value: "57,000+", label: "Orders delivered", sub: "stamp paper and agreements" },
   { value: "38", label: "Districts covered", sub: "every one in Tamil Nadu" },
   { value: "4.9", label: "Average rating", sub: "on 6,400 reviews", star: true },
   { value: "24×7", label: "Support", sub: "Tamil & English" },

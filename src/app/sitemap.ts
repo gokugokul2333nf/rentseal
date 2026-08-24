@@ -1,17 +1,23 @@
 import type { MetadataRoute } from "next";
 import { SERVICES } from "@/lib/services";
-import { CITIES, SITE } from "@/lib/site";
+import { DISTRICTS } from "@/lib/districts";
+import { SITE } from "@/lib/site";
 
 /**
  * Only live routes. The agreement builder, calculator and account pages live
  * under src/app/_disabled and are intentionally absent.
+ *
+ * Two location families are generated from DISTRICTS — rental agreement and
+ * stamp paper — giving 38 pages each plus their index.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-07-28");
+  const lastModified = new Date("2026-08-24");
 
   const staticPages: MetadataRoute.Sitemap = (
     [
       { url: SITE.url, changeFrequency: "weekly", priority: 1 },
+      { url: `${SITE.url}/rental-agreement`, changeFrequency: "weekly", priority: 0.9 },
+      { url: `${SITE.url}/stamp-paper`, changeFrequency: "weekly", priority: 0.9 },
       { url: `${SITE.url}/how-it-works`, changeFrequency: "monthly", priority: 0.8 },
       { url: `${SITE.url}/pricing`, changeFrequency: "monthly", priority: 0.9 },
       { url: `${SITE.url}/faq`, changeFrequency: "monthly", priority: 0.7 },
@@ -30,12 +36,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  const cityPages: MetadataRoute.Sitemap = CITIES.map((city) => ({
-    url: `${SITE.url}/rental-agreement/${city.slug}`,
+  /** Districts we take the most orders from rank higher than the long tail. */
+  const priorityFor = (orders: string) =>
+    Number(orders.replace(/[^\d]/g, "")) >= 1000 ? 0.8 : 0.6;
+
+  const rentalPages: MetadataRoute.Sitemap = DISTRICTS.map((d) => ({
+    url: `${SITE.url}/rental-agreement/${d.slug}`,
     lastModified,
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: priorityFor(d.orders),
   }));
 
-  return [...staticPages, ...servicePages, ...cityPages];
+  const stampPages: MetadataRoute.Sitemap = DISTRICTS.map((d) => ({
+    url: `${SITE.url}/stamp-paper/${d.slug}`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: priorityFor(d.orders),
+  }));
+
+  return [...staticPages, ...servicePages, ...rentalPages, ...stampPages];
 }

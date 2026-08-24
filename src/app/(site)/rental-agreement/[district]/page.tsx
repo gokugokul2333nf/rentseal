@@ -19,53 +19,72 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Counter, Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { AGREEMENT_TYPES, CITIES, LEAD_ANCHOR, SITE } from "@/lib/site";
+import { DISTRICTS, ZONE_META, getDistrict, nearbyDistricts } from "@/lib/districts";
+import { AGREEMENT_TYPES, LEAD_ANCHOR, SITE } from "@/lib/site";
 
 export function generateStaticParams() {
-  return CITIES.map((c) => ({ city: c.slug }));
+  return DISTRICTS.map((d) => ({ district: d.slug }));
 }
+
+export const dynamicParams = false;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ city: string }>;
+  params: Promise<{ district: string }>;
 }): Promise<Metadata> {
-  const { city: slug } = await params;
-  const city = CITIES.find((c) => c.slug === slug);
-  if (!city) return {};
-  const title = `Rental Agreement in ${city.name} — Online, e-Stamped in 10 Minutes`;
-  const description = `Create a legally valid rental agreement in ${city.name} online. E-stamped, advocate verified, Aadhaar e-signed and delivered by email and WhatsApp. ${city.agreements} agreements made in ${city.name}.`;
+  const { district: slug } = await params;
+  const district = getDistrict(slug);
+  if (!district) return {};
+
+  const title = `Rental Agreement in ${district.name} — Online, e-Stamped`;
+  const description = `Create a legally valid rental agreement anywhere in ${district.name} district. E-stamped at the government rate, Aadhaar e-signed and delivered by email and WhatsApp. ${district.orders} orders delivered across ${district.name}.`;
+
   return {
     title,
     description,
-    alternates: { canonical: `/rental-agreement/${city.slug}` },
+    alternates: { canonical: `/rental-agreement/${district.slug}` },
     openGraph: { title, description },
+    keywords: [
+      `rental agreement ${district.name}`,
+      `rental agreement in ${district.hq}`,
+      `online rental agreement ${district.name}`,
+      `lease agreement ${district.name}`,
+      ...district.towns.map((t) => `rental agreement ${t}`),
+    ],
   };
 }
 
-export default async function CityPage({ params }: { params: Promise<{ city: string }> }) {
-  const { city: slug } = await params;
-  const city = CITIES.find((c) => c.slug === slug);
-  if (!city) notFound();
+export default async function DistrictPage({
+  params,
+}: {
+  params: Promise<{ district: string }>;
+}) {
+  const { district: slug } = await params;
+  const district = getDistrict(slug);
+  if (!district) notFound();
+
+  const zone = ZONE_META[district.zone];
+  const nearby = nearbyDistricts(district);
 
   const crumbs = [
     { label: "Home", href: "/" },
-    { label: "Cities", href: "/#cities" },
-    { label: city.name },
+    { label: "Rental agreement", href: "/rental-agreement" },
+    { label: district.name },
   ];
 
   return (
     <>
       <PageHero
-        eyebrow={`${city.district} District`}
+        eyebrow={`${district.name} District · ${district.region}`}
         icon={MapPin}
         crumbs={crumbs}
-        title={`Rental agreement in ${city.name}, done from your phone`}
-        body={`${city.agreements} landlords and tenants in ${city.name} have made their agreement with us. E-stamped at the government rate, signed with Aadhaar OTP, delivered the same day — without anyone visiting the Sub-Registrar Office.`}
+        title={`Rental agreement in ${district.name}, done from your phone`}
+        body={`${district.orders} landlords and tenants across ${district.name} district have made their agreement with us. E-stamped at the government rate, signed with Aadhaar OTP, and delivered without anyone visiting the Sub-Registrar Office.`}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-            Get my {city.name} agreement started
+            Get my {district.name} agreement started
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
           <ButtonLink
@@ -91,9 +110,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
               },
               {
                 icon: Clock3,
-                label: "Typical delivery",
-                value: "Under 4 hrs",
-                sub: `for ${city.name} on the Standard plan`,
+                label: "Delivery to " + district.name,
+                value: zone.eta,
+                sub: zone.cutOff ?? `${zone.label} zone, ₹${zone.charge} or free above ₹2,000`,
               },
               {
                 icon: Landmark,
@@ -103,9 +122,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
               },
               {
                 icon: ShieldCheck,
-                label: "Agreements made",
-                value: city.agreements,
-                sub: `in ${city.name} since 2021`,
+                label: "Orders delivered",
+                value: district.orders,
+                sub: `across ${district.name} since 2021`,
               },
             ].map((stat) => (
               <StaggerItem key={stat.label}>
@@ -123,20 +142,32 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
             ))}
           </Stagger>
 
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          {/* What the district actually rents */}
+          <Reveal delay={0.1}>
+            <div className="mt-12 rounded-2xl border border-line bg-white p-7 sm:p-9">
+              <h2 className="font-display text-[20px] font-bold text-navy-950">
+                What renting looks like in {district.name}
+              </h2>
+              <p className="mt-4 text-[15px] leading-[1.75] text-navy-600">{district.economy}</p>
+              <p className="mt-3 text-[15px] leading-[1.75] text-navy-600">{district.demand}</p>
+            </div>
+          </Reveal>
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <Reveal>
               <div className="h-full rounded-2xl border border-line bg-white p-7">
                 <h2 className="flex items-center gap-2.5 font-display text-[18px] font-bold text-navy-950">
                   <Landmark className="size-5 text-brand-600" />
-                  Sub-Registrar Offices serving {city.name}
+                  Sub-Registrar Offices in {district.name}
                 </h2>
                 <p className="mt-3 text-[14.5px] leading-[1.7] text-navy-600">
-                  If your term runs 12 months or longer, registration is compulsory and both
-                  parties must appear in person. We prepare the deed, compute the fee and book
-                  your slot at the office with jurisdiction.
+                  The Registration Department runs an office at each taluk headquarters below. If
+                  your term runs 12 months or longer, registration is compulsory and both parties
+                  must appear in person — we prepare the deed, compute the fee and book your slot
+                  at the office with jurisdiction.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {city.sro.split(", ").map((office) => (
+                  {district.sroTowns.map((office) => (
                     <span
                       key={office}
                       className="rounded-full border border-line bg-canvas px-3.5 py-2 text-[13px] font-medium text-navy-600"
@@ -156,21 +187,27 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
               <div className="h-full rounded-2xl border border-line bg-white p-7">
                 <h2 className="flex items-center gap-2.5 font-display text-[18px] font-bold text-navy-950">
                   <Building2 className="size-5 text-brand-600" />
-                  Popular areas in {city.name}
+                  Where our {district.name} orders come from
                 </h2>
                 <p className="mt-3 text-[14.5px] leading-[1.7] text-navy-600">
-                  Most of our {city.name} agreements come from these localities — though we
-                  cover every street in {city.district} District and every other district in the
-                  state.
+                  Most of our work in this district comes from these towns and localities — though
+                  we cover every taluk in {district.name} and all 38 districts of Tamil Nadu.
                 </p>
                 <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-                  {city.localities.map((area) => (
+                  {district.towns.map((area) => (
                     <li key={area} className="flex items-center gap-2.5 text-[14px] text-navy-700">
                       <Check className="size-4 shrink-0 text-emerald-500" strokeWidth={3} />
                       {area}
                     </li>
                   ))}
                 </ul>
+                <Link
+                  href={`/stamp-paper/${district.slug}`}
+                  className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700 underline underline-offset-4"
+                >
+                  Buy stamp paper in {district.name}
+                  <ArrowRight className="size-3.5" />
+                </Link>
               </div>
             </Reveal>
           </div>
@@ -181,9 +218,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       <section className="section border-y border-line bg-white">
         <div className="container-page">
           <SectionHeading
-            eyebrow={`Available in ${city.name}`}
+            eyebrow={`Available across ${district.name}`}
             title="Four agreement types, all e-stamped for Tamil Nadu"
-            body={`Whether you are letting a flat in ${city.localities[0]} or a godown on the outskirts, the right instrument is here.`}
+            body={`Whether you are letting a flat in ${district.towns[0]} or a godown on the outskirts, the right instrument is here.`}
           />
 
           <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" amount={0.1}>
@@ -193,9 +230,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
                   href={`/services/${type.slug}`}
                   className="group flex h-full flex-col rounded-2xl border border-line bg-canvas/60 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:bg-white hover:shadow-card"
                 >
-                  <h3 className="font-display text-[16px] font-bold text-navy-950">
-                    {type.short}
-                  </h3>
+                  <h3 className="font-display text-[16px] font-bold text-navy-950">{type.short}</h3>
                   <p className="mt-2 flex-1 text-[13.5px] leading-relaxed text-navy-500">
                     {type.description}
                   </p>
@@ -214,12 +249,12 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       <PricingCards />
       <FaqSection limit={8} />
 
-      {/* Other cities */}
+      {/* Nearby districts */}
       <section className="section border-t border-line bg-white">
         <div className="container-page">
-          <SectionHeading title="We also work in" align="left" />
+          <SectionHeading title={`Rental agreements elsewhere in ${district.region}`} align="left" />
           <div className="mt-8 flex flex-wrap gap-2.5">
-            {CITIES.filter((c) => c.slug !== city.slug).map((other) => (
+            {nearby.map((other) => (
               <Link
                 key={other.slug}
                 href={`/rental-agreement/${other.slug}`}
@@ -229,6 +264,13 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
               </Link>
             ))}
           </div>
+          <Link
+            href="/rental-agreement"
+            className="mt-7 inline-flex items-center gap-1.5 text-[14.5px] font-semibold text-brand-700 underline underline-offset-4"
+          >
+            See all 38 districts
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
       </section>
 
@@ -239,15 +281,19 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            name: `${SITE.name} — ${city.name}`,
-            description: `Online rental agreement drafting, e-stamping and e-signing for ${city.name}, Tamil Nadu.`,
-            url: `${SITE.url}/rental-agreement/${city.slug}`,
+            name: `${SITE.name} — ${district.name}`,
+            description: `Online rental agreement drafting, e-stamping and e-signing across ${district.name} district, Tamil Nadu.`,
+            url: `${SITE.url}/rental-agreement/${district.slug}`,
             telephone: SITE.phone,
             priceRange: "₹349 – ₹1499",
-            areaServed: { "@type": "City", name: city.name },
+            areaServed: {
+              "@type": "AdministrativeArea",
+              name: `${district.name} district`,
+              containedInPlace: { "@type": "State", name: "Tamil Nadu" },
+            },
             address: {
               "@type": "PostalAddress",
-              addressLocality: city.name,
+              addressLocality: district.hq,
               addressRegion: "Tamil Nadu",
               addressCountry: "IN",
             },
