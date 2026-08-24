@@ -120,6 +120,18 @@ const websiteSchema = {
   name: SITE.name,
   publisher: { "@id": `${SITE.url}/#organization` },
   inLanguage: "en-IN",
+  // Restored now that /search actually exists and answers ?q= — it was removed
+  // while it pointed at a route that was never built. Note that Google retired
+  // the sitelinks searchbox rich result in 2023, so this is for correctness and
+  // other consumers rather than a Google feature.
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE.url}/search?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

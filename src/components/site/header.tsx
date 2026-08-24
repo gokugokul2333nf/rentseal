@@ -4,11 +4,12 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ChevronDown, Menu, Phone, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, Phone, Search, X } from "lucide-react";
 import { LEAD_ANCHOR, NAV_LINKS, SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { SearchDialog } from "@/components/site/search-dialog";
 
 /** Scroll position is external state, so subscribe to it rather than mirroring it. */
 function subscribeToScroll(onChange: () => void) {
@@ -24,6 +25,7 @@ export function Header() {
   );
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
 
   // Navigating away closes any open menu. Adjusting during render is the
@@ -33,6 +35,7 @@ export function Header() {
     setMenuPath(pathname);
     setMobileOpen(false);
     setOpenMenu(null);
+    setSearchOpen(false);
   }
 
   // Lock the page behind the mobile drawer.
@@ -44,10 +47,28 @@ export function Header() {
   }, [mobileOpen]);
 
   useEffect(() => {
+    const isTyping = (el: EventTarget | null) =>
+      el instanceof HTMLElement &&
+      (el.tagName === "INPUT" ||
+        el.tagName === "TEXTAREA" ||
+        el.tagName === "SELECT" ||
+        el.isContentEditable);
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setMobileOpen(false);
         setOpenMenu(null);
+      }
+      // ⌘K / Ctrl+K anywhere, or "/" when the user is not already in a field.
+      if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setMobileOpen(false);
+        setSearchOpen(true);
+        return;
+      }
+      if (e.key === "/" && !e.metaKey && !e.ctrlKey && !isTyping(e.target)) {
+        e.preventDefault();
+        setSearchOpen(true);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -167,6 +188,29 @@ export function Header() {
           </ul>
 
           <div className="flex items-center gap-2.5">
+            {/* Desktop: a real-looking field that opens the dialog. */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search the site"
+              className="hidden items-center gap-2 rounded-lg border border-line bg-canvas/80 py-2 pr-2 pl-3 text-[14px] text-navy-400 transition-colors hover:border-brand-300 hover:bg-white hover:text-navy-600 xl:flex"
+            >
+              <Search className="size-4" />
+              <span className="pr-6">Search…</span>
+              <kbd className="rounded border border-line bg-white px-1.5 py-0.5 font-sans text-[11px] font-semibold text-navy-400">
+                ⌘K
+              </kbd>
+            </button>
+            {/* Everything below xl gets the icon only. */}
+            <Button
+              variant="secondary"
+              size="sm"
+              className="!px-2.5 xl:hidden"
+              aria-label="Search the site"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="size-[18px]" />
+            </Button>
             <a
               href={`tel:${SITE.phone.replace(/\s/g, "")}`}
               className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-[14.5px] font-medium text-navy-600 transition-colors hover:bg-navy-100/70 hover:text-navy-950 lg:inline-flex"
@@ -191,6 +235,8 @@ export function Header() {
           </div>
         </nav>
       </header>
+
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* Mobile drawer */}
       <AnimatePresence>
@@ -227,6 +273,17 @@ export function Header() {
               </div>
 
               <div className="scroll-slim flex-1 overflow-y-auto px-5 py-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setSearchOpen(true);
+                  }}
+                  className="mb-2 flex w-full items-center gap-2.5 rounded-xl border border-line bg-canvas px-4 py-3 text-[15px] font-medium text-navy-500"
+                >
+                  <Search className="size-[18px]" />
+                  Search districts, agreements, stamp paper…
+                </button>
                 {NAV_LINKS.map((link) => (
                   <div key={link.label} className="mb-7">
                     {"items" in link ? (

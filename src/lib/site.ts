@@ -70,6 +70,7 @@ export const FOOTER_LINKS = [
       { label: "Pricing", href: "/pricing" },
       { label: "Delivery coverage", href: "/#delivery" },
       { label: "Frequently Asked Questions", href: "/faq" },
+      { label: "Search the site", href: "/search" },
       { label: "Contact & Support", href: "/contact" },
     ],
   },

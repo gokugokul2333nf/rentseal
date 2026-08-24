@@ -51,6 +51,7 @@ is **built but switched off** — see [Re-enabling the product](#re-enabling-the
 | `/rental-agreement/[district]` | **38** district pages with `LocalBusiness` schema |
 | `/stamp-paper` | District index — all 38, grouped by region, `ItemList` schema |
 | `/stamp-paper/[district]` | **38** district pages with `LocalBusiness` schema |
+| `/search` | Site search — server-rendered results, works without JavaScript |
 | `/legal/{terms,privacy,refund}` | Policy pages with a sticky table of contents |
 | `/sitemap.xml`, `/robots.txt` | Generated from `src/lib/site.ts` and `src/lib/services.ts` |
 
@@ -120,6 +121,50 @@ district page per track, one per service, one per index, one root fallback.
 Note that a page which exports its own `openGraph` metadata block **suppresses**
 the inherited file-convention image, which is why the index and service routes
 each need their own `opengraph-image.tsx` rather than relying on the root one.
+
+### Search
+
+There is no search backend. `src/lib/search.ts` assembles an index at module
+load from the same data the pages render — `DISTRICTS`, `SERVICES`,
+`DENOMINATIONS` and `FAQS` — so it cannot drift from what is published. Add a
+district and it is searchable in the same commit.
+
+Two entry points share that index:
+
+- **`components/site/search-dialog.tsx`** — ⌘K / Ctrl+K anywhere, `/` when not
+  already typing, or the header button. Runs in the browser, no request per
+  keystroke.
+- **`/search?q=`** — server-rendered results grouped by kind. It is a plain GET
+  form, so it works with JavaScript disabled and can be linked to directly.
+
+Districts carry their towns, taluk headquarters and alias names as keywords, so
+searching a town finds its parent district — Hosur returns Krishnagiri, Ooty
+returns Nilgiris, Trichy returns Tiruchirappalli.
+
+**Ranking.** Scoring is IDF-weighted, and this is not optional polish. Every one
+of the 38 stamp paper pages carries the keyword "stamp paper", so an unweighted
+scorer answered "₹100 stamp paper" and "stamp duty" with a wall of districts and
+buried the denomination and the duty answer. Terms common across the corpus now
+count for almost nothing and rare ones decide the ranking. Two further guards:
+a relevance floor drops anything scoring below 22% of the best hit, and query
+stopwords ("how much does it cost") are dropped unless the query is nothing but
+stopwords.
+
+If you add documents whose keywords repeat across many entries, re-check the
+queries in the table below — that is where ranking regressions show up first.
+
+| Query | Expected first result |
+| --- | --- |
+| `hosur` | Stamp paper / Rental agreement in Krishnagiri |
+| `lease deed` | Lease Deed |
+| `100 stamp paper` | ₹100 stamp paper |
+| `stamp duty` | How is stamp duty calculated in Tamil Nadu? |
+| `how much does it cost` | Pricing |
+| `refund` | Refund policy |
+
+`/search` is `noindex, follow` and absent from the sitemap — internal search
+results are low value to index and can open an unbounded crawl space — but it is
+deliberately left crawlable so the `SearchAction` target stays fetchable.
 
 ### Routes deliberately kept out of the index
 
