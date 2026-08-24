@@ -19,7 +19,7 @@ export function FaqSection({ limit = 8 }: { limit?: number }) {
           body="Straight answers, including the ones that are inconvenient for us."
         />
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px]">
           <Reveal>
             <Accordion items={items} defaultOpen={0} />
             {limit < FAQS.length ? (

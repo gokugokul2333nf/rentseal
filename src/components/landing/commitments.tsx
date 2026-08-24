@@ -58,7 +58,7 @@ export function Commitments() {
           body="We would rather be judged on what we guarantee than on numbers you cannot check. Each of these applies to your first order."
         />
 
-        <Stagger className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3" amount={0.1}>
+        <Stagger className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3" amount={0.1}>
           {COMMITMENTS.map((item) => (
             <StaggerItem key={item.title}>
               <Card className="h-full p-6">

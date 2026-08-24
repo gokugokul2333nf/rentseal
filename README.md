@@ -51,9 +51,61 @@ is **built but switched off** — see [Re-enabling the product](#re-enabling-the
 | `/rental-agreement/[district]` | **38** district pages with `LocalBusiness` schema |
 | `/stamp-paper` | District index — all 38, grouped by region, `ItemList` schema |
 | `/stamp-paper/[district]` | **38** district pages with `LocalBusiness` schema |
+| `/templates` | The 24-template library, moved off the homepage |
 | `/search` | Site search — server-rendered results, works without JavaScript |
 | `/legal/{terms,privacy,refund}` | Policy pages with a sticky table of contents |
 | `/sitemap.xml`, `/robots.txt` | Generated from `src/lib/site.ts` and `src/lib/services.ts` |
+
+---
+
+## Homepage length, and why sections were cut
+
+The homepage ran to **26,115px — about 26 screens**. Most of that length was
+repetition rather than content: four consecutive sections all arguing the same
+"no markup, no office visit" case.
+
+It is now **16,787px at the same width, a 36% cut**, and 13 sections down to 10.
+Measured on the current build:
+
+| Viewport | Height | Screens |
+| --- | --- | --- |
+| 1440 × 900 | 11,584px | 12.9 |
+| 825 × 998 | 16,787px | 16.8 |
+| 375 × 812 | 23,057px | 28.4 |
+
+Mobile is still the tallest because everything stacks to one column — that is
+the number to watch if more is added.
+
+### What moved or went
+
+| Section | Was | Now |
+| --- | --- | --- |
+| Template library | 25 cards, ~3,700px, the single largest section, leading to only 4 unique destinations | Its own page at `/templates`, linked from nav and footer |
+| Comparison table | On the homepage *and* `/pricing` | `/pricing` only |
+| Features | 13 cards | Off the homepage; all 13 remain on `/how-it-works` |
+| Stamp paper use-cases | 6 cards, ~1,700px on mobile | One line linking to `/stamp-paper`, where the same cards already appear on all 38 district pages |
+| Pricing | 10 rows per plan, a third of them greyed-out exclusions | `compact` shows only what each plan includes, with a link to the full comparison |
+| Featured districts | 10 cards | 6 — the rest continue on `/rental-agreement` and in the footer |
+| Homepage FAQ | 10 visible, 8 in schema | 5, and the schema matches |
+
+Section padding also came down from `4.5/6.5rem` to `3.25/4.75rem`.
+
+## Accessibility
+
+- **Reduced motion actually works now.** The `prefers-reduced-motion` block in
+  `globals.css` only neutralises CSS animations. Framer Motion animates by
+  writing inline styles from JavaScript, so every reveal, stagger and count-up
+  ran at full strength for users who had asked for less. `MotionProvider`
+  (`components/ui/motion-provider.tsx`) wraps the app in
+  `MotionConfig reducedMotion="user"`, and `Counter` renders its final value
+  directly instead of ticking up.
+- **The looping marquee is gone.** The trust bar scrolled its eight audience
+  segments forever, with no way to pause — WCAG 2.2.2 asks for a pause
+  mechanism on any motion that starts automatically and runs past five seconds.
+  It is a static wrapped row now, which also halves that part of the DOM: the
+  marquee duplicated all eight pills to sixteen to hide the seam.
+- Focus rings (`:focus-visible`), landmarks, heading order and accessible names
+  were already in good shape and were left alone.
 
 ---
 

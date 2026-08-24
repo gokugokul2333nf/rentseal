@@ -44,6 +44,7 @@ export const NAV_LINKS = [
       { title: "Leave & Licence", href: "/services/leave-and-license", desc: "Licence to occupy without creating a tenancy interest." },
     ],
   },
+  { label: "Templates", href: "/templates" },
   { label: "Districts", href: "/rental-agreement" },
   { label: "Delivery", href: "/#delivery" },
   { label: "Pricing", href: "/pricing" },
@@ -74,6 +75,7 @@ export const FOOTER_LINKS = [
       { label: "Lease Deed", href: "/services/lease-agreement" },
       { label: "Leave & Licence", href: "/services/leave-and-license" },
       { label: "Rental agreement by district", href: "/rental-agreement" },
+      { label: "All agreement templates", href: "/templates" },
       { label: "Talk to us before you order", href: LEAD_ANCHOR },
     ],
   },
@@ -172,7 +174,11 @@ export const CITIES = DISTRICTS.map((d) => ({
   localities: d.towns,
 }));
 
-/** The ten districts we take the most orders from, for compact UI. */
+/**
+ * The six largest districts, shown as cards on the homepage. Ten was two rows
+ * on desktop and ten stacked cards on a phone, for a list that continues in
+ * full on /rental-agreement and in the footer.
+ */
 export const FEATURED_DISTRICTS = [
   "chennai",
   "coimbatore",
@@ -180,10 +186,6 @@ export const FEATURED_DISTRICTS = [
   "tiruchirappalli",
   "chengalpattu",
   "salem",
-  "tiruvallur",
-  "tiruppur",
-  "kancheepuram",
-  "erode",
 ].map((slug) => DISTRICTS.find((d) => d.slug === slug)!);
 
 /** Well-known towns that are not districts, shown as "also delivering to". */

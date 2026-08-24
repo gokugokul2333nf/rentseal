@@ -20,7 +20,7 @@ export function Cities() {
         />
 
         {/* Zones */}
-        <Stagger className="mt-16 grid gap-4 lg:grid-cols-3" amount={0.1}>
+        <Stagger className="mt-11 grid gap-4 lg:grid-cols-3" amount={0.1}>
           {DELIVERY_ZONES.map((zone) => (
             <StaggerItem key={zone.id}>
               <div className="flex h-full flex-col rounded-2xl border border-line bg-canvas/60 p-6">
@@ -79,7 +79,7 @@ export function Cities() {
         </Reveal>
 
         {/* City pages */}
-        <div className="mt-16">
+        <div className="mt-11">
           <Reveal>
             <div className="mb-8 flex items-center gap-3">
               <MapPin className="size-5 text-brand-600" />

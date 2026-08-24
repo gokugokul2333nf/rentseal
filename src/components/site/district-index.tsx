@@ -28,7 +28,7 @@ export function DistrictIndex({
             body="Grouped by region, with the delivery promise that applies to each. Pick your district for local Sub-Registrar Offices, towns we cover and what the paperwork usually looks like there."
           />
 
-          <div className="mt-16 space-y-14">
+          <div className="mt-11 space-y-14">
             {groups.map((group) => (
               <div key={group.region}>
                 <Reveal>

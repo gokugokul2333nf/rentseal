@@ -35,7 +35,13 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Truck,
 };
 
-export function Features() {
+/**
+ * `limit` keeps the homepage to the six features that actually differentiate
+ * the service. The full thirteen still render on /how-it-works, where someone
+ * has already opted into the detail.
+ */
+export function Features({ limit }: { limit?: number } = {}) {
+  const features = limit ? FEATURES.slice(0, limit) : FEATURES;
   return (
     <section id="features" className="section bg-white">
       <div className="container-page">
@@ -46,8 +52,8 @@ export function Features() {
           body="A vendor for the stamp paper, a typist for the draft, a lawyer for the review, a courier for the copy. All of it from one place, on one invoice."
         />
 
-        <Stagger className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.05}>
-          {FEATURES.map((feature) => {
+        <Stagger className="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.05}>
+          {features.map((feature) => {
             const Icon = ICONS[feature.icon] ?? ShieldCheck;
             return (
               <StaggerItem key={feature.title}>

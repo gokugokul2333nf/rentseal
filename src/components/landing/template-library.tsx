@@ -104,20 +104,27 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
   );
 }
 
-export function TemplateLibrary() {
+/**
+ * Moved off the homepage, where it was the single largest section — 25 cards
+ * and roughly 3,700px of scroll leading to only four unique destinations.
+ * `heading={false}` hides the section heading when the page already has one.
+ */
+export function TemplateLibrary({ heading = true }: { heading?: boolean } = {}) {
   const groups = getTemplatesByCategory();
 
   return (
     <section id="templates" className="section">
       <div className="container-page">
-        <SectionHeading
-          eyebrow="Template library"
-          icon={LayoutGrid}
-          title={`${TEMPLATES.length} agreement templates, ready to draft`}
-          body="Every template below is a Tamil Nadu compliant draft built on one of our four instruments — pick the one that matches your situation and the right clauses come with it."
-        />
+        {heading ? (
+          <SectionHeading
+            eyebrow="Template library"
+            icon={LayoutGrid}
+            title={`${TEMPLATES.length} agreement templates, ready to draft`}
+            body="Every template below is a Tamil Nadu compliant draft built on one of our four instruments — pick the one that matches your situation and the right clauses come with it."
+          />
+        ) : null}
 
-        <div className="mt-16 space-y-14">
+        <div className="space-y-14">
           {groups.map(({ category, templates }) => (
             <div key={category}>
               <div className="flex items-center gap-3">

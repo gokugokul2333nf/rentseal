@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { DISTRICTS } from "@/lib/districts";
+import { MotionProvider } from "@/components/ui/motion-provider";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -144,7 +145,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           Skip to content
         </a>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}

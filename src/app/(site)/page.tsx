@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { AgreementTypes } from "@/components/landing/agreement-types";
-import { TemplateLibrary } from "@/components/landing/template-library";
 import { Cities } from "@/components/landing/cities";
 import { LeadForm } from "@/components/landing/lead-form";
-import { Comparison } from "@/components/landing/comparison";
 import { FaqSchema, FaqSection } from "@/components/landing/faq-section";
-import { Features } from "@/components/landing/features";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { PricingCards } from "@/components/landing/pricing-cards";
@@ -47,21 +44,34 @@ const serviceSchema = {
 export default function HomePage() {
   return (
     <>
+      {/*
+        Kept deliberately short. This page ran to 26 screens, which is not a
+        landing page, it is a brochure — and most of the length was repetition:
+        four separate sections all making the "no markup, no office visit" case.
+
+        Moved off: the 25-card template library (now /templates, where it is
+        indexable and does not cost every visitor 3,700px of scroll) and the
+        old-way comparison table (already on /pricing, and it restated what
+        How it works and Commitments already say).
+
+        Also cut: Features. How it works, Features and Commitments were three
+        consecutive sections all arguing why to use us. The full thirteen
+        features remain on /how-it-works, where the reader has asked for them.
+      */}
       <Hero />
       <TrustBar />
       <StampPaper />
       <Cities />
       <LeadForm />
       <AgreementTypes />
-      <TemplateLibrary />
       <HowItWorks />
-      <Features />
-      <Comparison />
-      <PricingCards />
+      <PricingCards compact />
       <Commitments />
-      <FaqSection limit={10} />
+      <FaqSection limit={5} />
 
-      <FaqSchema limit={8} />
+      {/* Schema must describe what is actually on the page — it marked up eight
+          questions while ten were rendered. */}
+      <FaqSchema limit={5} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}

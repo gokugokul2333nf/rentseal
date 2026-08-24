@@ -1,12 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useMotionValue, useSpring, type Variants } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  type Variants,
+} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-/** Scroll-triggered reveal. Fires once, respects prefers-reduced-motion via CSS. */
+/**
+ * Scroll-triggered reveal. Fires once.
+ *
+ * Reduced motion is handled by MotionConfig in components/ui/motion-provider,
+ * not by the CSS media query — Framer writes inline styles, which that query
+ * cannot reach.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -96,6 +109,7 @@ export function Counter({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const reduceMotion = useReducedMotion();
   const [display, setDisplay] = useState("0");
 
   const match = value.match(/^([^\d]*)([\d,.]+)(.*)$/);
@@ -108,7 +122,9 @@ export function Counter({
   const countable = Number.isFinite(target);
 
   useEffect(() => {
-    if (!inView || !countable) return;
+    // Reduced motion skips the animation entirely — the value is derived at
+    // render below instead, so there is no setState in this effect.
+    if (!inView || !countable || reduceMotion) return;
     let raf = 0;
     const start = performance.now();
     const ms = duration * 1000;
@@ -126,7 +142,7 @@ export function Counter({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [inView, countable, target, decimals, duration]);
+  }, [inView, countable, target, decimals, duration, reduceMotion]);
 
   if (!countable) {
     return (
@@ -136,10 +152,18 @@ export function Counter({
     );
   }
 
+  // Counting up is motion, so users who asked for less of it get the final
+  // number immediately rather than a value that ticks.
+  const text = reduceMotion
+    ? decimals > 0
+      ? target.toFixed(decimals)
+      : target.toLocaleString("en-IN")
+    : display;
+
   return (
     <span ref={ref} className={cn("tnum", className)}>
       {prefix}
-      {display}
+      {text}
       {suffix}
     </span>
   );

@@ -55,7 +55,7 @@ export function HowItWorks() {
           </Stagger>
         </div>
 
-        <Reveal delay={0.2} className="mt-14 flex justify-center">
+        <Reveal delay={0.2} className="mt-10 flex justify-center">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
             Start with a free call back
             <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />

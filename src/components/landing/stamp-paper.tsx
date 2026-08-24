@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -8,16 +10,15 @@ import {
   Bike,
   CheckCircle2,
   Clock3,
-  FileStack,
   ShieldCheck,
   Stamp,
   Truck,
 } from "lucide-react";
-import { DELIVERY_RULES, DELIVERY_ZONES, DENOMINATIONS, STAMP_USE_CASES } from "@/lib/stamp-paper";
+import { DELIVERY_RULES, DELIVERY_ZONES, DENOMINATIONS } from "@/lib/stamp-paper";
 import { LEAD_ANCHOR } from "@/lib/site";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
-import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
+import { Reveal } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { cn, inr } from "@/lib/utils";
 
@@ -35,7 +36,7 @@ export function StampPaper() {
           body="No hunting for a vendor who has shut for lunch, no queue at the treasury. Tell us the denomination and the address — we procure it at face value and a rider brings it to you."
         />
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
+        <div className="mt-11 grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
           {/* ── Denominations ──────────────────────────────── */}
           <Reveal>
             <div className="rounded-3xl border border-line bg-canvas p-6 sm:p-8">
@@ -218,48 +219,25 @@ export function StampPaper() {
           </Reveal>
         </div>
 
-        {/* ── Use cases ──────────────────────────────────── */}
-        <div className="mt-16">
-          <Reveal>
-            <div className="mb-8 flex items-center gap-3">
-              <FileStack className="size-5 text-brand-600" />
-              <h3 className="font-display text-[19px] font-bold text-navy-950">
-                Not sure which denomination you need?
-              </h3>
-            </div>
-          </Reveal>
-
-          <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.05}>
-            {STAMP_USE_CASES.map((useCase) => (
-              <StaggerItem key={useCase.title}>
-                <div className="h-full rounded-2xl border border-line bg-canvas/60 p-6 transition-colors hover:bg-white">
-                  <div className="flex items-start justify-between gap-3">
-                    <h4 className="font-display text-[15.5px] font-bold text-navy-950">
-                      {useCase.title}
-                    </h4>
-                  </div>
-                  <p className="mt-2 inline-block rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11.5px] font-bold text-brand-700">
-                    {useCase.denomination}
-                  </p>
-                  <p className="mt-3 text-[13.5px] leading-[1.7] text-navy-500">{useCase.body}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-
-          <Reveal delay={0.15}>
-            <div className="mt-8 flex flex-col items-start justify-between gap-5 rounded-2xl border border-line bg-canvas p-6 sm:flex-row sm:items-center sm:p-7">
-              <p className="max-w-xl text-[14.5px] leading-relaxed text-navy-600">
-                Still unsure? Tell us what the document is for and we will tell you the
-                denomination the registrar or the office asking for it will accept — before you
-                spend anything.
-              </p>
-              <ButtonLink href={LEAD_ANCHOR} size="lg" className="shrink-0">
-                Ask us which one
-              </ButtonLink>
-            </div>
-          </Reveal>
-        </div>
+        {/*
+          The six "which denomination do I need" cards used to sit here. They
+          are roughly 1,700px of scroll on a phone and they already appear, in
+          full, on all 38 /stamp-paper/[district] pages — which is where someone
+          asking that question actually lands from search. A single line does
+          the job here.
+        */}
+        <Reveal>
+          <p className="mt-9 text-center text-[14px] text-navy-500">
+            Not sure which denomination you need?{" "}
+            <Link
+              href="/stamp-paper"
+              className="font-semibold text-brand-700 underline underline-offset-4"
+            >
+              See what each one is used for
+            </Link>
+            , or tell us what you are executing and we will confirm it before you order.
+          </p>
+        </Reveal>
       </div>
     </section>
   );

@@ -24,7 +24,7 @@ export function AgreementTypes() {
           body="Picking the wrong instrument is the most expensive mistake in a rental. Here is what each one is for, in plain English."
         />
 
-        <Stagger className="mt-16 grid gap-5 md:grid-cols-2" amount={0.1}>
+        <Stagger className="mt-11 grid gap-5 md:grid-cols-2" amount={0.1}>
           {AGREEMENT_TYPES.map((type) => {
             const Icon = ICONS[type.id];
             return (

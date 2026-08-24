@@ -6,7 +6,19 @@ import { Reveal } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { cn, inr } from "@/lib/utils";
 
-export function PricingCards({ withHeading = true }: { withHeading?: boolean }) {
+/**
+ * `compact` shows only what each plan includes. The full list, with the
+ * excluded rows greyed out, belongs on /pricing where someone is comparing —
+ * on the homepage those rows were roughly a third of the section's height and
+ * spent it telling people what they do not get.
+ */
+export function PricingCards({
+  withHeading = true,
+  compact = false,
+}: {
+  withHeading?: boolean;
+  compact?: boolean;
+}) {
   return (
     <section id="pricing" className="section relative overflow-hidden">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-mesh opacity-60" />
@@ -21,7 +33,7 @@ export function PricingCards({ withHeading = true }: { withHeading?: boolean }) 
           />
         ) : null}
 
-        <div className="mt-16 grid items-start gap-6 lg:grid-cols-3">
+        <div className="mt-11 grid items-start gap-6 lg:grid-cols-3">
           {PLANS.map((plan, i) => {
             const featured = plan.recommended;
             return (
@@ -128,7 +140,7 @@ export function PricingCards({ withHeading = true }: { withHeading?: boolean }) 
                     </ButtonLink>
 
                     <ul className="mt-7 space-y-3">
-                      {plan.features.map((feature) => (
+                      {(compact ? plan.features.filter((f) => f.included) : plan.features).map((feature) => (
                         <li key={feature.label} className="flex items-start gap-2.5">
                           <span
                             className={cn(
@@ -205,6 +217,17 @@ export function PricingCards({ withHeading = true }: { withHeading?: boolean }) 
 
         <Reveal delay={0.35}>
           <p className="mt-8 text-center text-[13.5px] text-navy-400">
+            {compact ? (
+              <>
+                <Link
+                  href="/pricing"
+                  className="font-semibold text-brand-700 underline underline-offset-4"
+                >
+                  See what each plan leaves out
+                </Link>{" "}
+                ·{" "}
+              </>
+            ) : null}
             Registering a bulk portfolio?{" "}
             <Link href="/contact" className="font-semibold text-brand-700 underline underline-offset-4">
               Talk to us about volume pricing
