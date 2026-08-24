@@ -215,7 +215,7 @@ export function StampDutyCalculator() {
                   key={b.stampDuty}
                   initial={{ opacity: 0.4, y: -3 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="tnum text-[16px] font-extrabold text-brand-700"
+                  className="tnum text-[16px] font-bold text-brand-700"
                 >
                   {inr(b.stampDuty)}
                 </motion.dd>
@@ -282,7 +282,7 @@ export function StampDutyCalculator() {
                 key={b.total}
                 initial={{ opacity: 0.5, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="tnum font-display text-[30px] leading-none font-extrabold text-white"
+                className="tnum font-display text-[30px] leading-none font-bold text-white"
               >
                 {inr(b.total)}
               </motion.dd>

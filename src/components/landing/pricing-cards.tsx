@@ -66,7 +66,7 @@ export function PricingCards({
                   <div className="relative p-7 sm:p-8">
                     <h3
                       className={cn(
-                        "font-display text-[20px] font-extrabold",
+                        "font-display text-[20px] font-bold",
                         featured ? "text-white" : "text-navy-950",
                       )}
                     >
@@ -84,7 +84,7 @@ export function PricingCards({
                     <div className="mt-6 flex items-baseline gap-1.5">
                       <span
                         className={cn(
-                          "tnum font-display text-[42px] leading-none font-extrabold tracking-tight",
+                          "tnum font-display text-[42px] leading-none font-bold tracking-tight",
                           featured ? "text-white" : "text-navy-950",
                         )}
                       >

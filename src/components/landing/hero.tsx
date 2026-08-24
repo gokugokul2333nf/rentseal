@@ -54,7 +54,7 @@ function AgreementMock() {
         <p className="text-[9px] font-bold tracking-[0.22em] text-navy-400 uppercase">
           Government of Tamil Nadu · e-Stamp
         </p>
-        <h3 className="mt-2 font-display text-[15px] font-extrabold tracking-tight text-navy-950">
+        <h3 className="mt-2 font-display text-[15px] font-bold tracking-tight text-navy-950">
           RESIDENTIAL RENTAL AGREEMENT
         </h3>
         <p className="mt-1 text-[10.5px] text-navy-400">
@@ -202,8 +202,9 @@ export function Hero() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-mesh" />
         <div className="absolute inset-0 bg-grid" />
-        <div className="absolute -top-32 -right-40 size-[620px] rounded-full bg-brand-400/12 blur-[120px]" />
-        <div className="absolute -bottom-52 -left-40 size-[560px] rounded-full bg-emerald-400/10 blur-[120px]" />
+        {/* Two 600px blurred colour blobs sat here — the standard generated-hero
+            backdrop. A single, much fainter wash keeps depth without the glow. */}
+        <div className="absolute -top-40 -right-52 size-[520px] rounded-full bg-brand-400/[0.055] blur-[140px]" />
       </div>
 
       <div className="container-page">
@@ -228,30 +229,18 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, delay: 0.08, ease: EASE }}
-              className="mt-6 text-[clamp(2.2rem,5.6vw,3.7rem)] leading-[1.06] font-extrabold tracking-[-0.035em] text-navy-950"
+              className="mt-6 text-[clamp(2.2rem,5.6vw,3.7rem)] leading-[1.06] font-bold tracking-[-0.035em] text-navy-950"
             >
               Stamp paper and rental
               <br className="hidden sm:block" /> agreements,{" "}
-              <span className="relative inline-block whitespace-nowrap">
-                <span className="text-gradient">delivered</span>
-                <motion.svg
-                  viewBox="0 0 240 12"
-                  fill="none"
-                  className="absolute -bottom-1.5 left-0 w-full text-brand-500/50"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <motion.path
-                    d="M2 8.5C40 3.5 90 2 120 4.5c30 2.5 78 4 118 0"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 1, delay: 0.75, ease: EASE }}
-                  />
-                </motion.svg>
-              </span>
+              {/*
+                Was a gradient-filled word with an animated hand-drawn underline
+                swash beneath it. Both are decoration that every generated hero
+                reaches for. The emphasis now comes from the typeface itself.
+              */}
+              <em className="italic font-normal text-brand-800">
+                delivered
+              </em>
             </motion.h1>
 
             <motion.p
@@ -338,7 +327,7 @@ export function Hero() {
             {/* glow behind document */}
             <div
               aria-hidden="true"
-              className="absolute inset-x-6 top-10 bottom-10 rounded-[36px] bg-brand-600/20 blur-3xl"
+              className="absolute inset-x-8 top-12 bottom-12 rounded-[24px] bg-brand-600/[0.10] blur-3xl"
             />
 
             <div className="relative">

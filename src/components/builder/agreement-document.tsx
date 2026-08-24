@@ -56,7 +56,7 @@ export function AgreementDocument({
         <p className="mt-1 text-[9px] font-semibold tracking-[0.14em] text-navy-400 uppercase">
           e-Stamp Certificate · Article 35, Indian Stamp Act 1899
         </p>
-        <h1 className="mt-4 font-display text-[19px] font-extrabold tracking-tight text-navy-950 uppercase">
+        <h1 className="mt-4 font-display text-[19px] font-bold tracking-tight text-navy-950 uppercase">
           {agreementTitle(draft.type)}
         </h1>
         <p className="mt-2 text-[11px] text-navy-500">

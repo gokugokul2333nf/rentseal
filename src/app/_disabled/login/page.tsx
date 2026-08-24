@@ -29,7 +29,7 @@ export default function LoginPage() {
 
           <Logo />
 
-          <h1 className="mt-8 text-[clamp(1.8rem,4vw,2.35rem)] leading-[1.12] font-extrabold tracking-[-0.03em] text-navy-950">
+          <h1 className="mt-8 text-[clamp(1.8rem,4vw,2.35rem)] leading-[1.12] font-bold tracking-[-0.03em] text-navy-950">
             Sign in to your agreements
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-navy-500">
@@ -94,7 +94,7 @@ export default function LoginPage() {
           <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/10 pt-12">
             {STATS.map((stat) => (
               <div key={stat.label}>
-                <dd className="font-display text-[28px] font-extrabold tracking-tight text-white">
+                <dd className="font-display text-[28px] font-bold tracking-tight text-white">
                   {stat.value}
                 </dd>
                 <dt className="mt-1 text-[13.5px] font-medium text-white/60">{stat.label}</dt>

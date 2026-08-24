@@ -49,7 +49,7 @@ export default function FaqPage() {
               return (
                 <section key={cat} id={cat.toLowerCase().replace(/\s+/g, "-")} className="scroll-mt-28">
                   <Reveal delay={i * 0.04}>
-                    <h2 className="mb-5 font-display text-[22px] font-extrabold tracking-tight text-navy-950">
+                    <h2 className="mb-5 font-display text-[22px] font-bold tracking-tight text-navy-950">
                       {cat}
                       <span className="ml-2.5 text-[14px] font-medium text-navy-400">
                         {items.length} question{items.length === 1 ? "" : "s"}
@@ -64,7 +64,7 @@ export default function FaqPage() {
 
           <Reveal delay={0.15}>
             <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-line bg-navy-950 p-8 text-center text-white sm:p-10">
-              <h2 className="font-display text-[22px] font-extrabold">
+              <h2 className="font-display text-[22px] font-bold">
                 Your question isn&apos;t here?
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-white/60">

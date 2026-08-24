@@ -25,7 +25,7 @@ export function ContactForm() {
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-emerald-500">
           <CheckCircle2 className="size-7 text-white" />
         </span>
-        <h2 className="mt-5 font-display text-[20px] font-extrabold text-navy-950">
+        <h2 className="mt-5 font-display text-[20px] font-bold text-navy-950">
           Got it — we&apos;ll come back to you today
         </h2>
         <p className="mx-auto mt-3 max-w-md text-[14.5px] leading-relaxed text-navy-600">

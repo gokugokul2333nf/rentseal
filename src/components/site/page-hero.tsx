@@ -64,7 +64,7 @@ export function PageHero({
           <Reveal delay={0.05}>
             <h1
               className={cn(
-                "text-[clamp(2rem,5vw,3.15rem)] leading-[1.08] font-extrabold tracking-[-0.032em] text-navy-950",
+                "text-[clamp(2rem,5vw,3.15rem)] leading-[1.08] font-bold tracking-[-0.032em] text-navy-950",
                 eyebrow && "mt-5",
               )}
             >

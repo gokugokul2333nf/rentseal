@@ -72,7 +72,7 @@ export function LegalPage({
               {sections.map((section, i) => (
                 <Reveal key={section.id} delay={0.02 * i}>
                   <section id={section.id} className="scroll-mt-28 border-b border-line py-8 first:pt-0 last:border-0">
-                    <h2 className="font-display text-[20px] font-extrabold tracking-tight text-navy-950">
+                    <h2 className="font-display text-[20px] font-bold tracking-tight text-navy-950">
                       <span className="tnum mr-2.5 text-[15px] font-bold text-navy-300">
                         {String(i + 1).padStart(2, "0")}
                       </span>

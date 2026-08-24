@@ -35,7 +35,7 @@ export function Footer() {
         <div className="container-page border-b border-white/10 py-14">
           <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
             <div className="max-w-xl">
-              <h2 className="text-[clamp(1.6rem,3.2vw,2.15rem)] leading-[1.15] font-extrabold text-white">
+              <h2 className="text-[clamp(1.6rem,3.2vw,2.15rem)] leading-[1.15] font-bold text-white">
                 Your agreement is ten minutes away.
               </h2>
               <p className="mt-3 text-[15.5px] leading-relaxed text-white/60">

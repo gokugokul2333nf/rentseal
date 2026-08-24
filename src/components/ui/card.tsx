@@ -61,14 +61,21 @@ export function Eyebrow({
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   return (
+    /*
+      This was a tinted, bordered, rounded-full pill with an icon chip, repeated
+      above all 36 section headings. That pattern is the clearest visual tell of
+      a generated landing page. A ruled uppercase label does the same job — it
+      marks the section without decorating it.
+    */
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-brand-200/80 bg-brand-50/70 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-brand-700 uppercase",
+        "inline-flex items-center gap-2.5 text-[11.5px] font-semibold tracking-[0.14em] text-brand-700 uppercase",
         className,
       )}
     >
       {Icon ? <Icon className="size-3.5" /> : null}
       {children}
+      <span aria-hidden="true" className="h-px w-8 bg-brand-300" />
     </span>
   );
 }

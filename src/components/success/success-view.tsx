@@ -116,7 +116,7 @@ export function SuccessView({ agreementId }: { agreementId: string }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="mt-7 text-[clamp(2rem,5vw,3rem)] leading-[1.1] font-extrabold tracking-[-0.03em] text-navy-950"
+            className="mt-7 text-[clamp(2rem,5vw,3rem)] leading-[1.1] font-bold tracking-[-0.03em] text-navy-950"
           >
             That&apos;s it. Your agreement is being stamped.
           </motion.h1>

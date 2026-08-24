@@ -139,7 +139,7 @@ export default async function StampPaperDistrictPage({
                   <p className="mt-4 text-[12px] font-bold tracking-[0.12em] text-navy-400 uppercase">
                     {stat.label}
                   </p>
-                  <p className="mt-1.5 font-display text-[26px] font-extrabold tracking-tight text-navy-950">
+                  <p className="mt-1.5 font-display text-[26px] font-bold tracking-tight text-navy-950">
                     <Counter value={stat.value} />
                   </p>
                   <p className="mt-1 text-[12.5px] leading-snug text-navy-500">{stat.sub}</p>
@@ -175,7 +175,7 @@ export default async function StampPaperDistrictPage({
               <StaggerItem key={d.label}>
                 <div className="flex h-full flex-col rounded-2xl border border-line bg-canvas/60 p-6">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="font-display text-[24px] font-extrabold tracking-tight text-navy-950">
+                    <p className="font-display text-[24px] font-bold tracking-tight text-navy-950">
                       {d.label}
                     </p>
                     {d.popular ? (

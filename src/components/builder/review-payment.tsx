@@ -185,7 +185,7 @@ export function PaymentStep({ onPaid }: { onPaid: () => void }) {
                     </span>
                     {plan.recommended ? <Badge tone="brand">Popular</Badge> : null}
                   </div>
-                  <p className="tnum mt-1.5 text-[19px] font-extrabold text-navy-950">
+                  <p className="tnum mt-1.5 text-[19px] font-bold text-navy-950">
                     {inr(plan.price)}
                   </p>
                   <p className="mt-1 text-[12px] leading-snug text-navy-500">{plan.delivery}</p>
@@ -296,7 +296,7 @@ export function PaymentStep({ onPaid }: { onPaid: () => void }) {
                 key={payable}
                 initial={{ opacity: 0.5, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="tnum font-display text-[24px] font-extrabold text-white"
+                className="tnum font-display text-[24px] font-bold text-white"
               >
                 {inr(payable)}
               </motion.span>

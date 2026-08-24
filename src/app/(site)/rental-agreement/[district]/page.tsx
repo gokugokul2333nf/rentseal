@@ -137,7 +137,7 @@ export default async function DistrictPage({
                   <p className="mt-4 text-[12px] font-bold tracking-[0.12em] text-navy-400 uppercase">
                     {stat.label}
                   </p>
-                  <p className="mt-1.5 font-display text-[26px] font-extrabold tracking-tight text-navy-950">
+                  <p className="mt-1.5 font-display text-[26px] font-bold tracking-tight text-navy-950">
                     <Counter value={stat.value} />
                   </p>
                   <p className="mt-1 text-[12.5px] leading-snug text-navy-500">{stat.sub}</p>

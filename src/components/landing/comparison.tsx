@@ -34,7 +34,7 @@ export function Comparison() {
             </span>
           </Reveal>
           <Reveal delay={0.06}>
-            <h2 className="mt-5 text-[clamp(1.85rem,4.2vw,2.85rem)] leading-[1.12] font-extrabold text-white">
+            <h2 className="mt-5 text-[clamp(1.85rem,4.2vw,2.85rem)] leading-[1.12] font-bold text-white">
               You already know how this normally goes.
             </h2>
           </Reveal>

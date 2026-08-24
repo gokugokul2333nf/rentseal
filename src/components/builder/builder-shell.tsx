@@ -123,7 +123,7 @@ function SummaryRail({ onOpenPreview }: { onOpenPreview: () => void }) {
               key={breakdown.total}
               initial={{ opacity: 0.5, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
-              className="tnum font-display text-[19px] font-extrabold text-white"
+              className="tnum font-display text-[19px] font-bold text-white"
             >
               {inr(breakdown.total)}
             </motion.dd>
@@ -138,7 +138,7 @@ function SummaryRail({ onOpenPreview }: { onOpenPreview: () => void }) {
             <Sparkles className="size-4 text-brand-600" />
             Clauses generated
           </h2>
-          <span className="tnum font-display text-[19px] font-extrabold text-navy-950">
+          <span className="tnum font-display text-[19px] font-bold text-navy-950">
             {stats.total}
           </span>
         </div>
@@ -477,7 +477,7 @@ function SummaryRailMobile() {
       <span className="text-[13px] text-navy-500">
         Stamp duty {inr(breakdown.stampDuty)} · Fee {inr(breakdown.platformFee + breakdown.gst)}
       </span>
-      <span className="tnum text-[16px] font-extrabold text-navy-950">{inr(breakdown.total)}</span>
+      <span className="tnum text-[16px] font-bold text-navy-950">{inr(breakdown.total)}</span>
     </div>
   );
 }

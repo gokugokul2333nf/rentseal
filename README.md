@@ -90,6 +90,35 @@ the number to watch if more is added.
 
 Section padding also came down from `4.5/6.5rem` to `3.25/4.75rem`.
 
+## Typography and why the design changed
+
+The site was set in **Inter + Plus Jakarta Sans**, extrabold, with a tinted pill
+above every section heading and everything centred. That is the default output
+of a generated landing page, and it read like one — which is a problem for a
+business whose product is the credibility of a document.
+
+**Headings are now Source Serif 4**; body and UI stay on Inter. A serif is the
+right register here: it is what the instruments themselves are set in, it reads
+as institutional rather than startup, and at 38 / 1% / 11 months in the stats
+row the numerals carry far more authority than a geometric sans did. It also
+ships a native ₹ glyph, which matters on a site full of rupee figures — verified
+rather than assumed.
+
+### What else was changed, and why
+
+| Tell | Was | Now |
+| --- | --- | --- |
+| Display face | Plus Jakarta Sans, `font-extrabold` | Source Serif 4, `font-bold` (40 occurrences) |
+| Section eyebrows | Tinted, bordered, `rounded-full` pill with an icon chip, above all 36 headings | Ruled uppercase label — marks the section without decorating it |
+| Heading alignment | Centred by default, ten times down the page | Left by default; centre is now a deliberate choice |
+| Hero emphasis | Gradient-filled word with an animated hand-drawn underline swash | The serif italic |
+| Corner radius | Everything `rounded-2xl` (16px) / `rounded-3xl` (24px) | Scale pulled in — 2xl is 10px. Pills keep `rounded-full`, which is correct for pills |
+| Hero backdrop | Two 600px blurred colour blobs | One much fainter wash |
+| Heading tracking | `-0.022em`, tuned for a geometric sans | `-0.011em` — the tighter value closes up serifs |
+
+Radii are set as theme tokens in `globals.css`, so `rounded-2xl` changes
+everywhere at once rather than needing 68 edits.
+
 ## Accessibility
 
 - **Reduced motion actually works now.** The `prefers-reduced-motion` block in

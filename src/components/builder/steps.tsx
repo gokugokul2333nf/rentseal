@@ -54,7 +54,7 @@ const AMENITIES = [
 export function StepIntro({ title, body }: { title: string; body: string }) {
   return (
     <div className="mb-7">
-      <h2 className="font-display text-[22px] font-extrabold tracking-tight text-navy-950">
+      <h2 className="font-display text-[22px] font-bold tracking-tight text-navy-950">
         {title}
       </h2>
       <p className="mt-1.5 text-[14.5px] leading-relaxed text-navy-500">{body}</p>

@@ -35,7 +35,7 @@ export function HowItWorks() {
             {HOW_IT_WORKS.map((step) => (
               <StaggerItem key={step.step} className="relative">
                 <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-                  <span className="relative z-10 grid size-[76px] place-items-center rounded-2xl border border-line bg-white font-display text-[26px] font-extrabold text-navy-950 shadow-card">
+                  <span className="relative z-10 grid size-[76px] place-items-center rounded-2xl border border-line bg-white font-display text-[26px] font-bold text-navy-950 shadow-card">
                     {step.step}
                     <span className="absolute -right-1.5 -bottom-1.5 flex items-center gap-1 rounded-full bg-brand-600 px-2 py-0.5 text-[9.5px] font-bold text-white shadow-sm">
                       <Clock3 className="size-2.5" />

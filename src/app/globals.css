@@ -34,11 +34,18 @@
   --color-line: #e2e8f0;
 
   /* Type */
-  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-serif), ui-serif, Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* Radii */
-  --radius-4xl: 2rem;
+  /* Radii
+     Everything was rounded-2xl (16px) or rounded-3xl (24px), which reads soft
+     and generic. Pulling the scale in makes cards look drawn rather than
+     inflated. Pills keep rounded-full, which is correct for pills. */
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.875rem;
+  --radius-4xl: 1.25rem;
 
   /* Elevation — soft, layered, never harsh */
   --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px -2px rgb(15 23 42 / 0.06);
@@ -72,7 +79,10 @@
 
   h1, h2, h3, h4, h5 {
     font-family: var(--font-display);
-    letter-spacing: -0.022em;
+    /* A serif does not want the tight tracking a geometric sans needs — the
+       previous -0.022em was tuned for Plus Jakarta Sans and closes up the
+       serifs. */
+    letter-spacing: -0.011em;
     text-wrap: balance;
   }
 

@@ -87,7 +87,7 @@ export default function HowItWorksPage() {
               {DETAIL.map((item, i) => (
                 <Reveal key={item.n} delay={i * 0.05}>
                   <li className="relative border-l-2 border-line pl-8 pb-2">
-                    <span className="absolute -top-1 -left-[17px] grid size-8 place-items-center rounded-full border-2 border-line bg-white font-display text-[12px] font-extrabold text-navy-950">
+                    <span className="absolute -top-1 -left-[17px] grid size-8 place-items-center rounded-full border-2 border-line bg-white font-display text-[12px] font-bold text-navy-950">
                       {item.n}
                     </span>
                     <h3 className="font-display text-[19px] font-bold text-navy-950">

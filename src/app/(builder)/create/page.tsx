@@ -50,7 +50,7 @@ export default function CreatePage() {
             </Badge>
           </Reveal>
           <Reveal delay={0.06}>
-            <h1 className="mt-6 text-[clamp(2rem,5vw,3.15rem)] leading-[1.1] font-extrabold tracking-[-0.03em] text-navy-950">
+            <h1 className="mt-6 text-[clamp(2rem,5vw,3.15rem)] leading-[1.1] font-bold tracking-[-0.03em] text-navy-950">
               What kind of agreement do you need?
             </h1>
           </Reveal>

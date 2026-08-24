@@ -84,7 +84,7 @@ export function LeadForm() {
             </Reveal>
 
             <Reveal delay={0.06}>
-              <h2 className="mt-6 text-[clamp(2rem,4.6vw,3.05rem)] leading-[1.1] font-extrabold tracking-[-0.03em] text-white">
+              <h2 className="mt-6 text-[clamp(2rem,4.6vw,3.05rem)] leading-[1.1] font-bold tracking-[-0.03em] text-white">
                 Tell us what you need.
                 <br className="hidden sm:block" /> We&apos;ll bring it to you.
               </h2>
@@ -158,7 +158,7 @@ export function LeadForm() {
                 <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-emerald-500 shadow-[0_10px_32px_-10px_rgb(16_185_129/0.7)]">
                   <CheckCircle2 className="size-8 text-white" />
                 </span>
-                <h3 className="mt-6 font-display text-[23px] font-extrabold tracking-tight text-navy-950">
+                <h3 className="mt-6 font-display text-[23px] font-bold tracking-tight text-navy-950">
                   Thank you — we have your details
                 </h3>
                 <p className="mx-auto mt-3 max-w-sm text-[15px] leading-[1.7] text-navy-600">
@@ -199,7 +199,7 @@ export function LeadForm() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-display text-[20px] font-extrabold tracking-tight text-navy-950">
+                    <h3 className="font-display text-[20px] font-bold tracking-tight text-navy-950">
                       Tell us what you need
                     </h3>
                     <p className="mt-1.5 text-[13.5px] text-navy-500">

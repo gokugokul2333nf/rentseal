@@ -86,7 +86,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                   <Users className="size-3.5" />
                   Who this is for
                 </span>
-                <h2 className="mt-5 text-[clamp(1.7rem,3.4vw,2.3rem)] leading-[1.15] font-extrabold text-navy-950">
+                <h2 className="mt-5 text-[clamp(1.7rem,3.4vw,2.3rem)] leading-[1.15] font-bold text-navy-950">
                   Is this the right instrument for you?
                 </h2>
                 <p className="mt-4 text-[15.5px] leading-[1.7] text-navy-500">
@@ -174,7 +174,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             {service.watchOut.map((item, i) => (
               <StaggerItem key={item.title}>
                 <div className="h-full rounded-2xl border border-amber-200 bg-amber-50/60 p-6">
-                  <span className="grid size-9 place-items-center rounded-lg bg-amber-500 font-display text-[14px] font-extrabold text-white">
+                  <span className="grid size-9 place-items-center rounded-lg bg-amber-500 font-display text-[14px] font-bold text-white">
                     {i + 1}
                   </span>
                   <h3 className="mt-5 font-display text-[16.5px] font-bold text-navy-950">

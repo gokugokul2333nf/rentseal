@@ -83,7 +83,7 @@ export function StampPaper() {
                       ) : null}
                       <span
                         className={cn(
-                          "block font-display text-[22px] font-extrabold tracking-tight",
+                          "block font-display text-[22px] font-bold tracking-tight",
                           isActive ? "text-white" : "text-navy-950",
                         )}
                       >

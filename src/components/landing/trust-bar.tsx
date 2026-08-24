@@ -46,7 +46,7 @@ export function TrustBar() {
         <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line pt-10 lg:grid-cols-4">
           {STATS.map((stat, i) => (
             <Reveal key={stat.label} delay={i * 0.08} className="text-center">
-              <dd className="flex items-baseline justify-center gap-1.5 font-display text-[clamp(2rem,4vw,2.9rem)] font-extrabold tracking-tight text-navy-950">
+              <dd className="flex items-baseline justify-center gap-1.5 font-display text-[clamp(2rem,4vw,2.9rem)] font-bold tracking-tight text-navy-950">
                 <Counter value={stat.value} />
                 {"star" in stat && stat.star ? (
                   <Star className="size-6 fill-amber-400 text-amber-400" />

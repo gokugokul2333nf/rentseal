@@ -2,11 +2,19 @@ import { cn } from "@/lib/utils";
 import { Eyebrow } from "./card";
 import { Reveal } from "./motion";
 
+/**
+ * Default alignment is left.
+ *
+ * Every section previously ran centred eyebrow, centred heading, centred
+ * paragraph, ten times down the page. Centring everything is what a template
+ * does; editorial layouts anchor to a left margin and centre only when there is
+ * a reason to.
+ */
 export function SectionHeading({
   eyebrow,
   title,
   body,
-  align = "center",
+  align = "left",
   className,
   icon,
 }: {
@@ -20,7 +28,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "max-w-2xl",
+        align === "center" ? "max-w-2xl" : "max-w-3xl",
         align === "center" ? "mx-auto text-center" : "text-left",
         className,
       )}
@@ -31,7 +39,7 @@ export function SectionHeading({
         </Reveal>
       ) : null}
       <Reveal delay={0.06}>
-        <h2 className="mt-5 text-[clamp(1.85rem,4.2vw,2.85rem)] leading-[1.12] font-extrabold text-navy-950">
+        <h2 className="mt-4 text-[clamp(1.8rem,3.8vw,2.6rem)] leading-[1.15] font-bold text-navy-950">
           {title}
         </h2>
       </Reveal>

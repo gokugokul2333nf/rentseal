@@ -135,7 +135,7 @@ export default function AboutPage() {
                 <Reveal key={item.step} delay={i * 0.06}>
                   <li className="relative border-l-2 border-line pl-8 pb-2">
                     <span className="absolute -top-0.5 -left-[13px] size-6 rounded-full border-[5px] border-white bg-brand-600" />
-                    <p className="tnum font-display text-[13px] font-extrabold tracking-wide text-brand-700">
+                    <p className="tnum font-display text-[13px] font-bold tracking-wide text-brand-700">
                       {item.step}
                     </p>
                     <h3 className="mt-1 font-display text-[18px] font-bold text-navy-950">

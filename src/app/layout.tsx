@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Source_Serif_4 } from "next/font/google";
 import { DISTRICTS } from "@/lib/districts";
 import { MotionProvider } from "@/components/ui/motion-provider";
 import { SITE } from "@/lib/site";
@@ -11,10 +11,22 @@ const inter = Inter({
   display: "swap",
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+/**
+ * Headings are set in a serif on purpose.
+ *
+ * The site was previously Inter + Plus Jakarta Sans, which is the default
+ * pairing of every generated landing page on the internet right now — geometric,
+ * extrabold, and completely anonymous. A business that sells stamped legal
+ * instruments should not look like a SaaS template.
+ *
+ * Source Serif reads the way the documents themselves do: institutional,
+ * readable at size, and old enough to imply the company has been here a while.
+ */
+const serif = Source_Serif_4({
+  variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["400", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -137,7 +149,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-IN" className={`${inter.variable} ${jakarta.variable} h-full antialiased`}>
+    <html lang="en-IN" className={`${inter.variable} ${serif.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
