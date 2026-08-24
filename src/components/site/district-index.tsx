@@ -65,7 +65,7 @@ export function DistrictIndex({
                               {zone.eta}
                             </span>
                             <span className="text-[12.5px] text-navy-400">
-                              {district.orders} orders
+                              {district.towns.length} main towns
                             </span>
                           </div>
                         </Link>

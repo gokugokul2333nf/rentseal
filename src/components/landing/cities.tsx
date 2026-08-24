@@ -104,8 +104,8 @@ export function Cities() {
                   </div>
                   <p className="mt-1 text-[12.5px] text-navy-400">HQ {city.hq}</p>
                   <p className="mt-4 text-[13px] font-semibold text-brand-700">
-                    {city.orders}
-                    <span className="ml-1 font-normal text-navy-400">orders</span>
+                    {city.sroTowns.length}
+                    <span className="ml-1 font-normal text-navy-400">SRO jurisdictions</span>
                   </p>
                 </Link>
               </StaggerItem>

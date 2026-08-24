@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { PricingCards } from "@/components/landing/pricing-cards";
-import { Testimonials } from "@/components/landing/testimonials";
+import { Commitments } from "@/components/landing/commitments";
 import { Accordion } from "@/components/ui/accordion";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -189,7 +189,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       </section>
 
       <PricingCards />
-      <Testimonials />
+      <Commitments />
 
       {/* Service FAQs */}
       <section className="section border-t border-line bg-white">

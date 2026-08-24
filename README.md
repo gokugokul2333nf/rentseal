@@ -57,6 +57,49 @@ is **built but switched off** — see [Re-enabling the product](#re-enabling-the
 
 ---
 
+## Claims policy, and what you must supply before launch
+
+The site previously published a number of things that were invented. For a
+business selling legal documents that is a liability rather than a shortcut —
+a customer, a competitor or a tax officer can check most of them in seconds.
+Everything below has been removed and replaced with statements that are true
+from the first order.
+
+### Removed
+
+| Was | Why it went | Replaced with |
+| --- | --- | --- |
+| `CIN U74999TN2021PTC145678`, `GSTIN 33AABCR1234M1ZX` | Invented. `AABCR1234M` is the textbook example PAN | `SITE.cin` / `SITE.gstin` are empty strings; the footer and About table omit the row entirely while blank |
+| "ISO 27001 certified infrastructure", "PCI-DSS compliant payments" | Certifications not held. Claiming one is a misrepresentation | Statements about how the service actually handles data and cards |
+| "Annual third-party penetration testing" | Not performed | Removed from the privacy page |
+| "4.9 from 6,400 landlords and tenants", `42k+` avatar stack | Invented rating and customer count | A hero panel inviting the reader to verify the e-Stamp certificate number themselves |
+| "57,000+ orders delivered" stat | Invented | `38 districts` / `1% duty` / `11 months` / `7 days support` — all structurally true |
+| Per-district order counts (`orders: "18,400+"`) | Invented, on 76 pages | Sub-Registrar Office and taluk counts, which are real and already in the data |
+| Six named testimonials with cities and job titles | Invented people | `components/landing/commitments.tsx` — six service guarantees we control |
+| Five-entry founding timeline, two founders, a ₹2,00,000 anecdote | Invented company history | Five operating principles on the About page: how the money, the law and the signing actually work |
+| "brokers keep standing orders with us", "a good share of our volume" | Implies a customer base that does not exist yet | Capability statements — what bulk ordering supports, not who already uses it |
+
+### Still to supply
+
+These are placeholders and are marked as such at the top of `src/lib/site.ts`:
+
+- [ ] `SITE.phone` — currently `+91 44 4000 1200`
+- [ ] `SITE.whatsapp` — currently `+91 90000 12000`
+- [ ] `SITE.email` — currently `hello@rentseal.in`
+- [ ] `SITE.address` — currently a Chennai landmark address
+- [ ] `SITE.cin` — empty; fill in and the footer and About row appear automatically
+- [ ] `SITE.gstin` — empty; same
+- [ ] `SITE.legalName` — confirm the registered entity name is exact
+
+### The rule going forward
+
+Before adding a number or a credential to this site, ask whether a stranger
+could check it today. If they could and it would fail, it does not go on the
+page. Capability statements ("ten sheets or more ships free") are always
+available; volume and reputation claims have to be earned first.
+
+---
+
 ## The location matrix
 
 Every location page on the site is one of the **38 official districts of Tamil

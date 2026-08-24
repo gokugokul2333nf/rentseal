@@ -390,7 +390,7 @@ export function PaymentStep({ onPaid }: { onPaid: () => void }) {
 
         <p className="flex items-center justify-center gap-2 text-[12.5px] text-navy-400">
           <Lock className="size-3.5" />
-          256-bit encrypted · PCI-DSS compliant · Full refund until the e-stamp is procured
+          Encrypted · Card details never reach our servers · Full refund until the e-stamp is procured
         </p>
       </div>
     </>

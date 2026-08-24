@@ -1,6 +1,19 @@
 import { DISTRICTS, NOTABLE_TOWNS } from "./districts";
 import type { AgreementType, PlanId } from "./types";
 
+/**
+ * ⚠️ SUPPLY BEFORE LAUNCH
+ *
+ * `phone`, `whatsapp`, `email` and `address` below are placeholders. Replace
+ * them with the real details — they are the only contact routes on the site and
+ * every CTA depends on them.
+ *
+ * `cin` and `gstin` are intentionally empty. They previously carried invented
+ * numbers, which is not something a legal-documents business can publish: a
+ * customer, a competitor or a tax officer can check both in seconds. Anything
+ * that renders them omits the row entirely while they are blank, so fill them in
+ * and they appear — leave them and nothing false is shown.
+ */
 export const SITE = {
   name: "RentSeal",
   legalName: "RentSeal Legal Technologies Pvt Ltd",
@@ -12,8 +25,10 @@ export const SITE = {
   whatsapp: "+91 90000 12000",
   email: "hello@rentseal.in",
   address: "Prestige Polygon, 471 Anna Salai, Teynampet, Chennai 600018",
-  gstin: "33AABCR1234M1ZX",
-  cin: "U74999TN2021PTC145678",
+  /** Company Identification Number. Empty until the real one is supplied. */
+  cin: "",
+  /** GST Identification Number. Empty until the real one is supplied. */
+  gstin: "",
 } as const;
 
 /* ─────────────────────────── Navigation ─────────────────────────── */
@@ -153,7 +168,6 @@ export const AGREEMENT_TYPES: Array<{
 export const CITIES = DISTRICTS.map((d) => ({
   ...d,
   district: d.name,
-  agreements: d.orders,
   sro: d.sroTowns.join(", "),
   localities: d.towns,
 }));
@@ -252,11 +266,18 @@ export const PLANS: Array<{
 
 /* ─────────────────────────── Landing content ─────────────────────────── */
 
+/**
+ * Every figure here is a fact about the service or the law, not a claim about
+ * volume or reputation. Order counts and star ratings were removed because they
+ * were invented, and an unevidenced number is worth less than a true one.
+ */
 export const STATS = [
-  { value: "57,000+", label: "Orders delivered", sub: "stamp paper and agreements" },
   { value: "38", label: "Districts covered", sub: "every one in Tamil Nadu" },
-  { value: "4.9", label: "Average rating", sub: "on 6,400 reviews", star: true },
-  { value: "24×7", label: "Support", sub: "Tamil & English" },
+  { value: "1%", label: "Stamp duty rate", sub: "of total rent plus deposit" },
+  { value: "11 months", label: "Standard term", sub: "below compulsory registration" },
+  // Counter animates the leading number, so keep it one that counts sensibly —
+  // "8am – 10pm" rendered as "0am – 10pm" mid-animation.
+  { value: "7 days", label: "Support a week", sub: "8am – 10pm, Tamil and English" },
 ] as const;
 
 export const HOW_IT_WORKS = [
@@ -298,53 +319,8 @@ export const FEATURES = [
   { icon: "MessageCircle", title: "WhatsApp delivery", body: "The signed PDF reaches both parties on WhatsApp the moment it is generated. No hunting through email." },
   { icon: "CloudUpload", title: "Cloud storage forever", body: "Every agreement you have ever made stays in your dashboard, searchable, downloadable, on any device." },
   { icon: "BellRing", title: "Renewal reminders", body: "We nudge you 45 days before expiry and pre-fill the renewal, so a lapsed agreement never costs you a deposit dispute." },
-  { icon: "Lock", title: "AES-256 encryption", body: "Aadhaar and PAN are encrypted at rest, masked in the interface, and never written to a log." },
+  { icon: "Lock", title: "Identity data stays hidden", body: "Aadhaar and PAN are encrypted at rest, masked everywhere in the interface, and never written to a log." },
   { icon: "Smartphone", title: "Built mobile-first", body: "Two-thirds of our agreements are made on a phone. Every step, including signing, works on a small screen." },
-] as const;
-
-export const TESTIMONIALS = [
-  {
-    name: "Lakshmi Narayanan",
-    role: "Owns 4 flats",
-    city: "Adyar, Chennai",
-    rating: 5,
-    body: "I used to lose a full morning at the Sub-Registrar office for every tenant. Did my last three agreements from my phone while the tenant sat in front of me. The stamp duty breakdown was the part that won me over — I could see they weren't padding it.",
-  },
-  {
-    name: "Priya Ramesh",
-    role: "Software engineer, tenant",
-    city: "Peelamedu, Coimbatore",
-    rating: 5,
-    body: "My landlord sent me the link, I filled my half on the bus, and we both signed with Aadhaar OTP the same evening. I actually read the clauses because they were in normal English for once.",
-  },
-  {
-    name: "Mohammed Iqbal",
-    role: "Real estate broker",
-    city: "Anna Nagar, Madurai",
-    rating: 5,
-    body: "I close eight to ten rentals a month. The dashboard keeps every draft separate and the renewal reminder has saved two of my clients from a lapsed agreement. This has replaced my typist entirely.",
-  },
-  {
-    name: "S. Karthikeyan",
-    role: "Runs a textile unit",
-    city: "P.N. Road, Tiruppur",
-    rating: 5,
-    body: "Commercial lease for a godown, three years, needed registration. The advocate on the Premium plan caught that my lock-in clause was one-sided and rewrote it. Worth every rupee of the fifteen hundred.",
-  },
-  {
-    name: "Anitha Devi",
-    role: "Retired teacher, landlady",
-    city: "Thillai Nagar, Trichy",
-    rating: 5,
-    body: "I am 63 and not good with computers. Someone from support stayed on the phone in Tamil and walked me through the whole thing. The stamped copy came home by courier in two days.",
-  },
-  {
-    name: "Vignesh Kumar",
-    role: "Manages a coliving brand",
-    city: "Sholinganallur, Chennai",
-    rating: 5,
-    body: "We onboard forty tenants a month. Their templates handle the leave and licence structure properly, which most online drafts get wrong by accidentally creating a tenancy. Our counsel checked and cleared it.",
-  },
 ] as const;
 
 export const FAQS = [
@@ -371,7 +347,7 @@ export const FAQS = [
   {
     category: "Stamp paper",
     q: "Can I buy in bulk for my office or firm?",
-    a: "Yes, and this is a large part of what we do. Law firms, builders, HR teams and brokers keep standing orders with us. Ten sheets or more ships free anywhere in Tamil Nadu, we can hold a recurring monthly supply, and we raise a single GST invoice against your GSTIN. Ask us about account terms.",
+    a: "Yes. Ten sheets or more ships free anywhere in Tamil Nadu, we can hold a recurring monthly supply against a standing order, and we raise a single GST invoice to your GSTIN rather than one per delivery. It is built for law firms, builders, HR teams and brokers — ask us about account terms.",
   },
   {
     category: "Delivery",
@@ -460,11 +436,18 @@ export const FAQS = [
   },
 ] as const;
 
+/**
+ * Commitments about how the service operates — each one is something we decide
+ * and can honour. The previous list claimed ISO 27001 and PCI-DSS certification
+ * and registration with the Registration Department, none of which we hold.
+ * Stating a certification you do not have is a misrepresentation, and it is the
+ * first thing a serious customer checks.
+ */
 export const TRUST_SIGNALS = [
-  "Bar Council of Tamil Nadu enrolled advocates",
-  "ISO 27001 certified infrastructure",
-  "PCI-DSS compliant payments",
-  "Aadhaar e-Sign via licensed ASP",
-  "AES-256 encryption at rest",
-  "Registered with the Registration Department",
+  "Stamp duty paid in full to the Government of Tamil Nadu",
+  "No markup on any government charge",
+  "Certificate numbers printed on your invoice to verify yourself",
+  "Aadhaar e-Sign under Section 3A, IT Act 2000",
+  "Advocates independently enrolled with the Bar Council of Tamil Nadu",
+  "Aadhaar and PAN masked in the interface and never logged",
 ] as const;

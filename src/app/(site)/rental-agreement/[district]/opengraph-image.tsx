@@ -19,7 +19,7 @@ export default async function Image({ params }: { params: Promise<{ district: st
     facts: [
       "e-Stamped · Aadhaar e-signed",
       `${district.sroTowns.length} SROs covered`,
-      `${district.orders} orders`,
+      `${district.region}`,
     ],
   });
 }

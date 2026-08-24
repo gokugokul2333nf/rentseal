@@ -39,7 +39,7 @@ export async function generateMetadata({
 
   const zone = ZONE_META[district.zone];
   const title = `Stamp Paper in ${district.name} — ${zone.shortEta}`;
-  const description = `Buy non-judicial stamp paper and e-Stamp certificates in ${district.name} district at face value, delivered ${zone.eta.toLowerCase()}. ₹20 to ₹500 denominations plus e-Stamps for any value. ${district.orders} orders delivered.`;
+  const description = `Buy non-judicial stamp paper and e-Stamp certificates in ${district.name} district at face value, delivered ${zone.eta.toLowerCase()}. ₹20 to ₹500 denominations plus e-Stamps for any value, delivered to every taluk in the district.`;
 
   return {
     title,
@@ -128,9 +128,9 @@ export default async function StampPaperDistrictPage({
               },
               {
                 icon: BadgeCheck,
-                label: "Orders delivered",
-                value: district.orders,
-                sub: `across ${district.name} since 2021`,
+                label: "Taluks covered",
+                value: `${district.sroTowns.length}`,
+                sub: `every one in ${district.name}`,
               },
             ].map((stat) => (
               <StaggerItem key={stat.label}>

@@ -138,7 +138,7 @@ function buildIndex(): SearchDoc[] {
       title: `Rental agreement in ${d.name}`,
       href: `/rental-agreement/${d.slug}`,
       kind: "District",
-      description: `${d.orders} orders delivered · ${d.sroTowns.length} Sub-Registrar Offices · ${d.region}`,
+      description: `${d.sroTowns.length} Sub-Registrar Offices · ${d.region}`,
       keywords: [
         d.name,
         d.slug,

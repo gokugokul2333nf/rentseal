@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Building2, Heart, Lock, Scale, ShieldCheck, Users } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { TrustBar } from "@/components/landing/trust-bar";
-import { Testimonials } from "@/components/landing/testimonials";
+import { Commitments } from "@/components/landing/commitments";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
@@ -41,31 +41,41 @@ const VALUES = [
   },
 ];
 
-const TIMELINE = [
+/**
+ * This was a five-entry company timeline — founding year, two named founder
+ * roles, a ₹2,00,000 anecdote, and a 42,800-agreement milestone. None of it was
+ * verifiable, and a fabricated history is a strange foundation for a business
+ * that sells accuracy.
+ *
+ * What replaces it is how the service actually works. It is all true on day one
+ * and it answers the question an About page is really being asked: what happens
+ * to my money and my document.
+ */
+const PRINCIPLES = [
   {
-    year: "2021",
-    title: "Started in a Chennai living room",
-    body: "Two founders — one an advocate practising at the Madras High Court, one an engineer — after a friend lost a ₹2,00,000 deposit over an agreement that was never stamped.",
+    step: "01",
+    title: "You pay the state directly, at the state's rate",
+    body: "Stamp duty in Tamil Nadu is 1% of the total rent across the term plus any deposit. That amount goes to the Government of Tamil Nadu in full. It appears as its own line on your invoice, and we take nothing from it — our platform fee is separate, and GST applies to that fee alone.",
   },
   {
-    year: "2022",
-    title: "e-Stamping integrated",
-    body: "The moment stamp paper stopped being something our customers had to chase, volumes tripled. We stopped charging for it separately and passed it through at cost.",
+    step: "02",
+    title: "Everything we hand you can be checked without us",
+    body: "Non-judicial paper comes through licensed stamp vendors, and e-Stamp certificates through the state's authorised channel. Each carries a serial or certificate number, printed on your invoice, that you can verify against the Registration Department's own records.",
   },
   {
-    year: "2023",
-    title: "Aadhaar e-Sign, and the last office visit disappeared",
-    body: "For 11-month agreements the entire journey became remote. A landlord in Salem and a tenant in Chennai could sign the same document within an hour.",
+    step: "03",
+    title: "The eleven-month term is a legal choice, not a sales one",
+    body: "Section 17(1)(d) of the Registration Act, 1908 makes registration compulsory at twelve months. Below that, e-stamping alone makes an agreement admissible in evidence. We default to eleven months because it is what most lettings need — and we tell you the moment your term crosses the line.",
   },
   {
-    year: "2024",
-    title: "Advocate verification at scale",
-    body: "A panel of advocates enrolled with the Bar Council of Tamil Nadu now reviews Premium agreements within 24 hours, catching the one-sided clauses that templates copy blindly.",
+    step: "04",
+    title: "Signing happens on your own phone",
+    body: "Both parties sign with an Aadhaar OTP, which has the same legal effect as a handwritten signature under Section 3A of the Information Technology Act, 2000. Only a registered instrument of twelve months or more requires anyone to appear at a Sub-Registrar Office, and no online service can remove that.",
   },
   {
-    year: "2026",
-    title: "All 38 districts, 42,800 agreements",
-    body: "From Chennai to Kanyakumari. Two-thirds are created on a phone, and the median time from first field to signed PDF is under nine minutes.",
+    step: "05",
+    title: "We are a document service, not your lawyer",
+    body: "We draft, stamp and deliver. On the Premium plan an advocate independently enrolled with the Bar Council of Tamil Nadu reviews the clauses before you sign. That is advice from them, not from us — we do not provide legal representation and we say so on every page.",
   },
 ];
 
@@ -76,8 +86,8 @@ export default function AboutPage() {
         eyebrow="About RentSeal"
         icon={Building2}
         crumbs={CRUMBS}
-        title="We started this because a friend lost his deposit over an unstamped agreement"
-        body="₹2,00,000, gone, because a document downloaded from the internet was never stamped and could not be produced in evidence. Everything we have built since is aimed at making sure that doesn't happen to anyone else in Tamil Nadu."
+        title="Legal documents that ordinary people can actually read"
+        body="An unstamped agreement can be refused in evidence under Section 35 of the Indian Stamp Act — which is how people lose deposits they were always entitled to. We exist to make the stamped, signed, admissible version the easy one to get, anywhere in Tamil Nadu."
       >
         <ButtonLink href={LEAD_ANCHOR} size="lg">
           Start my order
@@ -121,12 +131,12 @@ export default function AboutPage() {
 
           <div className="mx-auto mt-16 max-w-3xl">
             <ol className="space-y-8">
-              {TIMELINE.map((item, i) => (
-                <Reveal key={item.year} delay={i * 0.06}>
+              {PRINCIPLES.map((item, i) => (
+                <Reveal key={item.step} delay={i * 0.06}>
                   <li className="relative border-l-2 border-line pl-8 pb-2">
                     <span className="absolute -top-0.5 -left-[13px] size-6 rounded-full border-[5px] border-white bg-brand-600" />
                     <p className="tnum font-display text-[13px] font-extrabold tracking-wide text-brand-700">
-                      {item.year}
+                      {item.step}
                     </p>
                     <h3 className="mt-1 font-display text-[18px] font-bold text-navy-950">
                       {item.title}
@@ -153,15 +163,18 @@ export default function AboutPage() {
           <Reveal delay={0.12}>
             <div className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-2xl border border-line bg-white">
               <dl className="divide-y divide-line">
-                {[
+                {([
                   ["Registered name", SITE.legalName],
-                  ["CIN", SITE.cin],
-                  ["GSTIN", SITE.gstin],
+                  // Rendered only once real numbers are supplied — see SITE in
+                  // lib/site.ts. Publishing an invented CIN or GSTIN is not a
+                  // placeholder, it is a false statement about the company.
+                  ...(SITE.cin ? [["CIN", SITE.cin]] : []),
+                  ...(SITE.gstin ? [["GSTIN", SITE.gstin]] : []),
                   ["Registered office", SITE.address],
-                  ["Advocate panel", "Enrolled with the Bar Council of Tamil Nadu"],
-                  ["Infrastructure", "ISO 27001 certified, hosted in the ap-south-1 region"],
-                  ["Payments", "PCI-DSS compliant gateway; we never store card data"],
-                ].map(([label, value]) => (
+                  ["Advocate panel", "Independently enrolled with the Bar Council of Tamil Nadu"],
+                  ["Data handling", "Encrypted in transit and at rest; Aadhaar and PAN masked and never logged"],
+                  ["Card details", "Handled by the payment gateway — they never reach our servers"],
+                ] as Array<[string, string]>).map(([label, value]) => (
                   <div key={label} className="grid gap-1 px-6 py-4 sm:grid-cols-[200px_1fr] sm:gap-4">
                     <dt className="text-[13.5px] font-semibold text-navy-500">{label}</dt>
                     <dd className="text-[14.5px] text-navy-900">{value}</dd>
@@ -184,7 +197,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <Testimonials />
+      <Commitments />
 
       <BreadcrumbSchema crumbs={CRUMBS} baseUrl={SITE.url} />
     </>

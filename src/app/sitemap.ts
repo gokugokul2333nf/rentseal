@@ -36,22 +36,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  /** Districts we take the most orders from rank higher than the long tail. */
-  const priorityFor = (orders: string) =>
-    Number(orders.replace(/[^\d]/g, "")) >= 1000 ? 0.8 : 0.6;
+  /** Metro and major-city districts rank above the long tail. */
+  const priorityFor = (zone: string) => (zone === "state" ? 0.6 : 0.8);
 
   const rentalPages: MetadataRoute.Sitemap = DISTRICTS.map((d) => ({
     url: `${SITE.url}/rental-agreement/${d.slug}`,
     lastModified,
     changeFrequency: "monthly",
-    priority: priorityFor(d.orders),
+    priority: priorityFor(d.zone),
   }));
 
   const stampPages: MetadataRoute.Sitemap = DISTRICTS.map((d) => ({
     url: `${SITE.url}/stamp-paper/${d.slug}`,
     lastModified,
     changeFrequency: "monthly",
-    priority: priorityFor(d.orders),
+    priority: priorityFor(d.zone),
   }));
 
   return [...staticPages, ...servicePages, ...rentalPages, ...stampPages];

@@ -10,7 +10,6 @@ import {
   PlayCircle,
   ShieldCheck,
   Sparkles,
-  Star,
   Stamp,
   Truck,
 } from "lucide-react";
@@ -20,13 +19,6 @@ import { LEAD_ANCHOR } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-const AVATARS = [
-  { name: "LN", tint: "bg-brand-600" },
-  { name: "PR", tint: "bg-emerald-500" },
-  { name: "MI", tint: "bg-amber-500" },
-  { name: "SK", tint: "bg-violet-500" },
-];
 
 const PROOF_POINTS = [
   { icon: Truck, label: "Same-day delivery in Chennai" },
@@ -310,34 +302,28 @@ export function Hero() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.44, ease: EASE }}
-              className="mt-9 flex items-center gap-4 border-t border-line pt-7"
+              className="mt-9 border-t border-line pt-7"
             >
-              <div className="flex -space-x-2.5">
-                {AVATARS.map((a) => (
-                  <span
-                    key={a.name}
-                    className={cn(
-                      "grid size-9 place-items-center rounded-full border-2 border-canvas text-[11px] font-bold text-white",
-                      a.tint,
-                    )}
-                  >
-                    {a.name}
-                  </span>
-                ))}
-                <span className="grid size-9 place-items-center rounded-full border-2 border-canvas bg-navy-950 text-[10px] font-bold text-white">
-                  42k+
+              {/*
+                A star rating and a customer count stood here. Both were
+                invented, and an unverifiable number is worth less than a
+                verifiable one — so this states what the service guarantees
+                instead, which is true from the first order.
+              */}
+              <div className="flex items-start gap-3.5 rounded-2xl border border-line bg-white/70 p-4 backdrop-blur-sm sm:p-5">
+                <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600">
+                  <BadgeCheck className="size-[18px]" />
                 </span>
-              </div>
-              <div>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                  <span className="ml-1 text-[13px] font-bold text-navy-950">4.9</span>
+                <div>
+                  <p className="text-[13.5px] font-bold text-navy-950">
+                    Don&apos;t take our word for it — check the certificate
+                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-navy-500">
+                    Stamp duty is paid in full to the Government of Tamil Nadu, and every sheet
+                    and e-Stamp carries a number you can verify against the Registration
+                    Department&apos;s own records. We print it on your invoice.
+                  </p>
                 </div>
-                <p className="mt-0.5 text-[12.5px] text-navy-500">
-                  from 6,400 landlords and tenants across Tamil Nadu
-                </p>
               </div>
             </motion.div>
           </div>

@@ -38,7 +38,7 @@ const SECTIONS: LegalSection[] = [
       "Aadhaar and PAN receive stricter handling than any other field on the platform.",
     ],
     list: [
-      "Encrypted with AES-256 at rest, with keys held in a managed key service separate from the database",
+      "Encrypted at rest, with keys held in a managed key service separate from the database",
       "Masked everywhere in the interface — you and our staff see only the last four digits",
       "Never written to an application log, an error report or an analytics event",
       "Only the last four digits are printed on the generated agreement",
@@ -98,7 +98,7 @@ const SECTIONS: LegalSection[] = [
     id: "security",
     heading: "How we protect it",
     paragraphs: [
-      "TLS 1.3 in transit and AES-256 at rest. Role-based access control, with staff access to customer documents logged and reviewed. Multi-factor authentication for every internal account. Annual third-party penetration testing. Infrastructure certified to ISO 27001.",
+      "Encrypted in transit and at rest. Role-based access control, with staff access to customer documents logged and reviewed. Multi-factor authentication on every internal account. Card details are handled by the payment gateway and never reach our servers.",
       "No system is perfect. If a breach affects your data, we will tell you and the relevant authority without undue delay, and we will tell you what we are doing about it.",
     ],
   },

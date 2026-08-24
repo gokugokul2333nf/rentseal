@@ -104,7 +104,7 @@ export default function LoginPage() {
 
           <p className="mt-16 flex items-center gap-2 text-[12.5px] text-white/40">
             <Lock className="size-3.5" />
-            AES-256 encryption · ISO 27001 infrastructure · {SITE.legalName}
+            Encrypted in transit and at rest · {SITE.legalName}
           </p>
         </div>
       </aside>

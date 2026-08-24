@@ -38,7 +38,7 @@ export async function generateMetadata({
   if (!district) return {};
 
   const title = `Rental Agreement in ${district.name} — Online, e-Stamped`;
-  const description = `Create a legally valid rental agreement anywhere in ${district.name} district. E-stamped at the government rate, Aadhaar e-signed and delivered by email and WhatsApp. ${district.orders} orders delivered across ${district.name}.`;
+  const description = `Create a legally valid rental agreement anywhere in ${district.name} district. E-stamped at the government rate, Aadhaar e-signed and delivered by email and WhatsApp. Covering ${district.sroTowns.length} Sub-Registrar Offices across the district.`;
 
   return {
     title,
@@ -81,7 +81,7 @@ export default async function DistrictPage({
         icon={MapPin}
         crumbs={crumbs}
         title={`Rental agreement in ${district.name}, done from your phone`}
-        body={`${district.orders} landlords and tenants across ${district.name} district have made their agreement with us. E-stamped at the government rate, signed with Aadhaar OTP, and delivered without anyone visiting the Sub-Registrar Office.`}
+        body={`We draft, e-stamp and e-sign rental agreements across every taluk in ${district.name} district — all ${district.sroTowns.length} Sub-Registrar Office jurisdictions. Duty is paid at the government rate, both parties sign with an Aadhaar OTP, and nobody has to visit an office.`}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
@@ -126,9 +126,9 @@ export default async function DistrictPage({
               },
               {
                 icon: ShieldCheck,
-                label: "Orders delivered",
-                value: district.orders,
-                sub: `across ${district.name} since 2021`,
+                label: "SRO jurisdictions",
+                value: `${district.sroTowns.length}`,
+                sub: `every taluk in ${district.name} covered`,
               },
             ].map((stat) => (
               <StaggerItem key={stat.label}>

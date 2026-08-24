@@ -10,7 +10,7 @@ import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { PricingCards } from "@/components/landing/pricing-cards";
 import { StampPaper } from "@/components/landing/stamp-paper";
-import { Testimonials } from "@/components/landing/testimonials";
+import { Commitments } from "@/components/landing/commitments";
 import { TrustBar } from "@/components/landing/trust-bar";
 import { SITE } from "@/lib/site";
 import { DENOMINATIONS } from "@/lib/stamp-paper";
@@ -58,7 +58,7 @@ export default function HomePage() {
       <Features />
       <Comparison />
       <PricingCards />
-      <Testimonials />
+      <Commitments />
       <FaqSection limit={10} />
 
       <FaqSchema limit={8} />

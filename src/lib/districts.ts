@@ -11,8 +11,13 @@
  * landing page. Change a district's zone here and both update together.
  *
  * `sroTowns` are the taluk headquarters, which is where the Registration
- * Department's Sub-Registrar Offices sit. `towns` are the localities our
- * orders actually come from, and drive the "popular areas" block.
+ * Department's Sub-Registrar Offices sit. `towns` are the main localities in
+ * the district, and drive the "areas we cover" block.
+ *
+ * There is deliberately no order-count field. One existed and was invented,
+ * which is not a number a business should publish before it is true. Pages now
+ * lead on facts that hold from day one — districts covered, Sub-Registrar
+ * Offices, delivery timing.
  */
 
 export type ZoneId = "metro" | "major" | "state";
@@ -36,10 +41,8 @@ export interface District {
   zone: ZoneId;
   /** Taluk headquarters — where the Sub-Registrar Offices are located. */
   sroTowns: string[];
-  /** Localities and towns our orders come from. */
+  /** Main towns and localities in the district. */
   towns: string[];
-  /** Orders delivered here since 2021. */
-  orders: string;
   /** What the district does — one line, used to keep every page distinct. */
   economy: string;
   /** What drives rental and stamp paper demand here specifically. */
@@ -55,7 +58,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Ariyalur", "Jayankondam", "Udayarpalayam", "Sendurai", "Andimadam"],
     towns: ["Ariyalur town", "Jayankondam", "Sendurai", "Andimadam"],
-    orders: "170+",
     economy:
       "The state's cement and limestone belt, with quarries and plants clustered around Ariyalur and Jayankondam town.",
     demand:
@@ -78,7 +80,6 @@ export const DISTRICTS: District[] = [
       "Cheyyur",
     ],
     towns: ["Tambaram", "Chromepet", "Guduvancheri", "Kelambakkam", "Maraimalai Nagar", "Pallavaram"],
-    orders: "2,400+",
     economy:
       "The OMR and GST Road corridor — IT parks at Siruseri and Navalur, and the automotive belt around Maraimalai Nagar and Oragadam.",
     demand:
@@ -103,11 +104,10 @@ export const DISTRICTS: District[] = [
       "Madhavaram",
     ],
     towns: ["Adyar", "Anna Nagar", "Velachery", "T. Nagar", "Porur", "Sholinganallur"],
-    orders: "18,400+",
     economy:
       "The state capital and its registration heartland — more instruments are registered here than in any other district in Tamil Nadu.",
     demand:
-      "Every kind of instrument, at volume: 11-month residential lets across the suburbs, commercial leases in T. Nagar and Guindy, and a steady run of affidavits for passports, name changes and college admissions.",
+      "Every kind of instrument is in demand here: 11-month residential lets across the suburbs, commercial leases in T. Nagar and Guindy, and a constant run of affidavits for passports, name changes and college admissions.",
   },
   {
     name: "Coimbatore",
@@ -127,7 +127,6 @@ export const DISTRICTS: District[] = [
       "Valparai",
     ],
     towns: ["R.S. Puram", "Peelamedu", "Saibaba Colony", "Gandhipuram", "Vadavalli", "Singanallur"],
-    orders: "6,200+",
     economy:
       "Pumps, motors and textile machinery, plus a large engineering-college population and a growing IT presence at Peelamedu.",
     demand:
@@ -150,7 +149,6 @@ export const DISTRICTS: District[] = [
       "Titagudi",
     ],
     towns: ["Cuddalore OT", "Neyveli", "Chidambaram", "Panruti"],
-    orders: "690+",
     economy:
       "The Neyveli lignite complex, the SIPCOT chemical estate, and Annamalai University at Chidambaram.",
     demand:
@@ -164,7 +162,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Dharmapuri", "Palacode", "Pennagaram", "Harur", "Pappireddipatti", "Karimangalam", "Nallampalli"],
     towns: ["Dharmapuri town", "Harur", "Pennagaram", "Palacode"],
-    orders: "330+",
     economy:
       "Mango and granite country, with the Hogenakkal belt and a growing spread of agri-processing units.",
     demand:
@@ -188,7 +185,6 @@ export const DISTRICTS: District[] = [
       "Guziliyamparai",
     ],
     towns: ["Dindigul town", "Palani", "Kodaikanal", "Oddanchatram"],
-    orders: "780+",
     economy: "Locks, leather and spinning mills, with Kodaikanal running a tourism economy of its own.",
     demand:
       "Two very different markets in one district — ordinary town lets in Dindigul and Palani, and short-season holiday-property licences in Kodaikanal that need a leave and licence, not a tenancy.",
@@ -211,7 +207,6 @@ export const DISTRICTS: District[] = [
       "Nambiyur",
     ],
     towns: ["Perundurai Road", "Brough Road", "Surampatti", "Veerappanchatram"],
-    orders: "1,450+",
     economy:
       "India's largest handloom and powerloom cluster, plus turmeric trading and the SIPCOT estate at Perundurai.",
     demand:
@@ -225,11 +220,10 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Kallakurichi", "Chinnasalem", "Sankarapuram", "Ulundurpet", "Tirukoilur"],
     towns: ["Kallakurichi town", "Ulundurpet", "Tirukoilur", "Chinnasalem"],
-    orders: "260+",
     economy:
       "Sugar mills and cashew processing, in a district carved out of Viluppuram in 2019 and still building its town centres.",
     demand:
-      "Mill staff quarters and small commercial shops on the Chennai–Trichy highway. A young district, so a good share of our work here is first-time agreements rather than renewals.",
+      "Mill staff quarters and small commercial shops on the Chennai–Trichy highway. A young district whose town centres are still forming, so first-time agreements are more common here than renewals.",
   },
   {
     name: "Kancheepuram",
@@ -239,7 +233,6 @@ export const DISTRICTS: District[] = [
     zone: "metro",
     sroTowns: ["Kancheepuram", "Sriperumbudur", "Uthiramerur", "Walajabad", "Kundrathur"],
     towns: ["Kancheepuram town", "Sriperumbudur", "Oragadam", "Kundrathur"],
-    orders: "1,600+",
     economy:
       "Silk weaving in the temple town, and the Sriperumbudur–Oragadam manufacturing corridor with its electronics and automotive plants.",
     demand:
@@ -253,7 +246,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Agastheeswaram", "Thovalai", "Kalkulam", "Vilavancode", "Killiyoor", "Thiruvattar"],
     towns: ["Nagercoil", "Marthandam", "Kanyakumari", "Colachel"],
-    orders: "740+",
     economy:
       "Rubber, tourism and the highest literacy rate in the state, with a very large share of families holding NRI income from the Gulf.",
     demand:
@@ -267,7 +259,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Karur", "Kulithalai", "Krishnarayapuram", "Aravakurichi", "Manmangalam", "Pugalur", "Kadavur"],
     towns: ["Karur town", "Kulithalai", "Pugalur", "Velayuthampalayam"],
-    orders: "540+",
     economy: "Home textiles for export, bus body building, and a dense cluster of paper mills at Pugalur.",
     demand:
       "Export units take godowns and staff housing on longer commercial terms, which usually means a registered lease deed rather than an 11-month agreement.",
@@ -289,7 +280,6 @@ export const DISTRICTS: District[] = [
       "Kaveripattinam",
     ],
     towns: ["Hosur", "Sipcot Hosur", "Mathigiri", "Bagalur Road", "Krishnagiri town"],
-    orders: "1,300+",
     economy:
       "Hosur's electronics and automotive belt, close enough to Bengaluru that it functions as part of that labour market.",
     demand:
@@ -313,7 +303,6 @@ export const DISTRICTS: District[] = [
       "Peraiyur",
     ],
     towns: ["Anna Nagar", "K.K. Nagar", "Villapuram", "Thirunagar", "Bypass Road"],
-    orders: "3,900+",
     economy:
       "The commercial capital of southern Tamil Nadu — temple tourism, a large medical-education sector, and wholesale trade for six surrounding districts.",
     demand:
@@ -327,11 +316,10 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Mayiladuthurai", "Sirkazhi", "Tharangambadi", "Kuthalam"],
     towns: ["Mayiladuthurai town", "Sirkazhi", "Poompuhar", "Tharangambadi"],
-    orders: "240+",
     economy:
       "Delta paddy country with a heritage-tourism strip along the coast, split off from Nagapattinam in 2020.",
     demand:
-      "Agricultural leases and small-town shop rentals. Being a new district, plenty of our work here is helping people work out which Sub-Registrar Office now has jurisdiction.",
+      "Agricultural leases and small-town shop rentals. Being a new district, the common difficulty here is working out which Sub-Registrar Office now has jurisdiction — we confirm that before anything is drafted.",
   },
   {
     name: "Nagapattinam",
@@ -341,7 +329,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Nagapattinam", "Kilvelur", "Vedaranyam", "Thirukkuvalai"],
     towns: ["Nagapattinam town", "Velankanni", "Vedaranyam", "Sikkal"],
-    orders: "280+",
     economy: "A fishing and port district, with the Velankanni pilgrimage economy and salt pans at Vedaranyam.",
     demand:
       "Lodging and shop licences around Velankanni that run seasonally, which is exactly the case for a leave and licence rather than a tenancy.",
@@ -362,7 +349,6 @@ export const DISTRICTS: District[] = [
       "Kumarapalayam",
     ],
     towns: ["Namakkal town", "Tiruchengode", "Rasipuram", "Komarapalayam"],
-    orders: "660+",
     economy:
       "The poultry capital of India, plus a nationally significant lorry-body and transport industry at Tiruchengode.",
     demand:
@@ -376,7 +362,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Udhagamandalam", "Coonoor", "Kotagiri", "Gudalur", "Pandalur", "Kundah"],
     towns: ["Ooty", "Coonoor", "Kotagiri", "Gudalur"],
-    orders: "360+",
     economy: "Tea estates and hill-station tourism, with a property market shaped by heavy restrictions on land transfer.",
     demand:
       "Homestay and holiday-let licences, which must be drafted as licences — handing a season-long tenant exclusive possession of a hill property is how owners lose control of it.",
@@ -389,10 +374,9 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Perambalur", "Kunnam", "Veppanthattai", "Alathur"],
     towns: ["Perambalur town", "Kunnam", "Alathur", "Veppanthattai"],
-    orders: "180+",
     economy: "Onion and maize farming, and the smallest district in the state by population.",
     demand:
-      "Mostly agricultural leases and single-shop rentals. Our lowest volume district, which means every order here gets handled by a named person rather than a queue.",
+      "Mostly agricultural leases and single-shop rentals. The smallest district in the state by population, and the one where a plain, correctly stamped agreement matters most because there is no local alternative to fall back on.",
   },
   {
     name: "Pudukkottai",
@@ -413,7 +397,6 @@ export const DISTRICTS: District[] = [
       "Avudaiyarkoil",
     ],
     towns: ["Pudukkottai town", "Aranthangi", "Keeranur", "Alangudi"],
-    orders: "370+",
     economy: "A former princely state, now farming and quarrying, with a very high share of Gulf remittance income.",
     demand:
       "Power of attorney instruments for families with a member working abroad, and ordinary town lets in Pudukkottai and Aranthangi.",
@@ -434,7 +417,6 @@ export const DISTRICTS: District[] = [
       "Tiruvadanai",
     ],
     towns: ["Ramanathapuram town", "Paramakudi", "Rameswaram", "Kamuthi"],
-    orders: "300+",
     economy: "Fishing, salt and chilli trade, with the Rameswaram pilgrimage circuit running year round.",
     demand:
       "Lodge and shop licences at Rameswaram, and salt-pan leases that are long-term agricultural instruments needing registration.",
@@ -447,7 +429,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Ranipet", "Arakkonam", "Arcot", "Walajah", "Sholingur", "Nemili", "Kalavai"],
     towns: ["Ranipet town", "Arakkonam", "Arcot", "Sholingur"],
-    orders: "340+",
     economy:
       "Leather tanning and the SIPCOT industrial estate, plus the railway junction and Air Force station at Arakkonam.",
     demand:
@@ -472,7 +453,6 @@ export const DISTRICTS: District[] = [
       "Valapady",
     ],
     towns: ["Hasthampatti", "Fairlands", "Ammapet", "Suramangalam"],
-    orders: "2,100+",
     economy: "Steel, magnesite and sago, with the Mettur dam and thermal complex anchoring the north of the district.",
     demand:
       "A large professional rental market around Hasthampatti and Fairlands, and industrial leases at Mettur that run long enough to require registration.",
@@ -494,7 +474,6 @@ export const DISTRICTS: District[] = [
       "Kalayarkoil",
     ],
     towns: ["Karaikudi", "Sivaganga town", "Devakottai", "Kanadukathan"],
-    orders: "380+",
     economy:
       "Chettinad country — heritage mansions, a strong banking and trading diaspora, and Alagappa University at Karaikudi.",
     demand:
@@ -517,7 +496,6 @@ export const DISTRICTS: District[] = [
       "Veerakeralampudur",
     ],
     towns: ["Tenkasi town", "Courtallam", "Sankarankovil", "Kadayanallur"],
-    orders: "320+",
     economy:
       "Powerlooms at Kadayanallur, wind energy along the Shencottai gap, and the Courtallam falls season from July to September.",
     demand:
@@ -541,7 +519,6 @@ export const DISTRICTS: District[] = [
       "Budalur",
     ],
     towns: ["Thanjavur town", "Kumbakonam", "Pattukkottai", "Thiruvaiyaru"],
-    orders: "860+",
     economy: "The rice bowl of Tamil Nadu, with a large university and medical-college population at Thanjavur.",
     demand:
       "Student housing around the medical and agricultural colleges, agricultural land leases across the delta, and shop rentals in the Kumbakonam temple streets.",
@@ -554,7 +531,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Theni", "Periyakulam", "Bodinayakanur", "Uthamapalayam", "Andipatti"],
     towns: ["Theni town", "Bodinayakanur", "Cumbum", "Periyakulam"],
-    orders: "350+",
     economy: "Cardamom, grapes and the Cumbum valley, sitting on the Kerala border with heavy cross-state trade.",
     demand:
       "Estate and godown leases for the spice trade, plus a fair number of agreements where one party is resident in Kerala — which makes Aadhaar e-signing far easier than a joint visit to an office.",
@@ -576,7 +552,6 @@ export const DISTRICTS: District[] = [
       "Sattankulam",
     ],
     towns: ["Thoothukudi town", "Kovilpatti", "Tiruchendur", "Millerpuram"],
-    orders: "920+",
     economy: "A major port, with salt, chemicals, thermal power and the match and printing cluster at Kovilpatti.",
     demand:
       "Port and logistics companies take warehouse space on commercial terms, and there is steady residential demand from the power and chemical plants.",
@@ -600,7 +575,6 @@ export const DISTRICTS: District[] = [
       "Marungapuri",
     ],
     towns: ["Thillai Nagar", "Srirangam", "Cantonment", "K.K. Nagar", "Woraiyur"],
-    orders: "2,750+",
     economy:
       "BHEL and the Ordnance Factory, a very large engineering and medical college population, and an international airport.",
     demand:
@@ -622,7 +596,6 @@ export const DISTRICTS: District[] = [
       "Manur",
     ],
     towns: ["Palayamkottai", "Vannarpettai", "Perumalpuram", "Tirunelveli Town"],
-    orders: "1,180+",
     economy:
       "The education hub of the deep south — Palayamkottai alone carries a dozen colleges — with wind energy across the Nanguneri belt.",
     demand:
@@ -636,7 +609,6 @@ export const DISTRICTS: District[] = [
     zone: "state",
     sroTowns: ["Tirupathur", "Vaniyambadi", "Ambur", "Natrampalli", "Jolarpet"],
     towns: ["Ambur", "Vaniyambadi", "Tirupathur town", "Jolarpet"],
-    orders: "300+",
     economy:
       "The Ambur–Vaniyambadi leather and footwear export belt, one of the largest in the country, on the Chennai–Bengaluru highway.",
     demand:
@@ -660,10 +632,9 @@ export const DISTRICTS: District[] = [
       "Uthukuli",
     ],
     towns: ["Kumaran Road", "Avinashi Road", "P.N. Road", "Perumanallur"],
-    orders: "1,850+",
     economy: "The knitwear export capital of India, turning over thousands of crores a year in garments.",
     demand:
-      "Enormous volumes of migrant worker accommodation and factory-shed leases. Many landlords here let ten or more units, which is why we built bulk drafting and a single dashboard for repeat landlords.",
+      "Enormous demand for migrant worker accommodation and factory-shed leases. Many landlords here let ten or more units, so the same terms have to be reproduced accurately again and again — which is exactly where a downloaded template starts to cost money.",
   },
   {
     name: "Tiruvallur",
@@ -683,7 +654,6 @@ export const DISTRICTS: District[] = [
       "Tiruttani",
     ],
     towns: ["Avadi", "Poonamallee", "Ponneri", "Tiruttani", "Gummidipoondi"],
-    orders: "1,900+",
     economy:
       "Chennai's northern and western industrial edge — Ennore port, the Gummidipoondi SIPCOT estate, and the defence establishments at Avadi.",
     demand:
@@ -708,11 +678,10 @@ export const DISTRICTS: District[] = [
       "Vembakkam",
     ],
     towns: ["Tiruvannamalai town", "Arani", "Vandavasi", "Cheyyar"],
-    orders: "480+",
     economy:
       "The Arunachaleswarar temple town, which draws a large long-staying visitor population, plus silk weaving at Arani.",
     demand:
-      "An unusual market — a real volume of long-stay lets to visitors, including foreign nationals, around the girivalam path. Those need a licence structure and a properly drafted term.",
+      "An unusual market — long-stay lets to visitors, including foreign nationals, around the girivalam path. Those need a licence structure and a properly drafted term rather than an ordinary tenancy.",
   },
   {
     name: "Tiruvarur",
@@ -730,7 +699,6 @@ export const DISTRICTS: District[] = [
       "Valangaiman",
     ],
     towns: ["Tiruvarur town", "Mannargudi", "Thiruthuraipoondi", "Kodavasal"],
-    orders: "230+",
     economy: "Delta paddy and a central university, in one of the most agricultural districts in the state.",
     demand:
       "Land leases on a seasonal cycle and modest town rentals. Faculty and student housing around the central university is the growth area.",
@@ -743,7 +711,6 @@ export const DISTRICTS: District[] = [
     zone: "major",
     sroTowns: ["Vellore", "Katpadi", "Gudiyatham", "Anaicut", "K.V. Kuppam", "Pernambut"],
     towns: ["Katpadi", "Sathuvachari", "Gandhi Nagar", "Bagayam", "Vellore Fort"],
-    orders: "980+",
     economy:
       "CMC Hospital and VIT University between them bring in a very large transient population from across India and abroad.",
     demand:
@@ -767,7 +734,6 @@ export const DISTRICTS: District[] = [
       "Tiruvennainallur",
     ],
     towns: ["Viluppuram town", "Tindivanam", "Gingee", "Marakkanam"],
-    orders: "460+",
     economy:
       "A major rail junction and cashew and sugar belt, with the Puducherry border and the ECR tourism strip on its eastern edge.",
     demand:
@@ -791,7 +757,6 @@ export const DISTRICTS: District[] = [
       "Watrap",
     ],
     towns: ["Sivakasi", "Rajapalayam", "Aruppukottai", "Srivilliputhur"],
-    orders: "520+",
     economy:
       "Sivakasi's fireworks, matches and offset printing — the largest concentration of any of the three in India — with spinning mills at Rajapalayam.",
     demand:
@@ -957,7 +922,7 @@ export function stampPaperFaqs(d: District): Faq[] {
     },
     {
       q: `Can I order stamp paper in bulk for my firm in ${d.name}?`,
-      a: `Yes, and a good share of our ${d.name} volume is exactly that. Ten sheets or more ships free anywhere in the district, we can hold a recurring monthly supply, and we raise a single GST invoice against your GSTIN. Law firms, builders, HR teams and brokers keep standing orders with us — ask about account terms.`,
+      a: `Yes. Ten sheets or more ships free anywhere in ${d.name}, we can hold a recurring monthly supply against a standing order, and we raise a single GST invoice to your GSTIN rather than one per delivery. This is set up for law firms, builders, HR teams and brokers — ask us about account terms.`,
     },
   ];
 }

@@ -189,7 +189,9 @@ export function Footer() {
         <div className="container-page border-t border-white/10 py-7">
           <div className="flex flex-col gap-4 text-[12.5px] text-white/40 lg:flex-row lg:items-center lg:justify-between">
             <p>
-              © {year} {SITE.legalName}. CIN {SITE.cin} · GSTIN {SITE.gstin}
+              © {year} {SITE.legalName}
+              {SITE.cin ? ` · CIN ${SITE.cin}` : ""}
+              {SITE.gstin ? ` · GSTIN ${SITE.gstin}` : ""}
             </p>
             <p className="max-w-3xl leading-relaxed">
               RentSeal is a technology platform, not a law firm, and does not provide legal

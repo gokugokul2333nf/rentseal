@@ -82,7 +82,7 @@ export function StaggerItem({
 }
 
 /**
- * Counts up when scrolled into view. Handles "42,800+", "4.9" and "100%" by
+ * Counts up when scrolled into view. Handles "1,200+", "4.9" and "100%" by
  * animating the numeric part and keeping the affixes intact.
  */
 export function Counter({
