@@ -200,7 +200,7 @@ export function LeadForm() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="font-display text-[20px] font-extrabold tracking-tight text-navy-950">
-                      Request a call back
+                      Tell us what you need
                     </h3>
                     <p className="mt-1.5 text-[13.5px] text-navy-500">
                       Takes 20 seconds. No payment, no obligation.
@@ -371,7 +371,7 @@ export function LeadForm() {
                       </>
                     ) : (
                       <>
-                        Request my call back
+                        Send my request
                         <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />
                       </>
                     )}

@@ -175,7 +175,7 @@ export function Header() {
               {SITE.phone}
             </a>
             <ButtonLink href={LEAD_ANCHOR} size="sm" className="hidden sm:inline-flex">
-              Request a call back
+              Start my order
               <ArrowRight className="size-4" />
             </ButtonLink>
             <Button
@@ -265,7 +265,7 @@ export function Header() {
 
               <div className="shrink-0 space-y-2.5 border-t border-line bg-navy-50/60 p-5">
                 <ButtonLink href={LEAD_ANCHOR} size="lg" fullWidth>
-                  Request a call back
+                  Start my order
                   <ArrowRight className="size-4" />
                 </ButtonLink>
                 <ButtonLink
@@ -274,7 +274,7 @@ export function Header() {
                   size="lg"
                   fullWidth
                 >
-                  WhatsApp us
+                  Get a quote on WhatsApp
                 </ButtonLink>
                 <a
                   href={`tel:${SITE.phone.replace(/\s/g, "")}`}

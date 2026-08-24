@@ -882,3 +882,82 @@ export const NOTABLE_TOWNS: Array<{ town: string; district: string; slug: string
   { town: "Mettur", district: "Salem", slug: "salem" },
   { town: "Arakkonam", district: "Ranipet", slug: "ranipet" },
 ];
+
+/* ─────────────────────────── Per-district FAQs ─────────────────────────── */
+
+export interface Faq {
+  q: string;
+  a: string;
+}
+
+/**
+ * FAQs written from a district's own data — its SRO towns, delivery zone,
+ * headquarters and the towns we serve.
+ *
+ * These exist because the generic FAQ block was rendering the same eight
+ * answers on all 76 location pages, which is duplicate content at exactly the
+ * scale Google demotes. Every district now answers the questions a searcher in
+ * that district actually types, and each page gets its own FAQPage schema.
+ */
+export function rentalFaqs(d: District): Faq[] {
+  const zone = ZONE_META[d.zone];
+  const [first, second] = d.sroTowns;
+
+  return [
+    {
+      q: `Is an online rental agreement legally valid in ${d.name}?`,
+      a: `Yes. The agreement is drafted on a Tamil Nadu compliant template, e-stamped with duty paid to the Government of Tamil Nadu, and signed using Aadhaar e-Sign — which has the same legal effect as a handwritten signature under Section 3A of the Information Technology Act, 2000. It is admissible in evidence in ${d.name} exactly as a paper agreement would be. Nothing about the district changes its validity.`,
+    },
+    {
+      q: `Do I have to visit a Sub-Registrar Office in ${d.name}?`,
+      a: `Not for an 11-month agreement — e-stamping alone makes it valid in evidence, and the whole thing happens online. Registration only becomes compulsory once the term reaches 12 months, under Section 17(1)(d) of the Registration Act, 1908. If that applies to you, ${d.name} has Sub-Registrar Offices at ${d.sroTowns.slice(0, 4).join(", ")}${d.sroTowns.length > 4 ? " and other taluk headquarters" : ""}, and we book the slot at whichever one has jurisdiction over your property.`,
+    },
+    {
+      q: `How much stamp duty will I pay on a rental agreement in ${d.name}?`,
+      a: `One per cent of the total rent across the whole term plus any deposit — the same rate everywhere in Tamil Nadu, ${d.name} included. On ₹15,000 a month for 11 months with a ₹1,00,000 deposit, the chargeable value is ₹2,65,000 and the duty is ₹2,650. We show that arithmetic line by line before you pay, and the government portion passes through at cost with no markup.`,
+    },
+    {
+      q: `How quickly can I get my agreement in ${d.name}?`,
+      a: `The signed PDF usually reaches both parties within four hours of the last Aadhaar OTP, wherever in ${d.name} you are — delivery of a digital document does not depend on your district. If you also want a printed, stamped copy couriered to you, ${d.name} falls in our ${zone.label.toLowerCase()} zone, so that arrives ${zone.eta.toLowerCase()}${zone.cutOff ? ` when you order before 2 pm` : ""}.`,
+    },
+    {
+      q: `Which areas of ${d.name} do you cover?`,
+      a: `Every taluk in the district. Most of our ${d.name} work comes from ${d.towns.slice(0, 3).join(", ")} and around ${d.hq}, but coverage is not limited to those — the agreement is drafted and signed online, so where the property sits inside ${d.name} makes no difference to what you pay or how long it takes.`,
+    },
+    {
+      q: `My landlord and I are not in the same city. Can we still sign?`,
+      a: `Yes, and this is one of the main reasons people use us. Each party signs with an Aadhaar OTP on their own phone, from wherever they happen to be. We regularly complete agreements where the property is in ${first}${second ? ` or ${second}` : ""} and the owner is in another state or abroad. Only a registered lease of 12 months or more requires both parties to appear in person.`,
+    },
+  ];
+}
+
+export function stampPaperFaqs(d: District): Faq[] {
+  const zone = ZONE_META[d.zone];
+
+  return [
+    {
+      q: `How fast is stamp paper delivered in ${d.name}?`,
+      a: `${d.name} is in our ${zone.label.toLowerCase()} zone, so stamp paper reaches you ${zone.eta.toLowerCase()}${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}. Delivery is ₹${zone.charge}, and free once your order crosses ₹2,000 of stamp value or ten sheets. An e-Stamp certificate, where your instrument allows one, is emailed within minutes and costs nothing to deliver.`,
+    },
+    {
+      q: `Do you charge more than the printed value in ${d.name}?`,
+      a: `No. You pay exactly the denomination printed on the sheet plus the flat ₹${zone.charge} delivery charge for ${d.name}, both stated before you confirm. We do not mark up the paper and we do not mark up government duty — the platform fee is the only thing we earn, and GST at 18% applies to that fee alone.`,
+    },
+    {
+      q: `Which denomination do I need?`,
+      a: `Most 11-month rental agreements in Tamil Nadu are executed on ₹100 paper, affidavits and declarations on ₹20, and indemnity or surety bonds on ₹50 to ₹100. Where the duty payable is a specific figure — a lease deed, sale agreement or mortgage — only an e-Stamp certificate for that exact amount will do. Tell us what you are executing and we will tell you which applies before you order.`,
+    },
+    {
+      q: `Is the stamp paper you deliver in ${d.name} genuine?`,
+      a: `Yes. Everything is procured through licensed stamp vendors and the state's authorised e-Stamping channel. Each sheet or certificate carries a serial number you can verify yourself against the Registration Department's records, and we print that number on your invoice so you can check without having to ask us.`,
+    },
+    {
+      q: `Where in ${d.name} do you deliver?`,
+      a: `Every taluk in the district, including ${d.towns.slice(0, 3).join(", ")} and ${d.hq}. If your town is not one we name on this page it is still covered — the ${zone.eta.toLowerCase()} promise applies across ${d.name}, not just to the larger towns.`,
+    },
+    {
+      q: `Can I order stamp paper in bulk for my firm in ${d.name}?`,
+      a: `Yes, and a good share of our ${d.name} volume is exactly that. Ten sheets or more ships free anywhere in the district, we can hold a recurring monthly supply, and we raise a single GST invoice against your GSTIN. Law firms, builders, HR teams and brokers keep standing orders with us — ask about account terms.`,
+    },
+  ];
+}

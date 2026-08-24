@@ -59,7 +59,7 @@ export const FOOTER_LINKS = [
       { label: "Lease Deed", href: "/services/lease-agreement" },
       { label: "Leave & Licence", href: "/services/leave-and-license" },
       { label: "Rental agreement by district", href: "/rental-agreement" },
-      { label: "Request a call back", href: LEAD_ANCHOR },
+      { label: "Talk to us before you order", href: LEAD_ANCHOR },
     ],
   },
   {

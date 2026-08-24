@@ -35,7 +35,7 @@ export default function RentalAgreementIndex() {
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
           <ButtonLink href="/stamp-paper" variant="secondary" size="lg">
-            Buy stamp paper instead
+            Order stamp paper only
           </ButtonLink>
         </div>
       </PageHero>

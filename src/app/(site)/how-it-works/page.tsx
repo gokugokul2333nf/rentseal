@@ -68,7 +68,7 @@ export default function HowItWorksPage() {
         body="No black box. Here is every step, including the parts where a human being is involved and the parts where the law says you still have to show up in person."
       >
         <ButtonLink href={LEAD_ANCHOR} size="lg">
-          Request a call back
+          Start my order
         </ButtonLink>
       </PageHero>
 

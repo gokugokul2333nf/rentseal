@@ -58,7 +58,7 @@ export function MobileCta() {
               href={LEAD_ANCHOR}
               className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-600 text-[15px] font-semibold text-white shadow-[0_6px_20px_-6px_rgb(37_99_235/0.6)] active:bg-brand-700"
             >
-              Request a call back
+              Start my order
               <ArrowRight className="size-4" />
             </Link>
           </div>

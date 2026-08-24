@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useId, useState } from "react";
+import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,17 +21,28 @@ export function Accordion({
   defaultOpen?: number;
 }) {
   const [open, setOpen] = useState<number>(defaultOpen);
+  const baseId = useId();
 
   return (
-    <div className={cn("divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white", className)}>
+    <div
+      className={cn(
+        "divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white",
+        className,
+      )}
+    >
       {items.map((item, i) => {
         const isOpen = open === i;
+        const panelId = `${baseId}-panel-${i}`;
+        const buttonId = `${baseId}-button-${i}`;
+
         return (
           <div key={item.q} className={cn("transition-colors", isOpen && "bg-navy-50/40")}>
             <h3>
               <button
                 type="button"
+                id={buttonId}
                 aria-expanded={isOpen}
+                aria-controls={panelId}
                 onClick={() => setOpen(isOpen ? -1 : i)}
                 className="flex w-full items-start gap-4 px-5 py-5 text-left sm:px-6"
               >
@@ -50,22 +61,31 @@ export function Accordion({
                 </span>
               </button>
             </h3>
-            <AnimatePresence initial={false}>
-              {isOpen ? (
-                <motion.div
-                  key="content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <p className="px-5 pb-5 pr-14 text-[14.5px] leading-[1.75] text-navy-600 sm:px-6 sm:pr-16">
-                    {item.a}
-                  </p>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+
+            {/*
+              The answer stays mounted whether or not the panel is open, and is
+              collapsed with height rather than unmounted.
+
+              This is load-bearing for SEO. Every page that renders an Accordion
+              also emits FAQPage structured data, and Google requires the marked-up
+              answer to be present in the page HTML. Unmounting collapsed panels
+              left only the one open answer in the DOM, so the schema described
+              content that was not there — and on the district pages it threw away
+              five sixths of the copy that makes each page distinct.
+            */}
+            <motion.div
+              id={panelId}
+              role="region"
+              aria-labelledby={buttonId}
+              initial={false}
+              animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <p className="px-5 pb-5 pr-14 text-[14.5px] leading-[1.75] text-navy-600 sm:px-6 sm:pr-16">
+                {item.a}
+              </p>
+            </motion.div>
           </div>
         );
       })}

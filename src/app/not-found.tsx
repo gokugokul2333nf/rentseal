@@ -39,7 +39,7 @@ export default function NotFound() {
             Back to the homepage
           </ButtonLink>
           <ButtonLink href={LEAD_ANCHOR} variant="secondary" size="lg">
-            Request a call back
+            Start my order
           </ButtonLink>
         </div>
 

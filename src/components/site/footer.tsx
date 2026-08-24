@@ -45,7 +45,7 @@ export function Footer() {
             </div>
             <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
               <ButtonLink href={LEAD_ANCHOR} size="lg">
-                Request a call back
+                Start my order
               </ButtonLink>
               <ButtonLink
                 href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, "")}`}

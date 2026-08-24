@@ -93,6 +93,41 @@ other district's:
 the same template with a name swapped in, which is exactly the thin-content
 pattern Google demotes. Write them for any district you add.
 
+### Why each district page has its own FAQs
+
+`rentalFaqs(district)` and `stampPaperFaqs(district)` in `districts.ts` generate
+six questions per page from that district's own data — its SRO towns, delivery
+zone, headquarters and the towns we serve.
+
+They exist because the shared `FaqSection` was rendering the same eight answers
+on all 76 location pages. Each page now also emits its own `FAQPage` schema.
+Measured on the current build: ~1,760 words per rental page and ~1,410 per stamp
+paper page, of which roughly a third of the sentences appear on that page and
+nowhere else on the site.
+
+> **Accordion constraint:** `components/ui/accordion.tsx` must keep collapsed
+> answers **mounted** (height-collapsed, not unmounted). Every page that renders
+> an Accordion also emits `FAQPage` structured data, and Google requires the
+> marked-up answer to exist in the page HTML. If you ever refactor it back to
+> conditional mounting, the schema will describe content that is not there.
+
+### Social cards
+
+`src/lib/og.tsx` holds one card layout; each route group has an
+`opengraph-image.tsx` that feeds it. There are 77 generated cards — one per
+district page per track, one per service, one per index, one root fallback.
+
+Note that a page which exports its own `openGraph` metadata block **suppresses**
+the inherited file-convention image, which is why the index and service routes
+each need their own `opengraph-image.tsx` rather than relying on the root one.
+
+### Routes deliberately kept out of the index
+
+`/create`, `/create/[type]` and `/success` render but carry
+`robots: { index: false }`. The self-serve product is switched off, so these are
+unlinked from the live site and absent from the sitemap — without the noindex
+they would be orphaned, crawlable pages.
+
 ### Slug stability
 
 Slugs are the official district names. Two of the original city slugs were towns

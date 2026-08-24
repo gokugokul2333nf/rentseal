@@ -35,7 +35,7 @@ export default function StampPaperIndex() {
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
           <ButtonLink href="/rental-agreement" variant="secondary" size="lg">
-            Need the agreement drafted?
+            Get the agreement drafted too
           </ButtonLink>
         </div>
       </PageHero>

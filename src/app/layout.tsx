@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { DISTRICTS } from "@/lib/districts";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -97,20 +98,18 @@ const organizationSchema = {
     postalCode: "600018",
     addressCountry: "IN",
   },
-  areaServed: { "@type": "State", name: "Tamil Nadu" },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "6400",
-    bestRating: "5",
-  },
+  areaServed: DISTRICTS.map((d) => ({
+    "@type": "AdministrativeArea",
+    name: `${d.name} district`,
+    containedInPlace: { "@type": "State", name: "Tamil Nadu" },
+  })),
+  knowsLanguage: ["en-IN", "ta-IN"],
   openingHoursSpecification: {
     "@type": "OpeningHoursSpecification",
     dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
     opens: "08:00",
     closes: "22:00",
   },
-  sameAs: ["https://twitter.com", "https://linkedin.com", "https://instagram.com"],
 };
 
 const websiteSchema = {
@@ -120,11 +119,7 @@ const websiteSchema = {
   url: SITE.url,
   name: SITE.name,
   publisher: { "@id": `${SITE.url}/#organization` },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: { "@type": "EntryPoint", urlTemplate: `${SITE.url}/search?q={search_term_string}` },
-    "query-input": "required name=search_term_string",
-  },
+  inLanguage: "en-IN",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

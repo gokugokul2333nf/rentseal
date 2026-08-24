@@ -73,7 +73,7 @@ export function Cities() {
               </div>
             </div>
             <ButtonLink href={LEAD_ANCHOR} variant="emerald" size="lg" className="shrink-0">
-              Check my area
+              Check delivery to my district
             </ButtonLink>
           </div>
         </Reveal>

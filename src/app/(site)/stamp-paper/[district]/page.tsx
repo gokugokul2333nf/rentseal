@@ -12,12 +12,12 @@ import {
   Truck,
 } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
-import { FaqSection } from "@/components/landing/faq-section";
+import { Accordion } from "@/components/ui/accordion";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Counter, Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { DISTRICTS, ZONE_META, getDistrict, nearbyDistricts } from "@/lib/districts";
+import { DISTRICTS, ZONE_META, getDistrict, nearbyDistricts, stampPaperFaqs } from "@/lib/districts";
 import { DENOMINATIONS, DELIVERY_RULES, STAMP_USE_CASES } from "@/lib/stamp-paper";
 import { LEAD_ANCHOR, SITE } from "@/lib/site";
 import { inr } from "@/lib/utils";
@@ -68,6 +68,7 @@ export default async function StampPaperDistrictPage({
 
   const zone = ZONE_META[district.zone];
   const nearby = nearbyDistricts(district);
+  const faqs = stampPaperFaqs(district);
 
   const crumbs = [
     { label: "Home", href: "/" },
@@ -86,7 +87,7 @@ export default async function StampPaperDistrictPage({
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-            Order stamp paper in {district.name}
+            Order stamp paper for {district.name}
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
           <ButtonLink
@@ -94,9 +95,12 @@ export default async function StampPaperDistrictPage({
             variant="secondary"
             size="lg"
           >
-            Ask on WhatsApp
+            Get a quote on WhatsApp
           </ButtonLink>
         </div>
+        <p className="mt-4 text-[13.5px] text-navy-500">
+          {zone.eta} delivery · Face value, no markup · Free above ₹2,000 of stamp value
+        </p>
       </PageHero>
 
       {/* Delivery facts */}
@@ -280,7 +284,7 @@ export default async function StampPaperDistrictPage({
                   href={`/rental-agreement/${district.slug}`}
                   className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700 underline underline-offset-4"
                 >
-                  Need the agreement drafted too?
+                  Need the agreement drafted as well?
                   <ArrowRight className="size-3.5" />
                 </Link>
               </div>
@@ -289,7 +293,31 @@ export default async function StampPaperDistrictPage({
         </div>
       </section>
 
-      <FaqSection limit={8} />
+      {/* District-specific FAQs — deliberately not the generic set, so 38 pages
+          do not ship the same eight answers. */}
+      <section id="faq" className="section scroll-mt-20">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow={`${district.name} — common questions`}
+            title={`Buying stamp paper in ${district.name}, answered`}
+            body={`Delivery, denominations and verification, with the numbers that apply to ${district.name} rather than a state average.`}
+          />
+          <Reveal delay={0.1} className="mx-auto mt-14 max-w-3xl">
+            <Accordion items={faqs} defaultOpen={0} />
+            <p className="mt-8 text-center text-[14px] text-navy-500">
+              Something not covered here?{" "}
+              <Link href="/faq" className="font-semibold text-brand-700 underline underline-offset-4">
+                Read the full FAQ
+              </Link>{" "}
+              or{" "}
+              <Link href="/contact" className="font-semibold text-brand-700 underline underline-offset-4">
+                ask us directly
+              </Link>
+              .
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
       {/* Nearby districts */}
       <section className="section border-t border-line bg-white">
@@ -340,6 +368,21 @@ export default async function StampPaperDistrictPage({
               addressCountry: "IN",
             },
             parentOrganization: { "@id": `${SITE.url}/#organization` },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "@id": `${SITE.url}/stamp-paper/${district.slug}#faq`,
+            mainEntity: faqs.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
           }),
         }}
       />

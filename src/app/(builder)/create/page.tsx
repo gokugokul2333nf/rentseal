@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description:
     "Pick the right instrument for your situation — residential rental, commercial rental, lease deed or leave and licence — then fill in the details. Free until you pay.",
   alternates: { canonical: "/create" },
+  // The self-serve builder is built but switched off — see the README. These
+  // routes still render, so keep them out of the index until it goes live.
+  robots: { index: false, follow: false },
 };
 
 const ICONS: Record<AgreementType, React.ComponentType<{ className?: string }>> = {
