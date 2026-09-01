@@ -27,7 +27,7 @@ import {
   UtensilsCrossed,
   Warehouse,
 } from "lucide-react";
-import { getTemplatesByCategory, SERVICE_SLUG_BY_TYPE, TEMPLATES } from "@/lib/templates";
+import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
 import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
@@ -74,7 +74,7 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
   const Icon = ICONS[template.icon] ?? Home;
   return (
     <Link
-      href={`/services/${SERVICE_SLUG_BY_TYPE[template.baseType]}`}
+      href={`/create/${template.id}`}
       className="group relative flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lift"
     >
       <div className="flex items-start justify-between gap-3">

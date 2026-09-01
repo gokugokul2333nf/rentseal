@@ -255,16 +255,22 @@ export function BuilderShell({
 }) {
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
-  const { draft, setType, hydrated, carriedOver, dismissCarriedOver, reset } = useAgreement();
+  const { draft, carriedOver, dismissCarriedOver, reset } = useAgreement();
   const [step, setStep] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const meta = AGREEMENT_TYPES.find((t) => t.id === type);
+  // The route names the instrument the user arrived on, but the template
+  // picker can move the draft across instruments — a warehouse is commercial
+  // even if they came in through /create/residential. So the heading follows
+  // the draft, not the URL.
+  const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type) ??
+    AGREEMENT_TYPES.find((t) => t.id === type);
 
-  // Keep the store in step with the route the user landed on.
-  useEffect(() => {
-    if (hydrated && draft.type !== type) setType(type);
-  }, [hydrated, draft.type, type, setType]);
+  // Reconciling the restored draft against the route is the provider's job and
+  // it does it once, at hydration. Repeating it here on every change of
+  // draft.type undid the template picker the moment it moved instrument:
+  // choosing Warehouse switched the draft to a 36-month commercial letting and
+  // this effect immediately pulled it back to an 11-month residential one.
 
   useEffect(() => {
     if (embedded) {

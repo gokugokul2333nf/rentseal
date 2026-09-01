@@ -7,6 +7,7 @@ import {
   generateClauses,
   propertyAddress,
   scheduleDescription,
+  scheduleHeading,
 } from "@/lib/clauses";
 import type { AgreementDraft } from "@/lib/types";
 import { cn, formatDate, inr, rupeesInWords } from "@/lib/utils";
@@ -206,10 +207,10 @@ export function AgreementDocument({
       {/* Title */}
       <header data-doc="title" className="avoid-break mb-7 text-center">
         <h1 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
-          {agreementTitle(draft.type)}
+          {agreementTitle(draft)}
         </h1>
         <p className="mt-4 text-left">
-          This {agreementTitle(draft.type).toUpperCase()} is made and executed at{" "}
+          This {agreementTitle(draft).toUpperCase()} is made and executed at{" "}
           <Blank w="90px">{executedAt || undefined}</Blank> on this{" "}
           <Blank w="120px">{t.executionDate ? formatDate(executed) : undefined}</Blank>.
         </p>
@@ -285,7 +286,7 @@ export function AgreementDocument({
       {/* Operative clauses */}
       <section data-doc="terms" className="mb-7">
         <p className="mb-4 text-[11px] font-bold tracking-[0.1em] text-navy-700">
-          NOW THIS DEED OF {agreementTitle(draft.type).toUpperCase()} WITNESSETH:
+          NOW THIS DEED OF {agreementTitle(draft).toUpperCase()} WITNESSETH:
         </p>
 
         <ol data-doc="clauses" className="space-y-3">
@@ -332,7 +333,10 @@ export function AgreementDocument({
       {/* Schedule */}
       <section className="avoid-break mb-7">
         <h2 className="mb-2 text-center font-display text-[13px] font-bold tracking-wide text-navy-950 uppercase">
-          {draft.property.wholeProperty ? "Schedule of the Premises" : "Schedule of the Portion"}
+          {draft.property.wholeProperty
+            ? // Title-cased for the screen; the PDF prints it in capitals.
+              scheduleHeading(draft).replace(/\b(\w)(\w*)/g, (_, a, b) => a + b.toLowerCase())
+            : "Schedule of the Portion"}
         </h2>
         <p className="text-justify">
           All that piece and parcel of{" "}

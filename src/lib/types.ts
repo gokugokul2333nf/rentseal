@@ -1,3 +1,5 @@
+import type { TemplateId } from "./agreement-templates";
+
 export type AgreementType =
   | "residential"
   | "commercial"
@@ -115,6 +117,18 @@ export interface AgreementOptions {
   lawyerReview: boolean;
   witnessRequired: boolean;
   customClauses: string[];
+  /**
+   * Rewritten wording for a generated clause, keyed by clause id.
+   *
+   * Every deed has something the standard wording does not cover — a rent-free
+   * fit-out month, a particular parking bay, whose name the electricity card is
+   * in. Rather than send those to the office as a note that has to be typed in
+   * again, the customer edits the clause itself and the edit travels with the
+   * draft into the PDF.
+   */
+  clauseEdits: Record<string, string>;
+  /** Generated clauses the customer has struck out. Core clauses cannot be struck. */
+  removedClauseIds: string[];
 }
 
 export interface FurnitureItem {
@@ -127,6 +141,8 @@ export interface FurnitureItem {
 export interface AgreementDraft {
   id: string;
   type: AgreementType;
+  /** Which of the twenty-four signed-off templates this deed is drawn from. */
+  templateId: TemplateId;
   plan: PlanId;
   landlord: Party;
   tenant: Party;

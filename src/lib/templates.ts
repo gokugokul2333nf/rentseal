@@ -1,7 +1,13 @@
 import type { AgreementType } from "./types";
+import type { TemplateId } from "./agreement-templates";
 
 export interface AgreementTemplate {
-  id: string;
+  /**
+   * Typed against the drafting specs on purpose: the browsable catalogue and
+   * the twenty-four templates the builder can actually draw are the same list,
+   * and the compiler now says so if one gains an entry the other lacks.
+   */
+  id: TemplateId;
   name: string;
   description: string;
   /** Which of the four service pages this template is drafted under. */

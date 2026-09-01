@@ -17,6 +17,8 @@ import {
   X,
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
+import { TemplatePicker } from "./template-picker";
+import { ClauseEditor } from "./clause-editor";
 import { CITIES, EXTRA_DISTRICTS } from "@/lib/site";
 import { checkPincode, districtFromPincode } from "@/lib/pincode";
 import { Button } from "@/components/ui/button";
@@ -94,6 +96,8 @@ export function PropertyStep() {
 
   return (
     <>
+      <TemplatePicker />
+
       <StepIntro
         title="Where is the property?"
         body="This tells us which Sub-Registrar has jurisdiction and which local rules to apply. Everything here goes into Schedule A of the agreement."
@@ -1061,6 +1065,8 @@ export function ClausesStep() {
             )}
           </div>
         ) : null}
+
+        <ClauseEditor />
 
         {/* Custom clauses */}
         <div className="rounded-2xl border border-line bg-white p-5">

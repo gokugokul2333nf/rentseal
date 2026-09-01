@@ -1,6 +1,7 @@
 import { calculateStampDuty } from "./stamp-duty";
 import { propertyAddress, agreementTitle } from "./clauses";
 import { AGREEMENT_TYPES } from "./site";
+import { TEMPLATES } from "./templates";
 import type { AgreementDraft } from "./types";
 
 /**
@@ -17,6 +18,10 @@ export interface SheetRow {
   contactPhone: string;
   contactEmail: string;
   city: string;
+  /** Which of the twenty-four templates was drawn, e.g. "warehouse-rental". */
+  template: string;
+  /** Set when the customer reworded or struck clauses. */
+  clausesChanged: string;
   /** Rupees, our quote — not a charge. Payment is taken on the call. */
   estimate: string;
   summary: string;
@@ -38,6 +43,11 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     lawyerReview: draft.options.lawyerReview,
   });
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type);
+  // Which of the twenty-four was drawn. "Commercial Rental Agreement" does not
+  // tell the counter whether to print a warehouse deed or an ATM lobby licence.
+  const tpl = TEMPLATES.find((t) => t.id === draft.templateId);
+  const reworded = Object.keys(draft.options.clauseEdits ?? {}).length;
+  const struck = (draft.options.removedClauseIds ?? []).length;
 
   // Whoever we call is the landlord where we have their number, the tenant
   // otherwise — one of the two has always been filled in by this point.
@@ -52,7 +62,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     city: draft.property.city || draft.property.district,
     estimate: String(breakdown.total),
     summary: joinTruthy(
-      meta?.name ?? agreementTitle(draft.type),
+      tpl?.name ?? meta?.name ?? agreementTitle(draft),
       `${draft.terms.durationMonths} months`,
       draft.terms.monthlyRent ? `rent ${draft.terms.monthlyRent}` : "",
       draft.terms.securityDeposit ? `deposit ${draft.terms.securityDeposit}` : "",
@@ -60,7 +70,13 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     ),
     notes,
 
-    agreementType: meta?.name ?? draft.type,
+    agreementType: tpl?.name ?? meta?.name ?? draft.type,
+    template: draft.templateId,
+    // Loud on purpose: a deed with reworded clauses must not be printed from
+    // the standard template. The attached PDF is the one to use.
+    clausesChanged: reworded || struck
+      ? `${reworded} reworded, ${struck} struck — print the attached PDF, not the standard template`
+      : "",
     plan: draft.plan,
     monthlyRent: draft.terms.monthlyRent,
     securityDeposit: draft.terms.securityDeposit,
@@ -116,6 +132,10 @@ export function enquiryRow(fields: {
       fields.agreementType ?? "",
     ),
     notes: fields.message ?? "",
+    // An enquiry has no drafted deed behind it, but the sheet's columns must
+    // line up across both kinds of row.
+    template: "",
+    clausesChanged: "",
     need: fields.need,
     denomination: fields.denomination ?? "",
     agreementType: fields.agreementType ?? "",

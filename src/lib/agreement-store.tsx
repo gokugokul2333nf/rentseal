@@ -16,113 +16,16 @@ import type {
   Party,
   PlanId,
 } from "./types";
+import {
+  DEFAULT_TEMPLATE_BY_TYPE,
+  TEMPLATE_SPECS,
+  type TemplateId,
+} from "./agreement-templates";
+import { createDraft, newDraftId, PENDING_ID, tomorrowISO } from "./draft";
+
+export { createDraft, newDraftId, PENDING_ID };
 
 const STORAGE_KEY = "lp-stamp-paper:draft:v1";
-
-function emptyParty(): Party {
-  return {
-    fullName: "",
-    relation: "son",
-    parentName: "",
-    partyType: "individual",
-    companyName: "",
-    designation: "",
-    age: "",
-    phone: "",
-    email: "",
-    aadhaar: "",
-    pan: "",
-    address: "",
-    city: "",
-    pincode: "",
-  };
-}
-
-/** Placeholder until the client mints a real one — keeps SSR and hydration identical. */
-export const PENDING_ID = "LP-DRAFT";
-
-export function newDraftId() {
-  return `LP-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 899999)}`;
-}
-
-function tomorrowISO() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
-}
-
-/**
- * Deterministic by design: no Date.now(), no Math.random(). The provider fills
- * in the id, start date and timestamp once, on the client, after mount.
- */
-export function createDraft(type: AgreementType = "residential"): AgreementDraft {
-  return {
-    id: PENDING_ID,
-    type,
-    plan: "standard",
-    landlord: emptyParty(),
-    tenant: emptyParty(),
-    property: {
-      kind: type === "commercial" ? "office" : "apartment",
-      doorNo: "",
-      buildingName: "",
-      street: "",
-      locality: "",
-      city: "",
-      district: "",
-      pincode: "",
-      builtUpArea: "",
-      bedrooms: "2",
-      bathrooms: "2",
-      floor: "",
-      wholeProperty: true,
-      portionDescription: "",
-      furnishing: "semi-furnished",
-      amenities: [],
-    },
-    terms: {
-      executionDate: "",
-      executionPlace: "",
-      startDate: "",
-      durationMonths: type === "commercial" || type === "lease" ? 36 : 11,
-      monthlyRent: "",
-      securityDeposit: "",
-      rentDueDay: "5th",
-      paymentMode: "bank-transfer",
-      escalationPercent: "5",
-      escalationAfterMonths: "11",
-      noticePeriodMonths: "1",
-      lockInMonths: "0",
-      maintenanceBorneBy: "tenant",
-      maintenanceAmount: "",
-      electricityBorneBy: "tenant",
-      waterBorneBy: "tenant",
-      propertyTaxBorneBy: "landlord",
-      depositAlreadyPaid: false,
-      // The sample allows two months of continuous default before eviction,
-      // which is the usual figure in Tamil Nadu agreements.
-      defaultMonths: "2",
-    },
-    options: {
-      parkingIncluded: true,
-      parkingType: "four-wheeler",
-      parkingSlots: "1",
-      petsAllowed: false,
-      sublettingAllowed: false,
-      commercialUseAllowed: type === "commercial",
-      businessNature: "",
-      alterationsAllowed: false,
-      noWallDamage: true,
-      noLiquorOrIllegalUse: true,
-      registrationRequired: type === "lease",
-      lawyerReview: false,
-      witnessRequired: true,
-      customClauses: [],
-    },
-    furniture: [],
-    updatedAt: "",
-  };
-}
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 
@@ -142,8 +45,12 @@ type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]>
  * escalation, lock-in, options, property kind and furniture all come from the
  * new type, and the draft takes a new number.
  */
-function switchInstrument(previous: AgreementDraft, type: AgreementType): AgreementDraft {
-  const fresh = createDraft(type);
+function switchInstrument(
+  previous: AgreementDraft,
+  type: AgreementType,
+  templateId: TemplateId = DEFAULT_TEMPLATE_BY_TYPE[type],
+): AgreementDraft {
+  const fresh = createDraft(type, templateId);
   return {
     ...fresh,
     landlord: previous.landlord,
@@ -174,6 +81,12 @@ interface StoreValue {
   update: (patch: DeepPartial<AgreementDraft>) => void;
   setParty: (which: "landlord" | "tenant", patch: Partial<Party>) => void;
   setType: (type: AgreementType) => void;
+  /** Move the draft onto one of the twenty-four templates, applying its defaults. */
+  setTemplate: (id: TemplateId) => void;
+  editClause: (id: string, text: string) => void;
+  resetClause: (id: string) => void;
+  removeClause: (id: string) => void;
+  restoreClause: (id: string) => void;
   setPlan: (plan: PlanId) => void;
   addFurniture: () => void;
   updateFurniture: (id: string, patch: Partial<FurnitureItem>) => void;
@@ -209,11 +122,20 @@ function mergeDeep<T>(base: T, patch: DeepPartial<T>): T {
 export function AgreementProvider({
   children,
   initialType = "residential",
+  initialTemplateId,
 }: {
   children: React.ReactNode;
   initialType?: AgreementType;
+  /**
+   * Set when the URL names one of the twenty-four templates rather than a bare
+   * instrument. A named template is authoritative — /create/warehouse-rental
+   * must open a warehouse deed whatever is in storage.
+   */
+  initialTemplateId?: TemplateId;
 }) {
-  const [draft, setDraft] = useState<AgreementDraft>(() => createDraft(initialType));
+  const [draft, setDraft] = useState<AgreementDraft>(() =>
+    createDraft(initialType, initialTemplateId ?? DEFAULT_TEMPLATE_BY_TYPE[initialType]),
+  );
   const [hydrated, setHydrated] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [saving, setSaving] = useState(false);
@@ -237,12 +159,22 @@ export function AgreementProvider({
       if (raw) {
         const parsed = JSON.parse(raw) as AgreementDraft;
         if (parsed?.id && parsed?.terms) {
-          const merged = mergeDeep(createDraft(initialType), parsed as DeepPartial<AgreementDraft>);
-          if (parsed.type === initialType) {
+          const want = initialTemplateId ?? DEFAULT_TEMPLATE_BY_TYPE[initialType];
+          const merged = mergeDeep(
+            createDraft(initialType, want),
+            parsed as DeepPartial<AgreementDraft>,
+          );
+          // A URL naming a template must win outright. A URL naming only an
+          // instrument is broader: any of its templates is a legitimate draft
+          // to come back to, so a saved warehouse survives /create/commercial.
+          const keep = initialTemplateId
+            ? parsed.templateId === initialTemplateId
+            : TEMPLATE_SPECS[parsed.templateId]?.baseType === initialType;
+          if (keep) {
             restored = merged;
             restoredSavedAt = parsed.updatedAt ? new Date(parsed.updatedAt) : null;
           } else {
-            restored = switchInstrument(merged, initialType);
+            restored = switchInstrument(merged, initialType, want);
             switched = true;
             // A different instrument is a different document, so it has not
             // been saved yet — leaving the old timestamp would claim otherwise.
@@ -267,6 +199,12 @@ export function AgreementProvider({
     });
     setSavedAt(restoredSavedAt);
     setCarriedOver(switched);
+    // Moving an instrument at restore rewrites the draft without anybody
+    // touching a field, so autosave — which only writes when something is
+    // dirty — never persisted it. Landing on /create/warehouse-rental left the
+    // warehouse deed on screen while storage still held the old house draft,
+    // and the next visit came back to the house.
+    if (switched) dirty.current = true;
     setHydrated(true);
     // Runs once; the picked type is captured at mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -323,6 +261,64 @@ export function AgreementProvider({
       property: {
         ...prev.property,
         kind: type === "commercial" && prev.property.kind === "apartment" ? "office" : prev.property.kind,
+      },
+    }));
+  }, []);
+
+  /**
+   * Switching template keeps the facts and re-applies the new template's own
+   * defaults. Staying inside the same instrument keeps the draft number; moving
+   * across one is a different document and gets a fresh one.
+   */
+  const setTemplate = useCallback((id: TemplateId) => {
+    dirty.current = true;
+    setDraft((prev) => {
+      const spec = TEMPLATE_SPECS[id];
+      if (!spec || prev.templateId === id) return prev;
+      const next = switchInstrument(prev, spec.baseType, id);
+      return spec.baseType === prev.type
+        ? { ...next, id: prev.id, plan: prev.plan, furniture: prev.furniture }
+        : { ...next, id: newDraftId(), plan: prev.plan };
+    });
+  }, []);
+
+  const editClause = useCallback((id: string, text: string) => {
+    dirty.current = true;
+    setDraft((prev) => ({
+      ...prev,
+      options: { ...prev.options, clauseEdits: { ...prev.options.clauseEdits, [id]: text } },
+    }));
+  }, []);
+
+  const resetClause = useCallback((id: string) => {
+    dirty.current = true;
+    setDraft((prev) => {
+      const next = { ...prev.options.clauseEdits };
+      delete next[id];
+      return { ...prev, options: { ...prev.options, clauseEdits: next } };
+    });
+  }, []);
+
+  const removeClause = useCallback((id: string) => {
+    dirty.current = true;
+    setDraft((prev) => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        removedClauseIds: prev.options.removedClauseIds.includes(id)
+          ? prev.options.removedClauseIds
+          : [...prev.options.removedClauseIds, id],
+      },
+    }));
+  }, []);
+
+  const restoreClause = useCallback((id: string) => {
+    dirty.current = true;
+    setDraft((prev) => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        removedClauseIds: prev.options.removedClauseIds.filter((x) => x !== id),
       },
     }));
   }, []);
@@ -402,6 +398,11 @@ export function AgreementProvider({
       update,
       setParty,
       setType,
+      setTemplate,
+      editClause,
+      resetClause,
+      removeClause,
+      restoreClause,
       setPlan,
       addFurniture,
       updateFurniture,
@@ -420,6 +421,11 @@ export function AgreementProvider({
       update,
       setParty,
       setType,
+      setTemplate,
+      editClause,
+      resetClause,
+      removeClause,
+      restoreClause,
       setPlan,
       addFurniture,
       updateFurniture,

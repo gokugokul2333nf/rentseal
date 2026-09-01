@@ -1,39 +1,51 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Briefcase,
-  Building2,
-  Check,
-  Clock3,
-  Home,
-  KeyRound,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
-import { AGREEMENT_TYPES } from "@/lib/site";
+import { ArrowRight, Check, Clock3, FileText, ShieldCheck, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
-import type { AgreementType } from "@/lib/types";
+import { TEMPLATE_SPECS } from "@/lib/agreement-templates";
+import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
+import type { AgreementTemplate } from "@/lib/templates";
 
 export const metadata: Metadata = {
-  title: "Choose Your Agreement Type",
-  description:
-    "Pick the right instrument for your situation — residential rental, commercial rental, lease deed or leave and licence — then fill in the details. Free until you pay.",
+  title: "Choose Your Agreement — All Templates",
+  description: `Pick from ${TEMPLATES.length} Tamil Nadu agreement templates — residential, commercial, lease deeds and leave-and-licence. Every one is drafted from the signed-off wording, with its own clauses. Free until you pay.`,
   alternates: { canonical: "/create" },
   // The self-serve builder is built but switched off — see the README. These
   // routes still render, so keep them out of the index until it goes live.
   robots: { index: false, follow: false },
 };
 
-const ICONS: Record<AgreementType, React.ComponentType<{ className?: string }>> = {
-  residential: Home,
-  commercial: Building2,
-  lease: Briefcase,
-  "leave-license": KeyRound,
+const CATEGORY_TONE: Record<
+  AgreementTemplate["category"],
+  "brand" | "emerald" | "violet" | "amber"
+> = {
+  Residential: "brand",
+  Commercial: "emerald",
+  "Lease deed": "violet",
+  "Leave & licence": "amber",
 };
 
+const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
+  Residential: "Somewhere to live — let on monthly rent, usually for eleven months.",
+  Commercial: "Trade premises. Longer terms, and the business clauses come with them.",
+  "Lease deed": "Twelve months and over, registrable, with the strongest evidentiary position.",
+  "Leave & licence": "Permission to occupy without granting a tenancy, so possession comes back cleanly.",
+};
+
+/**
+ * Every template we can draw, by name.
+ *
+ * This page used to offer four cards — the four instruments — which meant a
+ * warehouse and a shop were the same click, and the twenty-four templates the
+ * office actually signed off were nowhere the customer could see them. Each
+ * card now links to its own drafting URL, so picking "Warehouse / Godown" opens
+ * the godown deed with its own clauses and its own thirty-six month term
+ * already filled in.
+ */
 export default function CreatePage() {
+  const groups = getTemplatesByCategory();
+
   return (
     <div className="relative overflow-hidden">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
@@ -46,7 +58,7 @@ export default function CreatePage() {
           <Reveal>
             <Badge tone="brand" className="px-3.5 py-1.5">
               <Sparkles className="size-3.5" />
-              Step 1 of 8 — no signup needed
+              {TEMPLATES.length} templates — no signup needed
             </Badge>
           </Reveal>
           <Reveal delay={0.06}>
@@ -56,77 +68,105 @@ export default function CreatePage() {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-5 text-[17px] leading-[1.7] text-navy-600">
-              Pick the instrument that matches your situation. If you get it wrong, don&apos;t
-              worry — you can switch at any point and we will re-draft the clauses for you.
+              Pick the one closest to your situation and its clauses, its term and its wording come
+              with it. If you get it wrong you can switch at any point — we keep the parties and
+              the address and re-draft the rest.
             </p>
           </Reveal>
         </div>
 
-        <Stagger className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2" amount={0.1}>
-          {AGREEMENT_TYPES.map((type) => {
-            const Icon = ICONS[type.id];
-            return (
-              <StaggerItem key={type.id}>
-                <Link
-                  href={`/create/${type.id}`}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-lift"
-                >
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -top-24 -right-20 size-52 rounded-full bg-brand-500/[0.08] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                  <div className="relative flex items-start justify-between gap-4">
-                    <span className="grid size-12 place-items-center rounded-xl bg-navy-950 text-white transition-colors duration-300 group-hover:bg-brand-600">
-                      <Icon className="size-5.5" />
-                    </span>
-                    {type.popular ? <Badge tone="brand">Most popular</Badge> : null}
-                  </div>
+        <div className="mx-auto mt-14 max-w-6xl space-y-14">
+          {groups.map(({ category, templates }) => (
+            <div key={category}>
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge tone={CATEGORY_TONE[category]}>{category}</Badge>
+                <span className="text-[13px] font-medium text-navy-500">
+                  {templates.length} template{templates.length === 1 ? "" : "s"}
+                </span>
+                <span aria-hidden="true" className="hidden h-px flex-1 bg-line sm:block" />
+              </div>
+              <p className="mt-2 max-w-2xl text-[13.5px] leading-relaxed text-navy-500">
+                {CATEGORY_BLURB[category]}
+              </p>
 
-                  <h2 className="relative mt-6 font-display text-[19px] font-bold text-navy-950">
-                    {type.name}
-                  </h2>
-                  <p className="relative mt-2.5 flex-1 text-[14.5px] leading-[1.7] text-navy-500">
-                    {type.description}
-                  </p>
+              <Stagger className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.05}>
+                {templates.map((template) => {
+                  const spec = TEMPLATE_SPECS[template.id];
+                  return (
+                    <StaggerItem key={template.id} className="h-full">
+                      <Link
+                        href={`/create/${template.id}`}
+                        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-500 hover:shadow-lift"
+                      >
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -top-20 -right-16 size-44 rounded-full bg-brand-500/[0.07] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                        />
+                        <div className="relative flex items-start justify-between gap-3">
+                          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-navy-950 text-white transition-colors duration-300 group-hover:bg-brand-600">
+                            <FileText className="size-4.5" />
+                          </span>
+                          {template.popular ? <Badge tone="dark">Most popular</Badge> : null}
+                        </div>
 
-                  <ul className="relative mt-5 space-y-1.5">
-                    {type.bestFor.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-[13.5px] text-navy-600">
-                        <Check className="size-3.5 shrink-0 text-emerald-500" strokeWidth={3} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                        <h2 className="relative mt-4 font-display text-[15.5px] leading-snug font-bold text-navy-950">
+                          {template.name}
+                        </h2>
+                        <p className="relative mt-1.5 flex-1 text-[13px] leading-[1.65] text-navy-500">
+                          {template.description}
+                        </p>
 
-                  <div className="relative mt-6 flex items-center justify-between border-t border-line pt-5">
-                    <span className="flex items-center gap-1.5 text-[12.5px] text-navy-400">
-                      <Clock3 className="size-3.5" />
-                      Usually {type.defaultMonths} months
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand-700">
-                      Start
-                      <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </Link>
-              </StaggerItem>
-            );
-          })}
-        </Stagger>
+                        {spec ? (
+                          <p className="relative mt-3 text-[12px] text-navy-400">
+                            Drawn as{" "}
+                            <span className="font-semibold text-navy-600">{spec.deedTitle}</span> ·{" "}
+                            {spec.roleA.toLowerCase()} and {spec.roleB.toLowerCase()}
+                          </p>
+                        ) : null}
 
-        <Reveal delay={0.3}>
-          <div className="mx-auto mt-12 flex max-w-5xl flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-2xl border border-line bg-white/70 px-7 py-5 backdrop-blur">
+                        <div className="relative mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
+                          <span className="inline-flex items-center gap-1.5 text-[12px] text-navy-500">
+                            <Clock3 className="size-3.5" />
+                            {spec ? `${spec.defaults.durationMonths} months` : template.term}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-700">
+                            Draft this
+                            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                          </span>
+                        </div>
+                      </Link>
+                    </StaggerItem>
+                  );
+                })}
+              </Stagger>
+            </div>
+          ))}
+        </div>
+
+        <Reveal delay={0.2}>
+          <div className="mx-auto mt-14 flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-2xl border border-line bg-white/70 px-7 py-5 backdrop-blur">
             {[
-              "Free to draft — pay only at the end",
+              "Free to draft — pay only on the confirming call",
               "Your progress saves automatically",
-              "Switch type any time without losing data",
+              "Switch template any time without losing your details",
+              "Reword or strike out any clause before it is sent",
             ].map((item) => (
-              <span key={item} className="flex items-center gap-2 text-[13.5px] font-medium text-navy-600">
-                <ShieldCheck className="size-4 text-emerald-500" />
+              <span
+                key={item}
+                className="flex items-center gap-2 text-[13.5px] font-medium text-navy-600"
+              >
+                <ShieldCheck className="size-4 shrink-0 text-emerald-500" />
                 {item}
               </span>
             ))}
           </div>
+        </Reveal>
+
+        <Reveal delay={0.26}>
+          <p className="mt-6 text-center text-[13px] text-navy-400">
+            <Check className="mr-1.5 inline size-3.5 text-emerald-500" />
+            Not sure which one? Start with the closest and change it inside the builder.
+          </p>
         </Reveal>
       </div>
     </div>

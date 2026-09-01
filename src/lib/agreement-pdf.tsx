@@ -11,6 +11,8 @@ import {
   generateClauses,
   propertyAddress,
   scheduleDescription,
+  scheduleHeading,
+  specFor,
 } from "./clauses";
 import { formatDate } from "./utils";
 import { SITE } from "./site";
@@ -53,10 +55,22 @@ function aadhaar(value: string) {
   return digits ? digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim() : "";
 }
 
+/**
+ * The office prints these onto non-judicial stamp paper, whose top third is
+ * taken up by the pre-printed Government header. Nothing may be printed into
+ * it, so the first page starts 4.5 inches down and every later page starts at
+ * the normal margin. 72pt to the inch.
+ */
+const A4_HEIGHT = 841.89;
+const FIRST_PAGE_TOP_IN = 4.5;
+const PAGE_PADDING_TOP = 48;
+const FIRST_PAGE_GAP = FIRST_PAGE_TOP_IN * 72 - PAGE_PADDING_TOP;
+
 const s = StyleSheet.create({
   page: {
-    paddingTop: 48,
-    paddingBottom: 56,
+    paddingTop: PAGE_PADDING_TOP,
+    // Room for the signature strip and page number that repeat on every page.
+    paddingBottom: 104,
     paddingHorizontal: 56,
     fontSize: 10.5,
     lineHeight: 1.6,
@@ -107,9 +121,47 @@ const s = StyleSheet.create({
   witnessRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 26 },
   witnessNum: { fontFamily: "Times-Bold", fontSize: 10, marginBottom: 26 },
   hint: { fontSize: 8, color: "#888888" },
-  footer: {
+
+  /* The strip that repeats at the foot of every page.
+   *
+   * Two @react-pdf quirks are baked into these three styles, both verified
+   * against the rendered PDF rather than assumed:
+   *
+   *   - Only an absolutely positioned `Text` survives `fixed`. Wrapping the
+   *     strip in a `fixed` View puts it at y=398691 on an 842pt page.
+   *   - A `fixed` Text using `render` must be anchored with `top`, not
+   *     `bottom`. With `bottom` the dynamic text lands further off the page on
+   *     every sheet — 7106, 398691, 22425312 — because the offset resolves
+   *     against the flowed document height. Anchoring from the top is exact,
+   *     and A4 is a known height. */
+  footSigLeft: {
     position: "absolute",
-    bottom: 26,
+    top: A4_HEIGHT - 78,
+    left: 56,
+    width: "40%",
+    borderTopWidth: 0.6,
+    borderTopColor: "#666666",
+    paddingTop: 3,
+    fontFamily: "Times-Bold",
+    fontSize: 7.5,
+    letterSpacing: 0.5,
+  },
+  footSigRight: {
+    position: "absolute",
+    top: A4_HEIGHT - 78,
+    right: 56,
+    width: "40%",
+    borderTopWidth: 0.6,
+    borderTopColor: "#666666",
+    paddingTop: 3,
+    textAlign: "right",
+    fontFamily: "Times-Bold",
+    fontSize: 7.5,
+    letterSpacing: 0.5,
+  },
+  footMeta: {
+    position: "absolute",
+    top: A4_HEIGHT - 42,
     left: 56,
     right: 56,
     fontSize: 7.5,
@@ -117,7 +169,7 @@ const s = StyleSheet.create({
     textAlign: "center",
     borderTopWidth: 0.5,
     borderTopColor: "#DDDDDD",
-    paddingTop: 6,
+    paddingTop: 5,
   },
 });
 
@@ -153,13 +205,13 @@ function Party({
 export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
   const clauses = generateClauses(draft);
   const t = draft.terms;
-  const title = agreementTitle(draft.type).toUpperCase();
+  const title = agreementTitle(draft).toUpperCase();
   const executed = t.executionDate ? new Date(t.executionDate) : new Date();
   const at = t.executionPlace.trim() || draft.property.city;
-  const isLicence = draft.type === "leave-license";
-  const A = isLicence ? "LICENSOR" : "LANDLORD";
-  const B = isLicence ? "LICENSEE" : "TENANT";
-  const purpose = draft.type === "commercial" ? "COMMERCIAL PURPOSE" : "RESIDENTIAL PURPOSE";
+  const spec = specFor(draft);
+  const A = spec.roleA;
+  const B = spec.roleB;
+  const purpose = spec.purpose;
 
   return (
     <Document
@@ -168,6 +220,24 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
       subject={`${title} prepared for stamping`}
     >
       <Page size="A4" style={s.page}>
+        {/* Both sides initial every page, so no page can be swapped after signing. */}
+        <Text style={s.footSigLeft} fixed>
+          {A} — signature
+        </Text>
+        <Text style={s.footSigRight} fixed>
+          {B} — signature
+        </Text>
+        <Text
+          style={s.footMeta}
+          render={({ pageNumber, totalPages }) =>
+            `${draft.id}  ·  ${SITE.name}  ·  Page ${pageNumber} of ${totalPages}  ·  ` +
+            `Draft for stamping — not yet executed`
+          }
+          fixed
+        />
+        {/* Clears the stamp paper's pre-printed header. First page only. */}
+        <View style={{ height: FIRST_PAGE_GAP }} />
+
         <Text style={s.title}>{title}</Text>
 
         <Text style={s.para}>
@@ -200,7 +270,7 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
         ))}
 
         <Text style={s.scheduleHead}>
-          {draft.property.wholeProperty ? "SCHEDULE OF THE PREMISES" : "SCHEDULE OF THE PORTION"}
+          {draft.property.wholeProperty ? scheduleHeading(draft) : "SCHEDULE OF THE PORTION"}
         </Text>
         <Text style={s.para}>
           All that piece and parcel of {fill(scheduleDescription(draft), 40)}
@@ -245,14 +315,6 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
           </View>
         ) : null}
 
-        <Text
-          style={s.footer}
-          render={({ pageNumber, totalPages }) =>
-            `${draft.id}  ·  ${SITE.name}  ·  Page ${pageNumber} of ${totalPages}  ·  ` +
-            `Draft for stamping — not yet executed`
-          }
-          fixed
-        />
       </Page>
     </Document>
   );

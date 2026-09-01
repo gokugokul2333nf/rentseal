@@ -1,4 +1,5 @@
 import type { AgreementDraft } from "./types";
+import { DEFAULT_TEMPLATE_BY_TYPE, TEMPLATE_SPECS, type TemplateSpec } from "./agreement-templates";
 import { addMonths, formatDateNumeric, inr, rupeesInWords } from "./utils";
 
 export interface GeneratedClause {
@@ -11,20 +12,28 @@ export interface GeneratedClause {
   core?: boolean;
 }
 
-const AGREEMENT_LABEL: Record<AgreementDraft["type"], string> = {
-  residential: "Residential Rental Agreement",
-  commercial: "Commercial Rental Agreement",
-  lease: "Lease Deed",
-  "leave-license": "Leave and License Agreement",
-};
+/**
+ * The template behind a draft, falling back to the instrument's default.
+ *
+ * Drafts saved before templates existed have no templateId, and a returning
+ * customer must not be shown a blank deed because of it.
+ */
+export function specFor(d: AgreementDraft): TemplateSpec {
+  return TEMPLATE_SPECS[d.templateId] ?? TEMPLATE_SPECS[DEFAULT_TEMPLATE_BY_TYPE[d.type]];
+}
 
 function n(value: string | number) {
   const parsed = typeof value === "number" ? value : parseFloat(value || "0");
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export function agreementTitle(type: AgreementDraft["type"]) {
-  return AGREEMENT_LABEL[type];
+/** The heading the deed carries — "SHOP RENTAL AGREEMENT", "LEASE DEED". */
+export function agreementTitle(d: AgreementDraft) {
+  return specFor(d).deedTitle;
+}
+
+export function scheduleHeading(d: AgreementDraft) {
+  return specFor(d).scheduleHeading;
 }
 
 /**
@@ -71,10 +80,10 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const clauses: GeneratedClause[] = [];
   const t = d.terms;
   const o = d.options;
-  const isLicence = d.type === "leave-license";
-  const A = isLicence ? "LICENSOR" : "LANDLORD";
-  const B = isLicence ? "LICENSEE" : "TENANT";
-  const rentWord = isLicence ? "licence fee" : "rent";
+  const spec = specFor(d);
+  const A = spec.roleA;
+  const B = spec.roleB;
+  const rentWord = spec.moneyWord;
 
   const rent = n(t.monthlyRent);
   const deposit = n(t.securityDeposit);
@@ -83,7 +92,7 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const defaults = n(t.defaultMonths) || 2;
   const start = t.startDate ? new Date(t.startDate) : new Date();
   const end = addMonths(start, months);
-  const purpose = d.type === "commercial" ? "COMMERCIAL PURPOSE" : "RESIDENTIAL PURPOSE";
+  const purpose = spec.purpose;
 
   // 1 ── Rent
   clauses.push({
@@ -297,6 +306,17 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
     });
   }
 
+  /* ── The template's own clauses, transcribed from the signed-off document ── */
+
+  spec.clauses.forEach((body, i) => {
+    clauses.push({
+      id: `tpl-${i + 1}`,
+      trigger: "Template clause",
+      title: "Special Condition",
+      body,
+    });
+  });
+
   o.customClauses.forEach((text, i) => {
     if (!text.trim()) return;
     clauses.push({
@@ -307,7 +327,16 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
     });
   });
 
-  return clauses;
+  // Struck-out and rewritten clauses are applied last so an edit survives
+  // whatever produced the clause -- core, template or the customer's own.
+  return clauses
+    .filter((c) => c.core || !o.removedClauseIds?.includes(c.id))
+    .map((c) => {
+      const edited = o.clauseEdits?.[c.id];
+      return edited && edited.trim()
+        ? { ...c, body: edited.trim(), trigger: c.trigger ?? "Edited" }
+        : c;
+    });
 }
 
 export function clauseStats(d: AgreementDraft) {
@@ -315,6 +344,9 @@ export function clauseStats(d: AgreementDraft) {
   return {
     total: all.length,
     conditional: all.filter((c) => c.trigger).length,
-    triggers: all.filter((c) => c.trigger).map((c) => c.trigger as string),
+    // Deduplicated: these are summary chips, and the builder keys them by
+    // label. Five template clauses all reading "Template clause" would collide
+    // as React keys and tell the reader nothing five times over.
+    triggers: [...new Set(all.filter((c) => c.trigger).map((c) => c.trigger as string))],
   };
 }
