@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   CheckCircle2,
@@ -16,6 +17,10 @@ import {
   Stamp,
 } from "lucide-react";
 import { AGREEMENT_TYPES, CITIES, SITE } from "@/lib/site";
+import { enquiryRow } from "@/lib/orders";
+import { AgreementProvider } from "@/lib/agreement-store";
+import { BuilderShell } from "@/components/builder/builder-shell";
+import type { AgreementType } from "@/lib/types";
 import { DENOMINATIONS } from "@/lib/stamp-paper";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
@@ -45,8 +50,15 @@ export function LeadForm() {
   const [phone, setPhone] = useState("");
   const [need, setNeed] = useState<Need>("stamp-paper");
   const [error, setError] = useState("");
+  // Picking "Agreement" offers to draft it here rather than posting an enquiry
+  // and waiting for a call — the drafter is the product, so it should be one
+  // click from the thing that says "tell us what you need".
+  const [drafting, setDrafting] = useState<AgreementType | null>(null);
+  const [draftType, setDraftType] = useState<AgreementType>("residential");
+  const [wantsCallback, setWantsCallback] = useState(false);
+  const showDrafter = (need === "agreement" || need === "both") && !wantsCallback;
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length !== 10) {
       setError("Please enter a 10-digit mobile number so we can call you back.");
@@ -54,12 +66,82 @@ export function LeadForm() {
     }
     setError("");
     setSending(true);
-    // Stands in for the CRM hand-off.
-    setTimeout(() => {
+
+    const form = new FormData(e.currentTarget as HTMLFormElement);
+    const value = (name: string) => String(form.get(name) ?? "");
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          enquiryRow({
+            need,
+            name: value("name"),
+            phone,
+            email: value("email"),
+            city: value("city"),
+            denomination: value("denomination"),
+            agreementType: value("agreementType"),
+            message: value("message"),
+          }),
+        ),
+      });
+      if (!response.ok) throw new Error(String(response.status));
       setSending(false);
       setSent(true);
-    }, 900);
+    } catch {
+      // Saying "thank you" for an enquiry that never reached the sheet would
+      // leave someone waiting for a call that is never going to come.
+      setSending(false);
+      setError(
+        "We could not send that just now. Please call or WhatsApp us on the numbers beside this form and we will take your details down.",
+      );
+    }
   };
+
+  if (drafting) {
+    return (
+      <section
+        id="get-started"
+        className="section relative scroll-mt-20 overflow-hidden bg-navy-950"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-40 left-1/4 size-[620px] rounded-full bg-brand-600/18 blur-[130px]"
+        />
+        <div className="relative container-page">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-[26px] font-bold tracking-tight text-white sm:text-[32px]">
+                Draw it up right here
+              </h2>
+              <p className="mt-1.5 text-[14.5px] text-white/55">
+                Nothing to pay until the document is finished and you are happy with it.
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setDrafting(null);
+                setWantsCallback(false);
+              }}
+            >
+              <ArrowLeft className="size-4" />
+              Back
+            </Button>
+          </div>
+
+          <div className="mt-7 overflow-hidden rounded-3xl border border-line bg-canvas shadow-lift">
+            <AgreementProvider initialType={drafting}>
+              <BuilderShell type={drafting} embedded />
+            </AgreementProvider>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="get-started" className="section relative scroll-mt-20 overflow-hidden bg-navy-950">
@@ -85,8 +167,9 @@ export function LeadForm() {
 
             <Reveal delay={0.06}>
               <h2 className="mt-6 text-[clamp(2rem,4.6vw,3.05rem)] leading-[1.1] font-bold tracking-[-0.03em] text-white">
-                Tell us what you need.
-                <br className="hidden sm:block" /> We&apos;ll bring it to you.
+                Tell us what you need.{" "}
+                <br className="hidden sm:block" />
+                We&apos;ll bring it to you.
               </h2>
             </Reveal>
 
@@ -233,7 +316,10 @@ export function LeadForm() {
                             type="button"
                             role="radio"
                             aria-checked={isActive}
-                            onClick={() => setNeed(option.value)}
+                            onClick={() => {
+                              setNeed(option.value);
+                              setWantsCallback(false);
+                            }}
                             className={cn(
                               "flex flex-col items-center gap-2 rounded-xl border px-2 py-3.5 transition-all duration-200",
                               isActive
@@ -264,6 +350,8 @@ export function LeadForm() {
                     <input type="hidden" name="need" value={need} />
                   </div>
 
+                  {!showDrafter ? (
+                    <>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Your name" required>
                       {(id) => (
@@ -301,7 +389,77 @@ export function LeadForm() {
                       />
                     )}
                   </Field>
+                    </>
+                  ) : null}
 
+                  {showDrafter ? (
+                    <>
+                      <div>
+                        <p className="mb-1.5 text-[13.5px] font-semibold text-navy-800">
+                          Which agreement?
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {AGREEMENT_TYPES.map((option) => {
+                            const isActive = option.id === draftType;
+                            return (
+                              <button
+                                key={option.id}
+                                type="button"
+                                aria-pressed={isActive}
+                                onClick={() => setDraftType(option.id as AgreementType)}
+                                className={cn(
+                                  "rounded-xl border px-3.5 py-3 text-left transition-all duration-200",
+                                  isActive
+                                    ? "border-brand-600 bg-brand-50/70 shadow-[0_0_0_3px_rgb(37_99_235/0.10)]"
+                                    : "border-line bg-white hover:border-navy-300 hover:bg-navy-50/60",
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "block text-[13.5px] font-bold",
+                                    isActive ? "text-brand-800" : "text-navy-950",
+                                  )}
+                                >
+                                  {option.short}
+                                </span>
+                                <span className="mt-0.5 line-clamp-3 block text-[11.5px] leading-snug text-navy-500">
+                                  {option.description}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <Button
+                        type="button"
+                        size="xl"
+                        fullWidth
+                        className="group"
+                        onClick={() => setDrafting(draftType)}
+                      >
+                        Draft it here, now
+                        <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />
+                      </Button>
+
+                      <div className="flex items-start gap-2 rounded-xl border border-line bg-canvas p-3.5">
+                        <Clock3 className="mt-0.5 size-4 shrink-0 text-navy-400" />
+                        <p className="text-[12.5px] leading-relaxed text-navy-500">
+                          {need === "both"
+                            ? "Takes about ten minutes. The stamp paper comes with it — we work out the duty from your answers and supply the paper the agreement is printed on. "
+                            : "Takes about ten minutes and saves as you go. "}
+                          <button
+                            type="button"
+                            onClick={() => setWantsCallback(true)}
+                            className="font-semibold text-brand-700 underline underline-offset-2"
+                          >
+                            Rather we did it for you?
+                          </button>
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {need === "stamp-paper" ? (
                       <Field label="Denomination needed" required>
@@ -377,15 +535,13 @@ export function LeadForm() {
                     )}
                   </Button>
 
-                  <p
-                    className={cn(
-                      "flex items-start gap-2 text-[12px] leading-relaxed text-navy-400",
-                    )}
-                  >
+                  <p className="flex items-start gap-2 text-[12px] leading-relaxed text-navy-400">
                     <Lock className="mt-0.5 size-3.5 shrink-0" />
                     By submitting you agree that we may contact you about your enquiry. We never
                     sell your details and you can ask us to delete them at any time.
                   </p>
+                    </>
+                  )}
                 </div>
               </form>
             )}

@@ -3,7 +3,7 @@ import { ArrowRight, LayoutGrid } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { TemplateLibrary } from "@/components/landing/template-library";
 import { ButtonLink } from "@/components/ui/button";
-import { LEAD_ANCHOR, SITE } from "@/lib/site";
+import { BUILDER_START, SITE } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
 
 const title = `${TEMPLATES.length} Rental & Lease Agreement Templates — Tamil Nadu`;
@@ -28,8 +28,8 @@ export default function TemplatesPage() {
         title={`${TEMPLATES.length} templates, built on four instruments`}
         body="Every template here is a Tamil Nadu compliant draft. Pick the situation that matches yours and the right clauses come with it — you are never starting from a blank page or a generic download."
       >
-        <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-          Start my order
+        <ButtonLink href={BUILDER_START} size="lg" className="group">
+          Start drafting
           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
         </ButtonLink>
       </PageHero>

@@ -2,39 +2,74 @@ import { DISTRICTS, NOTABLE_TOWNS } from "./districts";
 import type { AgreementType, PlanId } from "./types";
 
 /**
- * ⚠️ SUPPLY BEFORE LAUNCH
+ * The business's own details, confirmed by the client on 25 August 2026.
  *
- * `phone`, `whatsapp`, `email` and `address` below are placeholders. Replace
- * them with the real details — they are the only contact routes on the site and
- * every CTA depends on them.
+ * Kept in one object so a correction is a single edit rather than a hunt
+ * through the pages. Two rules the rest of the codebase relies on:
  *
- * `cin` and `gstin` are intentionally empty. They previously carried invented
- * numbers, which is not something a legal-documents business can publish: a
- * customer, a competitor or a tax officer can check both in seconds. Anything
- * that renders them omits the row entirely while they are blank, so fill them in
- * and they appear — leave them and nothing false is shown.
+ *   1. Anything blank is not rendered. `cin` and `gstin` are empty because this
+ *      is a proprietorship that holds neither, and a registration number is not
+ *      something a legal-documents business can invent — a customer or a tax
+ *      officer checks it in seconds. Fill one in and its row appears; leave it
+ *      and nothing false is shown. The social links work the same way.
+ *
+ *   2. The phone, WhatsApp number, email and address are the only ways anyone
+ *      can reach this business — every call-to-action ends at one of them, and
+ *      payment is taken on the call. Wrong numbers here mean orders that are
+ *      drafted and then lost.
  */
 export const SITE = {
-  name: "RentSeal",
-  legalName: "RentSeal Legal Technologies Pvt Ltd",
-  tagline: "Stamp paper and rental agreements, delivered across Tamil Nadu",
+  name: "LP Stamp Paper",
+  legalName: "LP Enterprises",
+  tagline: "Licensed stamp paper and notarised agreements across Tamil Nadu",
   description:
-    "Licensed non-judicial stamp paper and e-Stamp certificates at face value, delivered anywhere in Tamil Nadu — same day in Chennai. Plus rental agreements drafted, stamped and e-signed online.",
-  url: "https://rentseal.in",
-  phone: "+91 44 4000 1200",
-  whatsapp: "+91 90000 12000",
-  email: "hello@rentseal.in",
-  address: "Prestige Polygon, 471 Anna Salai, Teynampet, Chennai 600018",
-  /** Company Identification Number. Empty until the real one is supplied. */
+    "Licensed non-judicial stamp paper and e-Stamp certificates at face value, delivered anywhere in Tamil Nadu — same day in Chennai. Rental agreements, sale deeds, affidavits and powers of attorney drafted and notarised.",
+  url: "https://lpstamppaper.com",
+  /** Landline. Dialled as 044 within India; the tel: link strips the spaces. */
+  phone: "044 4006 8402",
+  /** Needs the country code — wa.me will not route a bare ten-digit number. */
+  whatsapp: "+91 98434 41460",
+  email: "lpscanxerox@gmail.com",
+  address: "4/434, J J Nagar, Mogappair West, Chennai 600037",
+  /**
+   * A proprietorship, so there is no CIN and no GST registration. Both stay
+   * empty and every place that renders them omits the row — the Udyam number
+   * below is the registration this business actually holds.
+   */
   cin: "",
-  /** GST Identification Number. Empty until the real one is supplied. */
   gstin: "",
+  udyam: "UDYAM-TN-24-0060126",
+  /** Sunday is a short evening shift, so the two are listed separately. */
+  hours: {
+    weekday: { label: "Monday to Saturday", opens: "09:30", closes: "21:30" },
+    sunday: { label: "Sunday", opens: "18:00", closes: "21:30" },
+    summary: "Mon–Sat 9.30am–9.30pm · Sun 6–9.30pm",
+  },
+  /**
+   * Profile URLs. Each empty string hides that icon in the footer — better a
+   * missing icon than one that lands on twitter.com's front page.
+   */
+  social: {
+    x: "",
+    linkedin: "",
+    instagram: "",
+    youtube: "",
+  },
 } as const;
 
 /* ─────────────────────────── Navigation ─────────────────────────── */
 
+/**
+ * Ordered by what a visitor actually does, not by what we have pages for:
+ * what you can draw up → what stamps it → what it costs → how it runs → help.
+ *
+ * Was seven flat items — Stamp paper, Agreements, Templates, Districts,
+ * Delivery, Pricing, FAQ — three of which were the same journey split apart
+ * (Templates and Districts are both ways into an agreement) and one of which
+ * ("Delivery") was a homepage anchor sitting among page links, so choosing it
+ * from any other page threw you back to the homepage.
+ */
 export const NAV_LINKS = [
-  { label: "Stamp paper", href: "/stamp-paper" },
   {
     label: "Agreements",
     items: [
@@ -42,16 +77,37 @@ export const NAV_LINKS = [
       { title: "Commercial Rental", href: "/services/commercial-rental-agreement", desc: "Offices, shops and warehouses with GST and trade-licence clauses." },
       { title: "Lease Deed", href: "/services/lease-agreement", desc: "Long-term leases of 12 months and above, registered at the SRO." },
       { title: "Leave & Licence", href: "/services/leave-and-license", desc: "Licence to occupy without creating a tenancy interest." },
+      { title: "All 24 templates", href: "/templates", desc: "Every situation we have a ready draft for, by instrument." },
+      { title: "Rental agreement by district", href: "/rental-agreement", desc: "Stamp duty, SRO jurisdiction and timelines for all 38 districts." },
     ],
   },
-  { label: "Templates", href: "/templates" },
-  { label: "Districts", href: "/rental-agreement" },
-  { label: "Delivery", href: "/#delivery" },
+  { label: "Stamp paper", href: "/stamp-paper" },
+  { label: "Certificates", href: "/certificates" },
   { label: "Pricing", href: "/pricing" },
-  { label: "FAQ", href: "/faq" },
+  { label: "How it works", href: "/how-it-works" },
+  {
+    label: "Help",
+    items: [
+      { title: "Frequently asked questions", href: "/faq", desc: "Stamp duty, registration, e-signing and delivery, answered plainly." },
+      { title: "Contact and support", href: "/contact", desc: "Phone, WhatsApp and email — a real person, in Tamil or English." },
+      { title: "Site map", href: "/sitemap", desc: "Every page on LP Stamp Paper, and the order to use them in." },
+    ],
+  },
 ] as const;
 
-/** Every conversion path on the site funnels to the lead form. */
+/**
+ * The two ways to buy, and both need to be reachable.
+ *
+ * BUILDER_START is the product: the seven-step drafter that ends in payment.
+ * It was orphaned — the only link to it in the whole codebase sat in
+ * app/_disabled/, a folder Next does not serve — so every one of the twenty-odd
+ * calls to action on the site funnelled into the callback form instead, and
+ * nobody could reach the thing the homepage advertises.
+ *
+ * LEAD_ANCHOR stays as the assisted path, for stamp paper on its own and for
+ * anyone who would rather talk to someone first.
+ */
+export const BUILDER_START = "/create";
 export const LEAD_ANCHOR = "/#get-started";
 
 export const FOOTER_LINKS = [
@@ -76,6 +132,7 @@ export const FOOTER_LINKS = [
       { label: "Leave & Licence", href: "/services/leave-and-license" },
       { label: "Rental agreement by district", href: "/rental-agreement" },
       { label: "All agreement templates", href: "/templates" },
+      { label: "Certificates and registrations", href: "/certificates" },
       { label: "Talk to us before you order", href: LEAD_ANCHOR },
     ],
   },
@@ -89,6 +146,7 @@ export const FOOTER_LINKS = [
       { label: "Frequently Asked Questions", href: "/faq" },
       { label: "Search the site", href: "/search" },
       { label: "Contact & Support", href: "/contact" },
+      { label: "Site map", href: "/sitemap" },
     ],
   },
   {
@@ -218,7 +276,7 @@ export const PLANS: Array<{
       { label: "Cloud storage for 12 months", included: true },
       { label: "e-Stamp paper procured for you", included: false, hint: "You buy the stamp paper yourself" },
       { label: "Aadhaar e-Sign for both parties", included: false },
-      { label: "Advocate verification", included: false },
+      { label: "Notary attestation", included: false },
       { label: "WhatsApp delivery", included: false },
       { label: "Doorstep delivery of stamped copy", included: false },
     ],
@@ -239,7 +297,7 @@ export const PLANS: Array<{
       { label: "Cloud storage, unlimited", included: true },
       { label: "e-Stamp paper procured for you", included: true, hint: "Duty charged at government rate, no markup" },
       { label: "Aadhaar e-Sign for both parties", included: true },
-      { label: "Advocate verification", included: false, hint: "Add for ₹700" },
+      { label: "Notary attestation", included: false, hint: "Add for ₹700" },
       { label: "WhatsApp delivery", included: true },
       { label: "Doorstep delivery of stamped copy", included: false },
     ],
@@ -248,7 +306,7 @@ export const PLANS: Array<{
     id: "premium",
     name: "Premium",
     price: 1499,
-    tagline: "An advocate reads every clause before you sign, and a stamped copy reaches your door.",
+    tagline: "Signatures attested by a notary, and a stamped copy reaches your door.",
     delivery: "Verified within 24 hours",
     cta: "Go Premium",
     features: [
@@ -259,7 +317,7 @@ export const PLANS: Array<{
       { label: "Cloud storage, unlimited", included: true },
       { label: "e-Stamp paper procured for you", included: true },
       { label: "Aadhaar e-Sign for both parties", included: true },
-      { label: "Advocate verification", included: true, hint: "Enrolled Bar Council of Tamil Nadu advocate" },
+      { label: "Notary attestation", included: true, hint: "Signatures attested by a notary public" },
       { label: "WhatsApp delivery", included: true },
       { label: "Doorstep delivery of stamped copy", included: true, hint: "Within Tamil Nadu" },
     ],
@@ -279,7 +337,7 @@ export const STATS = [
   { value: "11 months", label: "Standard term", sub: "below compulsory registration" },
   // Counter animates the leading number, so keep it one that counts sensibly —
   // "8am – 10pm" rendered as "0am – 10pm" mid-animation.
-  { value: "7 days", label: "Support a week", sub: "8am – 10pm, Tamil and English" },
+  { value: "7 days", label: "Open a week", sub: "Mon–Sat 9.30–9.30, Sun evening" },
 ] as const;
 
 export const HOW_IT_WORKS = [
@@ -297,14 +355,14 @@ export const HOW_IT_WORKS = [
   },
   {
     step: "03",
-    title: "Pay and e-stamp",
-    body: "Pay by UPI, card or net banking. We procure the e-stamp paper at the exact government rate and affix it — no markup, itemised on your invoice.",
+    title: "We call to confirm",
+    body: "Nothing is charged on the site. Someone from the team reads your draft, rings you to check the details, and takes payment on that call — UPI, transfer or on delivery.",
     time: "1 minute",
   },
   {
     step: "04",
-    title: "Sign and download",
-    body: "Both parties e-sign with Aadhaar OTP. The final PDF lands in your email and on WhatsApp, and stays in your dashboard forever.",
+    title: "We stamp, you sign, we deliver",
+    body: "We procure the e-stamp at the exact government rate and affix it. Both parties e-sign with Aadhaar OTP, the PDF reaches your email and WhatsApp, and the paper copy comes to your door.",
     time: "1 minute",
   },
 ] as const;
@@ -315,9 +373,9 @@ export const FEATURES = [
   { icon: "ShieldCheck", title: "Licensed and verifiable", body: "Procured through authorised vendors and the state e-Stamp channel. Every sheet carries a certificate number you can check yourself." },
   { icon: "Wand2", title: "Clauses that write themselves", body: "Say the flat is furnished and an inventory clause appears. Allow pets and the pet clause writes itself. No legal drafting required." },
   { icon: "PenTool", title: "Aadhaar e-Sign", body: "Both parties sign with an OTP on their own phone. Legally valid under Section 3A of the Information Technology Act, 2000." },
-  { icon: "Scale", title: "Advocate verification", body: "On Premium, an advocate enrolled with the Bar Council of Tamil Nadu reads every clause and signs off before you commit." },
+  { icon: "Scale", title: "Notarised signatures", body: "Signatures on your agreement are attested by a notary public — the standard proof that the parties signed it, and who they were." },
   { icon: "FileText", title: "Smart templates", body: "Four instrument types, version-controlled, each with the schedules and annexures the Sub-Registrar expects." },
-  { icon: "Calculator", title: "Honest stamp duty maths", body: "See exactly how the duty is computed — rent × term, plus deposit, at 1%. Every rupee traced to a rule, before you pay." },
+  { icon: "Calculator", title: "Honest stamp duty maths", body: "See exactly how the duty is computed — rent × term, plus deposit, at 1%. Every rupee traced to a rule, and quoted to you on the call before you pay." },
   { icon: "MessageCircle", title: "WhatsApp delivery", body: "The signed PDF reaches both parties on WhatsApp the moment it is generated. No hunting through email." },
   { icon: "CloudUpload", title: "Cloud storage forever", body: "Every agreement you have ever made stays in your dashboard, searchable, downloadable, on any device." },
   { icon: "BellRing", title: "Renewal reminders", body: "We nudge you 45 days before expiry and pre-fill the renewal, so a lapsed agreement never costs you a deposit dispute." },
@@ -368,7 +426,7 @@ export const FAQS = [
   },
   {
     category: "Legal validity",
-    q: "Is an agreement made on RentSeal legally valid?",
+    q: "Is an agreement made on LP Stamp Paper legally valid?",
     a: "Yes. Your agreement is drafted on a Tamil Nadu compliant template, e-stamped with duty paid to the Government of Tamil Nadu, and signed using Aadhaar e-Sign, which has the same legal effect as a handwritten signature under Section 3A of the Information Technology Act, 2000. It is admissible in evidence in the same way as a paper agreement.",
   },
   {
@@ -399,7 +457,7 @@ export const FAQS = [
   {
     category: "Process",
     q: "How long does the whole thing actually take?",
-    a: "Filling the form takes most people six to ten minutes. On the Standard plan the e-stamped, e-signed PDF is usually in your inbox within four hours of both parties completing their OTP. On Premium, advocate verification adds up to 24 hours.",
+    a: "Filling the form takes most people six to ten minutes. Once we have confirmed your order on the phone, the e-stamped, e-signed PDF is usually with you within four hours of both parties completing their OTP. Notary attestation adds up to 24 hours.",
   },
   {
     category: "Process",
@@ -434,7 +492,7 @@ export const FAQS = [
   {
     category: "Support",
     q: "Can I speak to someone in Tamil?",
-    a: "Yes. Our support team works in Tamil and English, seven days a week from 8am to 10pm, on phone, WhatsApp and chat. Premium customers get a named advocate they can call directly.",
+    a: "Yes. We work in Tamil and English, Monday to Saturday from 9.30am to 9.30pm and on Sunday evenings from 6pm to 9.30pm, on phone and WhatsApp.",
   },
 ] as const;
 
@@ -450,6 +508,6 @@ export const TRUST_SIGNALS = [
   "No markup on any government charge",
   "Certificate numbers printed on your invoice to verify yourself",
   "Aadhaar e-Sign under Section 3A, IT Act 2000",
-  "Advocates independently enrolled with the Bar Council of Tamil Nadu",
+  "Signatures attested by a notary public",
   "Aadhaar and PAN masked in the interface and never logged",
 ] as const;

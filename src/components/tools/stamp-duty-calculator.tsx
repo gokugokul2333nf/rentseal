@@ -166,8 +166,8 @@ export function StampDutyCalculator() {
             ) : null}
             {plan !== "premium" ? (
               <Toggle
-                label="Add advocate verification — ₹700"
-                desc="An advocate enrolled with the Bar Council of Tamil Nadu vets every clause."
+                label="Add notary attestation — ₹700"
+                desc="A notary public attests the signatures on the agreement."
                 checked={lawyerReview}
                 onChange={setLawyerReview}
               />
@@ -251,7 +251,7 @@ export function StampDutyCalculator() {
 
             <div className="px-6 py-4">
               <p className="mb-3 text-[11.5px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-                Payable to RentSeal
+                Payable to LP Stamp Paper
               </p>
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-[14px]">
@@ -260,7 +260,7 @@ export function StampDutyCalculator() {
                 </div>
                 {b.lawyerFee > 0 ? (
                   <div className="flex items-center justify-between text-[14px]">
-                    <dt className="text-navy-600">Advocate verification</dt>
+                    <dt className="text-navy-600">Notary attestation</dt>
                     <dd className="tnum font-semibold text-navy-950">{inr(b.lawyerFee)}</dd>
                   </div>
                 ) : null}

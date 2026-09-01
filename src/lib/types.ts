@@ -8,8 +8,17 @@ export type PlanId = "basic" | "standard" | "premium";
 
 export type PartyType = "individual" | "company" | "huf" | "trust";
 
+/**
+ * How the party is described in the deed — "S/o", "D/o", "W/o", "H/o".
+ * Executed Tamil Nadu agreements name the relationship explicitly rather than
+ * hedging with "son/daughter of", and it is not always a parent: the sample we
+ * were given records the landlord as "H/o: Nithyananthan".
+ */
+export type Relation = "son" | "daughter" | "wife" | "husband";
+
 export interface Party {
   fullName: string;
+  relation: Relation;
   parentName: string;
   partyType: PartyType;
   companyName: string;
@@ -48,6 +57,13 @@ export interface PropertyDetails {
   bedrooms: string;
   bathrooms: string;
   floor: string;
+  /**
+   * Letting a part of a building rather than all of it is the norm here — the
+   * sample lets "a portion in the First Floor" of the landlord's own house.
+   * The Schedule has to describe the portion, not the whole property.
+   */
+  wholeProperty: boolean;
+  portionDescription: string;
   furnishing: FurnishingLevel;
   amenities: string[];
 }
@@ -55,6 +71,12 @@ export interface PropertyDetails {
 export type PaymentDay = string;
 
 export interface AgreementTerms {
+  /**
+   * When the deed is signed, which is not when the tenancy starts. The sample
+   * was executed on 1 December for a term running from the following March.
+   */
+  executionDate: string;
+  executionPlace: string;
   startDate: string;
   durationMonths: number;
   monthlyRent: string;
@@ -70,6 +92,10 @@ export interface AgreementTerms {
   electricityBorneBy: "tenant" | "landlord";
   waterBorneBy: "tenant" | "landlord";
   propertyTaxBorneBy: "landlord" | "tenant";
+  /** Handed over before signing, or due on signing. Changes the tense. */
+  depositAlreadyPaid: boolean;
+  /** Months of continuous default after which the landlord may evict. */
+  defaultMonths: string;
 }
 
 export interface AgreementOptions {
@@ -81,6 +107,10 @@ export interface AgreementOptions {
   commercialUseAllowed: boolean;
   businessNature: string;
   alterationsAllowed: boolean;
+  /** No nails in the walls; repaint on vacating if there are. */
+  noWallDamage: boolean;
+  /** No illegal or anti-social use, and no liquor on the premises. */
+  noLiquorOrIllegalUse: boolean;
   registrationRequired: boolean;
   lawyerReview: boolean;
   witnessRequired: boolean;

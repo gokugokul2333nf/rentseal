@@ -119,7 +119,7 @@ export function SearchDialog({
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label="Search RentSeal"
+            aria-label="Search LP Stamp Paper"
             initial={{ opacity: 0, y: -12, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.99 }}

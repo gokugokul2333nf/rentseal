@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { SERVICES, getService } from "@/lib/services";
-import { LEAD_ANCHOR, SITE } from "@/lib/site";
+import { BUILDER_START, LEAD_ANCHOR, SITE } from "@/lib/site";
 
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
@@ -62,16 +62,12 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         body={service.intro}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-            Get this agreement started
+          <ButtonLink href={`${BUILDER_START}/${service.id}`} size="lg" className="group">
+            Draft this agreement
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
-          <ButtonLink
-            href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, "")}`}
-            variant="secondary"
-            size="lg"
-          >
-            Ask on WhatsApp
+          <ButtonLink href={LEAD_ANCHOR} variant="secondary" size="lg">
+            Talk to us first
           </ButtonLink>
         </div>
       </PageHero>

@@ -117,12 +117,20 @@ const organizationSchema = {
     containedInPlace: { "@type": "State", name: "Tamil Nadu" },
   })),
   knowsLanguage: ["en-IN", "ta-IN"],
-  openingHoursSpecification: {
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-    opens: "08:00",
-    closes: "22:00",
-  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: SITE.hours.weekday.opens,
+      closes: SITE.hours.weekday.closes,
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Sunday"],
+      opens: SITE.hours.sunday.opens,
+      closes: SITE.hours.sunday.closes,
+    },
+  ],
 };
 
 const websiteSchema = {

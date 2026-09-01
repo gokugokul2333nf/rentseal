@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "What personal data RentSeal collects, why, how long we keep it, and how Aadhaar and PAN details are protected. Written in plain English.",
+    "What personal data LP Stamp Paper collects, why, how long we keep it, and how Aadhaar and PAN details are protected. Written in plain English.",
   alternates: { canonical: "/legal/privacy" },
 };
 
@@ -27,7 +27,7 @@ const SECTIONS: LegalSection[] = [
       "Contact details — mobile number and email address, used for delivery and for the signing link",
       "Property details — address, area, configuration, furnishing and amenities",
       "Commercial terms — rent, deposit, duration, escalation and the allocation of charges",
-      "Payment metadata — amount, timestamp, method and gateway reference. We never see or store your full card number",
+      "Payment records — the amount agreed and how it was settled. No payment is taken on this website, so we never handle or store card details at all",
       "Technical data — IP address, browser and device type, and pages visited, used for security and to fix problems",
     ],
   },
@@ -65,10 +65,10 @@ const SECTIONS: LegalSection[] = [
     list: [
       "The licensed e-Sign Application Service Provider, to obtain signatures",
       "The authorised e-stamping channel, to procure and affix the stamp certificate",
-      "Our payment gateway, to take payment and issue refunds",
+      "Google Sheets, where your enquiry or draft is recorded so that our team can call you back",
       "Email, SMS and WhatsApp providers, to deliver your document and notifications",
       "Cloud hosting in the ap-south-1 (Mumbai) region, where the platform runs",
-      "On the Premium plan, the advocate reviewing your agreement — who sees the document, as they must, in order to review it",
+      "The notary public attesting the signatures — who sees the document, as they must, in order to attest it",
     ],
   },
   {
@@ -98,7 +98,7 @@ const SECTIONS: LegalSection[] = [
     id: "security",
     heading: "How we protect it",
     paragraphs: [
-      "Encrypted in transit and at rest. Role-based access control, with staff access to customer documents logged and reviewed. Multi-factor authentication on every internal account. Card details are handled by the payment gateway and never reach our servers.",
+      "Encrypted in transit and at rest. Role-based access control, with staff access to customer documents logged and reviewed. Multi-factor authentication on every internal account. No payment is collected through the website, so no card details ever reach it.",
       "No system is perfect. If a breach affects your data, we will tell you and the relevant authority without undue delay, and we will tell you what we are doing about it.",
     ],
   },

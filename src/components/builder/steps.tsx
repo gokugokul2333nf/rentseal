@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
 import { CITIES, EXTRA_DISTRICTS } from "@/lib/site";
+import { checkPincode, districtFromPincode } from "@/lib/pincode";
 import { Button } from "@/components/ui/button";
 import {
   ChipGroup,
@@ -29,7 +30,7 @@ import {
   Textarea,
   Toggle,
 } from "@/components/ui/field";
-import type { FurnishingLevel, PropertyKind } from "@/lib/types";
+import type { FurnishingLevel, PropertyKind, Relation } from "@/lib/types";
 import { inr } from "@/lib/utils";
 
 const ALL_LOCATIONS = [...CITIES.map((c) => c.name), ...EXTRA_DISTRICTS].sort();
@@ -68,6 +69,13 @@ export function PropertyStep() {
   const { draft, update } = useAgreement();
   const p = draft.property;
   const commercial = draft.type === "commercial";
+
+  // Nothing is said while the number is still being typed — only once it is
+  // six digits long, or once they have moved on and left it wrong.
+  const [pinTouched, setPinTouched] = useState(false);
+  const pin = checkPincode(p.pincode, p.district);
+  const showPin =
+    pin.status !== "empty" && pin.status !== "ok" && (pinTouched || p.pincode.length === 6);
 
   const kinds: Array<{ value: PropertyKind; label: string; desc: string; icon: React.ComponentType<{ className?: string }> }> =
     commercial
@@ -179,16 +187,37 @@ export function PropertyStep() {
               />
             )}
           </Field>
-          <Field label="PIN code" required>
+          <Field
+            label="PIN code"
+            required
+            error={showPin ? pin.message : undefined}
+            help={
+              !showPin && pin.status === "ok" && pin.districts?.length === 1
+                ? `${pin.districts[0]} district.`
+                : undefined
+            }
+          >
             {(id) => (
               <Input
                 id={id}
                 inputMode="numeric"
                 maxLength={6}
                 value={p.pincode}
-                onChange={(e) =>
-                  update({ property: { pincode: e.target.value.replace(/\D/g, "").slice(0, 6) } })
-                }
+                aria-invalid={showPin || undefined}
+                onBlur={() => setPinTouched(true)}
+                onChange={(e) => {
+                  const pincode = e.target.value.replace(/\D/g, "").slice(0, 6);
+                  // Filling the district from the PIN removes the commonest
+                  // mismatch instead of only complaining about it afterwards.
+                  const derived = districtFromPincode(pincode);
+                  update({
+                    property: {
+                      pincode,
+                      ...(derived && !p.district.trim() ? { district: derived } : {}),
+                    },
+                  });
+                  if (pincode.length < 6) setPinTouched(false);
+                }}
                 placeholder="600020"
               />
             )}
@@ -253,6 +282,30 @@ export function PropertyStep() {
             )}
           </Field>
         </div>
+
+        <Toggle
+          label="Letting the whole property"
+          desc="Turn this off if only a part of the building is being let — a floor, a portion, one room."
+          checked={p.wholeProperty}
+          onChange={(wholeProperty) => update({ property: { wholeProperty } })}
+        />
+
+        {!p.wholeProperty ? (
+          <Field
+            label="Which portion"
+            required
+            help="Goes into the Schedule word for word, so describe it as the deed should read."
+          >
+            {(id) => (
+              <Input
+                id={id}
+                value={p.portionDescription}
+                onChange={(e) => update({ property: { portionDescription: e.target.value } })}
+                placeholder="e.g. a portion in the First Floor"
+              />
+            )}
+          </Field>
+        ) : null}
 
         <div>
           <Label hint="Changes which clauses appear">Furnishing</Label>
@@ -361,14 +414,31 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
               />
             )}
           </Field>
-          <Field label="Father's / husband's name" required>
+          <Field
+            label="Named in the deed as"
+            required
+            help="Printed as S/o, D/o, W/o or H/o before the name, the way the deed reads."
+          >
             {(id) => (
-              <Input
-                id={id}
-                value={party.parentName}
-                onChange={(e) => setParty(which, { parentName: e.target.value })}
-                placeholder="e.g. Subramanian"
-              />
+              <div className="flex gap-2">
+                <Select
+                  aria-label="Relationship"
+                  value={party.relation}
+                  onChange={(e) => setParty(which, { relation: e.target.value as Relation })}
+                  className="w-[104px] shrink-0"
+                >
+                  <option value="son">S/o</option>
+                  <option value="daughter">D/o</option>
+                  <option value="wife">W/o</option>
+                  <option value="husband">H/o</option>
+                </Select>
+                <Input
+                  id={id}
+                  value={party.parentName}
+                  onChange={(e) => setParty(which, { parentName: e.target.value })}
+                  placeholder="e.g. Subramanian"
+                />
+              </div>
             )}
           </Field>
         </div>
@@ -483,7 +553,34 @@ export function TermsStep() {
 
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Agreement starts on" required>
+          <Field
+            label="Signed on"
+            required
+            help="The date on the deed. Often earlier than the day the tenancy starts."
+          >
+            {(id) => (
+              <Input
+                id={id}
+                type="date"
+                value={t.executionDate}
+                onChange={(e) => update({ terms: { executionDate: e.target.value } })}
+              />
+            )}
+          </Field>
+          <Field label="Signed at" help="Town where it is executed. Defaults to the property's city.">
+            {(id) => (
+              <Input
+                id={id}
+                value={t.executionPlace}
+                onChange={(e) => update({ terms: { executionPlace: e.target.value } })}
+                placeholder={draft.property.city || "e.g. Chennai"}
+              />
+            )}
+          </Field>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Tenancy starts on" required>
             {(id) => (
               <Input
                 id={id}
@@ -564,6 +661,13 @@ export function TermsStep() {
           </Field>
         </div>
 
+        <Toggle
+          label="The deposit has already been paid"
+          desc="The deed then records it as received rather than payable on signing."
+          checked={t.depositAlreadyPaid}
+          onChange={(v) => update({ terms: { depositAlreadyPaid: v } })}
+        />
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Rent payable on or before">
             {(id) => (
@@ -580,7 +684,7 @@ export function TermsStep() {
               </Select>
             )}
           </Field>
-          <Field label="Payment method">
+          <Field label="How rent is paid">
             {(id) => (
               <Select
                 id={id}
@@ -617,6 +721,25 @@ export function TermsStep() {
                 id={id}
                 value={t.noticePeriodMonths}
                 onChange={(e) => update({ terms: { noticePeriodMonths: e.target.value } })}
+              >
+                {["1", "2", "3"].map((m) => (
+                  <option key={m} value={m}>
+                    {m} month{m === "1" ? "" : "s"}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field
+            label="Evict after rent unpaid for"
+            hint="months"
+            help="Continuous default that lets the landlord end the tenancy."
+          >
+            {(id) => (
+              <Select
+                id={id}
+                value={t.defaultMonths}
+                onChange={(e) => update({ terms: { defaultMonths: e.target.value } })}
               >
                 {["1", "2", "3"].map((m) => (
                   <option key={m} value={m}>
@@ -818,6 +941,18 @@ export function ClausesStep() {
             onChange={(alterationsAllowed) => update({ options: { alterationsAllowed } })}
           />
           <Toggle
+            label="No nails in the walls"
+            desc="If nails are driven, the walls are cemented and the premises repainted before handover."
+            checked={o.noWallDamage}
+            onChange={(noWallDamage) => update({ options: { noWallDamage } })}
+          />
+          <Toggle
+            label="No illegal or anti-social use, and no liquor"
+            desc="Standard in Tamil Nadu residential agreements."
+            checked={o.noLiquorOrIllegalUse}
+            onChange={(noLiquorOrIllegalUse) => update({ options: { noLiquorOrIllegalUse } })}
+          />
+          <Toggle
             label="Commercial use permitted"
             desc="Adds trade licence, GST and business-use obligations."
             checked={o.commercialUseAllowed}
@@ -985,8 +1120,8 @@ export function ClausesStep() {
           <Lock className="mt-0.5 size-4 shrink-0 text-brand-700" />
           <p className="text-[13px] leading-relaxed text-brand-900">
             Every clause you see is drafted against the Tamil Nadu Regulation of Rights and
-            Responsibilities of Landlords and Tenants Act, 2017. On the Premium plan an advocate
-            reads all of them before you sign.
+            Responsibilities of Landlords and Tenants Act, 2017. We go through them with you on
+            the confirming call.
           </p>
         </div>
       </div>

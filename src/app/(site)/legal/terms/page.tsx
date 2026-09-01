@@ -5,7 +5,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The terms on which RentSeal provides document automation, e-stamping, e-signing and delivery services in Tamil Nadu.",
+    "The terms on which LP Stamp Paper provides document automation, e-stamping, e-signing and delivery services in Tamil Nadu.",
   alternates: { canonical: "/legal/terms" },
 };
 
@@ -14,7 +14,7 @@ const SECTIONS: LegalSection[] = [
     id: "who-we-are",
     heading: "Who we are and what this covers",
     paragraphs: [
-      `These terms govern your use of ${SITE.url} and every service offered on it. The service is operated by ${SITE.legalName}, a company incorporated in India with CIN ${SITE.cin}, having its registered office at ${SITE.address}.`,
+      `These terms govern your use of ${SITE.url} and every service offered on it. The service is operated by ${SITE.legalName}${SITE.cin ? `, a company incorporated in India with CIN ${SITE.cin},` : SITE.udyam ? `, registered under Udyam as ${SITE.udyam},` : ","} having its place of business at ${SITE.address}.`,
       "By creating an agreement, making a payment, or otherwise using the platform, you accept these terms. If you do not accept them, do not use the service.",
     ],
   },
@@ -22,8 +22,8 @@ const SECTIONS: LegalSection[] = [
     id: "disclaimer",
     heading: "We are not a law firm",
     paragraphs: [
-      "RentSeal is a technology platform that automates the preparation of legal documents. We are not a law firm, we do not practise law, and nothing on this platform constitutes legal advice or creates an advocate-client relationship between you and us.",
-      "Where you purchase the Premium plan, your agreement is reviewed by an independent advocate enrolled with the Bar Council of Tamil Nadu. That advocate is solely responsible for their professional opinion. Their engagement is with you, not with us, and we do not supervise or direct the content of their advice.",
+      "LP Stamp Paper is a technology platform that automates the preparation of legal documents. We are not a law firm, we do not practise law, and nothing on this platform constitutes legal advice or creates an advocate-client relationship between you and us.",
+      "Where attestation is included or added, the signatures on your agreement are attested by an independent notary public appointed under the Notaries Act, 1952. The notary is solely responsible for that act. Attestation confirms who signed; it is not a legal opinion on the contents.",
       "If your situation involves a dispute, a claim, or anything beyond the preparation of a standard document, you should engage an advocate directly. We will tell you when we think that is the case.",
     ],
   },

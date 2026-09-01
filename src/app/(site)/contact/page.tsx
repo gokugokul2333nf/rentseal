@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact Us — Talk to a Person in Tamil or English",
   description:
-    "Phone, WhatsApp, email or the form. Support in Tamil and English, seven days a week, 8am to 10pm. We reply to everything within a couple of hours.",
+    "Phone, WhatsApp, email or the form. Tamil and English, Monday to Saturday 9.30am to 9.30pm and Sunday evenings 6 to 9.30.",
   alternates: { canonical: "/contact" },
 };
 
@@ -22,7 +22,7 @@ export default function ContactPage() {
         icon={MessageCircle}
         crumbs={CRUMBS}
         title="Ask us before you pay, not after"
-        body="We would rather spend ten minutes talking you out of something you don't need than process a refund next week. Tamil and English, seven days a week."
+        body="We would rather spend ten minutes talking you out of something you don't need than process a refund next week. Tamil and English, six full days and Sunday evenings."
       />
 
       <section className="section">
@@ -59,7 +59,7 @@ export default function ContactPage() {
                       <span>
                         <span className="block text-[14px] font-semibold">{SITE.phone}</span>
                         <span className="block text-[12px] text-white/45">
-                          Tamil and English, 8am – 10pm
+                          Tamil and English, Mon–Sat 9.30–9.30
                         </span>
                       </span>
                     </a>
@@ -118,7 +118,7 @@ export default function ContactPage() {
                     Premium customers
                   </h2>
                   <p className="mt-2.5 text-[13.5px] leading-relaxed text-brand-800">
-                    You have a named advocate on your agreement. Their direct number is in your
+                    Your agreement has been notarised. The notary’s details are on the
                     dashboard under the agreement — call them, not us.
                   </p>
                 </div>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   RentSeal Design System — tokens
+   LP Stamp Paper Design System — tokens
    ============================================================ */
 @theme {
   /* Brand */
@@ -258,6 +258,29 @@
 }
 
 /* ============================================================
+   Screenshot guard — see components/site/screenshot-guard.tsx
+   Classes are put on <body> by that component, so these rules are
+   inert on the builder routes, where printing your own agreement
+   is the point.
+   ============================================================ */
+body.guard-no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  /* Stops the iOS long-press "Copy / Save Image" sheet. */
+  -webkit-touch-callout: none;
+}
+/* Someone copying their own phone number back out of a form is not the
+   thing being guarded against. */
+body.guard-no-select input,
+body.guard-no-select textarea,
+body.guard-no-select [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.guard-print-notice { display: none; }
+
+/* ============================================================
    Print — the generated agreement must print like a legal doc
    ============================================================ */
 @media print {
@@ -283,4 +306,19 @@
   }
   .print-break { break-before: page; }
   .avoid-break { break-inside: avoid; }
+
+  /* Cmd+P → "Save as PDF" is a full-fidelity capture of the page, so on the
+     guarded routes the sheet carries a notice instead of the content.
+     visibility (not display) so the notice can sit anywhere in the tree. */
+  body.guard-no-print { visibility: hidden; }
+  body.guard-no-print .guard-print-notice {
+    display: block !important;
+    visibility: visible;
+    position: fixed;
+    inset: 0;
+    padding: 24mm;
+    font-size: 12pt;
+    line-height: 1.7;
+    color: #000;
+  }
 }

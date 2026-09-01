@@ -38,7 +38,7 @@ const PAGES: SearchDoc[] = [
     kind: "Page",
     description:
       "Stamp paper and rental agreements delivered across all 38 districts of Tamil Nadu.",
-    keywords: ["rentseal", "home", "start", "order"],
+    keywords: ["lp", "lp stamp paper", "home", "start", "order"],
   },
   {
     id: "page-rental-index",
@@ -82,18 +82,43 @@ const PAGES: SearchDoc[] = [
   },
   {
     id: "page-about",
-    title: "About RentSeal",
+    title: "About LP Stamp Paper",
     href: "/about",
     kind: "Page",
     description: "Why we started, what we believe, and who is behind the company.",
     keywords: ["about", "company", "team", "story", "who"],
   },
   {
+    id: "page-certificates",
+    title: "Certificates and registrations",
+    href: "/certificates",
+    kind: "Page",
+    description: "PAN, voter ID, ration card, passport, community, income, nativity, OBC and MSME — fees and the documents to bring.",
+    keywords: ["certificate", "pan", "voter id", "ration card", "passport", "community", "income",
+               "nativity", "obc", "msme", "udyam", "widow", "unmarried", "nativity", "epic"],
+  },
+  {
+    id: "page-create",
+    title: "Create an agreement",
+    href: "/create",
+    kind: "Page",
+    description: "The seven-step drafter — answer the questions and the deed writes itself.",
+    keywords: ["create", "draft", "make", "build", "new", "start", "agreement", "online"],
+  },
+  {
+    id: "page-sitemap",
+    title: "Site map",
+    href: "/sitemap",
+    kind: "Page",
+    description: "Every page on LP Stamp Paper, grouped by what you are trying to do.",
+    keywords: ["site map", "sitemap", "index", "all pages", "navigation", "where"],
+  },
+  {
     id: "page-contact",
     title: "Contact and support",
     href: "/contact",
     kind: "Page",
-    description: "Phone, WhatsApp and email, seven days a week in Tamil and English.",
+    description: "Phone, WhatsApp and email in Tamil and English, six days plus Sunday evenings.",
     keywords: ["contact", "phone", "call", "whatsapp", "email", "support", "help", "tamil"],
   },
   {
@@ -101,7 +126,7 @@ const PAGES: SearchDoc[] = [
     title: "Terms of service",
     href: "/legal/terms",
     kind: "Page",
-    description: "The terms you agree to when you use RentSeal.",
+    description: "The terms you agree to when you use LP Stamp Paper.",
     keywords: ["terms", "legal", "conditions", "disclaimer"],
   },
   {

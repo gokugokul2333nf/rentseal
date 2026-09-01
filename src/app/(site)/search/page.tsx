@@ -86,7 +86,7 @@ export default async function SearchPage({
         eyebrow="Search"
         icon={SearchIcon}
         crumbs={CRUMBS}
-        title={query ? `Results for “${query}”` : "Search RentSeal"}
+        title={query ? `Results for “${query}”` : "Search LP Stamp Paper"}
         body={
           query
             ? `${results.length} ${results.length === 1 ? "match" : "matches"} across districts, agreement types, stamp paper and help articles.`
@@ -103,7 +103,7 @@ export default async function SearchPage({
               name="q"
               defaultValue={query}
               placeholder="Chennai, lease deed, ₹100 stamp paper…"
-              aria-label="Search RentSeal"
+              aria-label="Search LP Stamp Paper"
               className="h-11 min-w-0 flex-1 bg-transparent text-[15px] text-navy-950 outline-none placeholder:text-navy-400"
             />
             <button

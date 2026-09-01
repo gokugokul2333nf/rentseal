@@ -17,11 +17,12 @@ import type {
   PlanId,
 } from "./types";
 
-const STORAGE_KEY = "rentseal:draft:v1";
+const STORAGE_KEY = "lp-stamp-paper:draft:v1";
 
 function emptyParty(): Party {
   return {
     fullName: "",
+    relation: "son",
     parentName: "",
     partyType: "individual",
     companyName: "",
@@ -38,10 +39,10 @@ function emptyParty(): Party {
 }
 
 /** Placeholder until the client mints a real one — keeps SSR and hydration identical. */
-export const PENDING_ID = "RS-DRAFT";
+export const PENDING_ID = "LP-DRAFT";
 
 export function newDraftId() {
-  return `RS-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 899999)}`;
+  return `LP-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 899999)}`;
 }
 
 function tomorrowISO() {
@@ -74,10 +75,14 @@ export function createDraft(type: AgreementType = "residential"): AgreementDraft
       bedrooms: "2",
       bathrooms: "2",
       floor: "",
+      wholeProperty: true,
+      portionDescription: "",
       furnishing: "semi-furnished",
       amenities: [],
     },
     terms: {
+      executionDate: "",
+      executionPlace: "",
       startDate: "",
       durationMonths: type === "commercial" || type === "lease" ? 36 : 11,
       monthlyRent: "",
@@ -93,6 +98,10 @@ export function createDraft(type: AgreementType = "residential"): AgreementDraft
       electricityBorneBy: "tenant",
       waterBorneBy: "tenant",
       propertyTaxBorneBy: "landlord",
+      depositAlreadyPaid: false,
+      // The sample allows two months of continuous default before eviction,
+      // which is the usual figure in Tamil Nadu agreements.
+      defaultMonths: "2",
     },
     options: {
       parkingIncluded: true,
@@ -103,6 +112,8 @@ export function createDraft(type: AgreementType = "residential"): AgreementDraft
       commercialUseAllowed: type === "commercial",
       businessNature: "",
       alterationsAllowed: false,
+      noWallDamage: true,
+      noLiquorOrIllegalUse: true,
       registrationRequired: type === "lease",
       lawyerReview: false,
       witnessRequired: true,
@@ -115,9 +126,49 @@ export function createDraft(type: AgreementType = "residential"): AgreementDraft
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 
+/**
+ * Moving an in-progress draft onto a different instrument.
+ *
+ * Relabelling the old draft — which is what this used to do — produced a deed
+ * headed COMMERCIAL RENTAL AGREEMENT carrying the residential answers
+ * underneath: an eleven-month term where commercial defaults to thirty-six, a
+ * flat where the property kinds are offices and warehouses, and the same
+ * document number as the draft it came from. Worse, because the type field then
+ * already matched, the reconciliation in BuilderShell saw nothing to do and the
+ * instrument's own defaults were never applied at all.
+ *
+ * A different instrument is a different document. Only the facts that hold
+ * either way survive — who the parties are and where the property is. Term,
+ * escalation, lock-in, options, property kind and furniture all come from the
+ * new type, and the draft takes a new number.
+ */
+function switchInstrument(previous: AgreementDraft, type: AgreementType): AgreementDraft {
+  const fresh = createDraft(type);
+  return {
+    ...fresh,
+    landlord: previous.landlord,
+    tenant: previous.tenant,
+    property: {
+      ...fresh.property,
+      doorNo: previous.property.doorNo,
+      buildingName: previous.property.buildingName,
+      street: previous.property.street,
+      locality: previous.property.locality,
+      city: previous.property.city,
+      district: previous.property.district,
+      pincode: previous.property.pincode,
+      builtUpArea: previous.property.builtUpArea,
+      floor: previous.property.floor,
+    },
+  };
+}
+
 interface StoreValue {
   draft: AgreementDraft;
   hydrated: boolean;
+  /** True when an in-progress draft was moved onto a different instrument. */
+  carriedOver: boolean;
+  dismissCarriedOver: () => void;
   savedAt: Date | null;
   saving: boolean;
   update: (patch: DeepPartial<AgreementDraft>) => void;
@@ -166,6 +217,7 @@ export function AgreementProvider({
   const [hydrated, setHydrated] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [saving, setSaving] = useState(false);
+  const [carriedOver, setCarriedOver] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dirty = useRef(false);
   // Monotonic — reusing furniture.length would collide after a delete.
@@ -178,6 +230,7 @@ export function AgreementProvider({
   useEffect(() => {
     let restored: AgreementDraft | null = null;
     let restoredSavedAt: Date | null = null;
+    let switched = false;
 
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -185,8 +238,16 @@ export function AgreementProvider({
         const parsed = JSON.parse(raw) as AgreementDraft;
         if (parsed?.id && parsed?.terms) {
           const merged = mergeDeep(createDraft(initialType), parsed as DeepPartial<AgreementDraft>);
-          restored = parsed.type === initialType ? merged : { ...merged, type: initialType };
-          restoredSavedAt = parsed.updatedAt ? new Date(parsed.updatedAt) : null;
+          if (parsed.type === initialType) {
+            restored = merged;
+            restoredSavedAt = parsed.updatedAt ? new Date(parsed.updatedAt) : null;
+          } else {
+            restored = switchInstrument(merged, initialType);
+            switched = true;
+            // A different instrument is a different document, so it has not
+            // been saved yet — leaving the old timestamp would claim otherwise.
+            restoredSavedAt = null;
+          }
         }
       }
     } catch {
@@ -198,10 +259,14 @@ export function AgreementProvider({
       const next = { ...base };
       if (!next.id || next.id === PENDING_ID) next.id = newDraftId();
       if (!next.terms.startDate) next.terms = { ...next.terms, startDate: tomorrowISO() };
+      if (!next.terms.executionDate) {
+        next.terms = { ...next.terms, executionDate: new Date().toISOString().slice(0, 10) };
+      }
       if (base.furniture.length) counter.current = base.furniture.length;
       return next;
     });
     setSavedAt(restoredSavedAt);
+    setCarriedOver(switched);
     setHydrated(true);
     // Runs once; the picked type is captured at mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,9 +373,12 @@ export function AgreementProvider({
     }));
   }, []);
 
+  const dismissCarriedOver = useCallback(() => setCarriedOver(false), []);
+
   const reset = useCallback((type: AgreementType = "residential") => {
     dirty.current = true;
     counter.current = 0;
+    setCarriedOver(false);
     const fresh = createDraft(type);
     fresh.id = newDraftId();
     fresh.terms.startDate = tomorrowISO();
@@ -327,6 +395,8 @@ export function AgreementProvider({
     () => ({
       draft,
       hydrated,
+      carriedOver,
+      dismissCarriedOver,
       savedAt,
       saving,
       update,
@@ -343,6 +413,8 @@ export function AgreementProvider({
     [
       draft,
       hydrated,
+      carriedOver,
+      dismissCarriedOver,
       savedAt,
       saving,
       update,

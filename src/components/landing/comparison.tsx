@@ -8,7 +8,7 @@ const ROWS = [
   { label: "Drafting", old: "Typist copy-pastes a generic template", old2: true, now: "Clauses generated from your actual answers" },
   { label: "Stamp paper", old: "Hunt for a licensed vendor", now: "e-Stamp procured for you at government rate" },
   { label: "Signatures", old: "Both parties in the same room", now: "Aadhaar OTP from anywhere" },
-  { label: "Legal review", old: "₹2,000–5,000 to an advocate", now: "Included on Premium" },
+  { label: "Notarisation", old: "Find a notary, queue, pay cash", now: "Arranged for you" },
   { label: "Your copy in three years", old: "A folder, if you kept it", now: "In your dashboard, always" },
   { label: "Cost", old: "₹1,500–4,000 in fees and running around", now: "From ₹349 plus government duty" },
 ];
@@ -30,7 +30,7 @@ export function Comparison() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-white/70 uppercase backdrop-blur">
               <Scale className="size-3.5" />
-              The old way vs RentSeal
+              The old way vs LP Stamp Paper
             </span>
           </Reveal>
           <Reveal delay={0.06}>
@@ -60,7 +60,7 @@ export function Comparison() {
                 <div className="flex items-center justify-center gap-2">
                   <LogoMark className="size-5" />
                   <p className="text-[13px] font-bold tracking-wide text-white uppercase">
-                    RentSeal
+                    LP Stamp Paper
                   </p>
                 </div>
               </div>

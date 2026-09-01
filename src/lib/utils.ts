@@ -39,6 +39,15 @@ export function formatDate(date: Date | string | null | undefined) {
 }
 
 /** "14 Mar 2026" */
+/** DD.MM.YYYY — how the term dates are written in Tamil Nadu rental deeds. */
+export function formatDateNumeric(date: Date | string | null | undefined) {
+  if (!date) return "—";
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) return "—";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
 export function formatDateShort(date: Date | string | null | undefined) {
   if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;

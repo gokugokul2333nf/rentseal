@@ -12,7 +12,7 @@ import { LEAD_ANCHOR, SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About Us — Legal Documents Ordinary People Can Read",
   description:
-    "RentSeal builds rental agreements for Tamil Nadu that are legally sound and written in plain English. Registered in Chennai, serving all 38 districts.",
+    "LP Stamp Paper builds rental agreements for Tamil Nadu that are legally sound and written in plain English. Registered in Chennai, serving all 38 districts.",
   alternates: { canonical: "/about" },
 };
 
@@ -75,7 +75,7 @@ const PRINCIPLES = [
   {
     step: "05",
     title: "We are a document service, not your lawyer",
-    body: "We draft, stamp and deliver. On the Premium plan an advocate independently enrolled with the Bar Council of Tamil Nadu reviews the clauses before you sign. That is advice from them, not from us — we do not provide legal representation and we say so on every page.",
+    body: "We draft, stamp, notarise and deliver. Attestation is performed by an independent notary public appointed under the Notaries Act, 1952 — that is their act, not ours. We do not provide legal advice or representation, and we say so on every page.",
   },
 ];
 
@@ -83,7 +83,7 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow="About RentSeal"
+        eyebrow="About LP Stamp Paper"
         icon={Building2}
         crumbs={CRUMBS}
         title="Legal documents that ordinary people can actually read"
@@ -170,10 +170,11 @@ export default function AboutPage() {
                   // placeholder, it is a false statement about the company.
                   ...(SITE.cin ? [["CIN", SITE.cin]] : []),
                   ...(SITE.gstin ? [["GSTIN", SITE.gstin]] : []),
+                  ...(SITE.udyam ? [["Udyam registration", SITE.udyam]] : []),
                   ["Registered office", SITE.address],
-                  ["Advocate panel", "Independently enrolled with the Bar Council of Tamil Nadu"],
+                  ["Notarisation", "By an independent notary public appointed under the Notaries Act, 1952"],
                   ["Data handling", "Encrypted in transit and at rest; Aadhaar and PAN masked and never logged"],
-                  ["Card details", "Handled by the payment gateway — they never reach our servers"],
+                  ["Payment", "Taken by our team on the confirming call — the website collects none of it"],
                 ] as Array<[string, string]>).map(([label, value]) => (
                   <div key={label} className="grid gap-1 px-6 py-4 sm:grid-cols-[200px_1fr] sm:gap-4">
                     <dt className="text-[13.5px] font-semibold text-navy-500">{label}</dt>
@@ -187,9 +188,9 @@ export default function AboutPage() {
           <Reveal delay={0.2}>
             <p className="mx-auto mt-8 max-w-3xl rounded-2xl border border-line bg-canvas p-6 text-[14px] leading-[1.75] text-navy-600">
               <strong className="font-semibold text-navy-950">To be completely clear:</strong>{" "}
-              RentSeal is a technology platform. We do not practise law and we do not represent
-              you in a dispute. Advocate verification on the Premium plan is rendered by
-              independent advocates enrolled with the Bar Council of Tamil Nadu, who are
+              LP Stamp Paper is a technology platform. We do not practise law and we do not represent
+              you in a dispute. Notary attestation is performed by an independent notary
+              public appointed under the Notaries Act, 1952, who is
               responsible for their own professional opinion. If your matter needs
               representation, we will tell you and point you toward it.
             </p>

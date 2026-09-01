@@ -7,7 +7,7 @@ import { SITE, STATS } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to RentSeal with a one-time password to see your agreements, drafts, invoices and renewals.",
+  description: "Sign in to LP Stamp Paper with a one-time password to see your agreements, drafts, invoices and renewals.",
   robots: { index: false, follow: true },
 };
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
             className="mb-10 inline-flex items-center gap-2 text-[13.5px] font-medium text-navy-500 transition-colors hover:text-navy-950"
           >
             <ArrowLeft className="size-4" />
-            Back to RentSeal
+            Back to LP Stamp Paper
           </Link>
 
           <Logo />

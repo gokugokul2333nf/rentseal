@@ -1,5 +1,5 @@
 import type { AgreementDraft } from "./types";
-import { addMonths, formatDate, inr, rupeesInWords } from "./utils";
+import { addMonths, formatDateNumeric, inr, rupeesInWords } from "./utils";
 
 export interface GeneratedClause {
   id: string;
@@ -18,16 +18,6 @@ const AGREEMENT_LABEL: Record<AgreementDraft["type"], string> = {
   "leave-license": "Leave and License Agreement",
 };
 
-const PROPERTY_LABEL: Record<string, string> = {
-  apartment: "apartment",
-  "independent-house": "independent house",
-  villa: "villa",
-  office: "office premises",
-  shop: "shop premises",
-  warehouse: "warehouse",
-  land: "parcel of land",
-};
-
 function n(value: string | number) {
   const parsed = typeof value === "number" ? value : parseFloat(value || "0");
   return Number.isFinite(parsed) ? parsed : 0;
@@ -35,6 +25,20 @@ function n(value: string | number) {
 
 export function agreementTitle(type: AgreementDraft["type"]) {
   return AGREEMENT_LABEL[type];
+}
+
+/**
+ * How the let premises are described in the Schedule.
+ *
+ * A portion has to be named as a portion — "a portion in the First Floor of
+ * No.5/185, …" — because a Schedule that describes the whole building when only
+ * one floor is let describes the wrong thing.
+ */
+export function scheduleDescription(d: AgreementDraft) {
+  const address = propertyAddress(d);
+  if (d.property.wholeProperty) return address;
+  const portion = d.property.portionDescription.trim();
+  return portion ? `${portion} of ${address}` : `a portion of ${address}`;
 }
 
 export function propertyAddress(d: AgreementDraft) {
@@ -51,79 +55,183 @@ export function propertyAddress(d: AgreementDraft) {
 }
 
 /**
- * Builds the clause set from the user's answers. Every branch here maps to a
- * control in the builder, so the preview updates the instant a toggle flips.
+ * The clause set, following the executed agreement the client supplied.
+ *
+ * That document is the template: same order, same wording, same numbering. It
+ * is a working Chennai rental agreement of the kind the Sub-Registrar and the
+ * parties both expect, and it is short — sixteen clauses where the generic
+ * draft this replaced ran to twenty-three of considerably more verbose prose.
+ *
+ * Everything variable comes from the builder's answers, so a clause only says
+ * "three months' notice" or "two months' default" because someone chose it.
+ * Clauses the sample does not have appear only when an answer calls for them —
+ * parking, pets, furniture, commercial use, registration.
  */
 export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const clauses: GeneratedClause[] = [];
   const t = d.terms;
   const o = d.options;
+  const isLicence = d.type === "leave-license";
+  const A = isLicence ? "LICENSOR" : "LANDLORD";
+  const B = isLicence ? "LICENSEE" : "TENANT";
+  const rentWord = isLicence ? "licence fee" : "rent";
 
   const rent = n(t.monthlyRent);
   const deposit = n(t.securityDeposit);
   const months = t.durationMonths || 11;
+  const notice = n(t.noticePeriodMonths) || 1;
+  const defaults = n(t.defaultMonths) || 2;
   const start = t.startDate ? new Date(t.startDate) : new Date();
   const end = addMonths(start, months);
-  const kind = PROPERTY_LABEL[d.property.kind] ?? "premises";
-  const isLicence = d.type === "leave-license";
-  const partyA = isLicence ? "Licensor" : "Landlord";
-  const partyB = isLicence ? "Licensee" : "Tenant";
+  const purpose = d.type === "commercial" ? "COMMERCIAL PURPOSE" : "RESIDENTIAL PURPOSE";
 
-  // ── 1. Grant ────────────────────────────────────────────────────────────
-  clauses.push({
-    id: "grant",
-    core: true,
-    title: `Grant of ${isLicence ? "Licence" : "Tenancy"}`,
-    body: `The ${partyA} hereby grants to the ${partyB}, and the ${partyB} accepts, the ${isLicence ? "licence to occupy and use" : "right to occupy"} the ${kind} situated at ${propertyAddress(d)} (the "Premises"), for a term of ${months} (${months === 11 ? "eleven" : months}) months commencing on ${formatDate(start)} and ending on ${formatDate(end)}, on the terms recorded below.`,
-  });
-
-  // ── 2. Rent ─────────────────────────────────────────────────────────────
+  // 1 ── Rent
   clauses.push({
     id: "rent",
     core: true,
-    title: isLicence ? "Licence Fee" : "Rent",
-    body: `The ${partyB} shall pay to the ${partyA} a monthly ${isLicence ? "licence fee" : "rent"} of ${inr(rent)} (${rupeesInWords(rent)}), payable in advance on or before the ${t.rentDueDay || "5"} day of each calendar month${
-      t.paymentMode === "cash"
-        ? ", in cash against a written receipt"
-        : t.paymentMode === "cheque"
-          ? ", by account-payee cheque drawn in favour of the " + partyA
-          : t.paymentMode === "upi"
-            ? ", by UPI transfer to the account nominated by the " + partyA
-            : ", by electronic bank transfer to the account nominated by the " + partyA
-    }. ${
-      t.paymentMode === "cash"
-        ? "Every cash payment shall be acknowledged in writing; an unacknowledged payment shall not be treated as made."
-        : "The bank record of the transfer shall be sufficient proof of payment."
-    }`,
+    title: "Rent",
+    body: `The monthly ${rentWord} for the premises hereby let-out to the ${B} is ${inr(rent)} (${rupeesInWords(rent)}) and the ${B} has agreed to pay it on or before the ${t.rentDueDay} of every succeeding calendar month.`,
   });
 
-  // ── 3. Deposit ──────────────────────────────────────────────────────────
+  // 2 ── Deposit
   clauses.push({
     id: "deposit",
     core: true,
     title: "Security Deposit",
-    body: `The ${partyB} has paid to the ${partyA} an interest-free refundable security deposit of ${inr(deposit)} (${rupeesInWords(deposit)}), the receipt of which the ${partyA} acknowledges. The deposit shall be refunded in full within 15 (fifteen) days of the ${partyB} handing over vacant possession, after deducting only (a) unpaid ${isLicence ? "licence fee" : "rent"}, (b) unpaid utility charges, and (c) the cost of repairing damage beyond normal wear and tear. The ${partyA} shall furnish an itemised written statement of every deduction. The deposit shall not be adjusted against ${isLicence ? "licence fee" : "rent"} during the term without the ${partyA}'s written consent.`,
+    body: `The ${B} has agreed to pay a deposit of ${inr(deposit)} (${rupeesInWords(deposit)}). ${
+      t.depositAlreadyPaid
+        ? `The ${B} has paid this deposit to the ${A}.`
+        : `The ${B} shall pay this deposit to the ${A} on or before the date the tenancy commences.`
+    }`,
   });
 
-  // ── 4. Escalation (conditional) ─────────────────────────────────────────
-  if (n(t.escalationPercent) > 0) {
-    const afterMonths = n(t.escalationAfterMonths) || 11;
+  // 3 ── Deposit carries no interest, refundable on vacating
+  clauses.push({
+    id: "deposit-refund",
+    core: true,
+    title: "Refund of Deposit",
+    body: `The aforesaid security deposit will not carry any interest and the ${A} shall return this amount to the ${B} at the time of vacating and delivering vacant possession of the demised premises as it is let-out to ${B === "TENANT" ? "the TENANT" : "the LICENSEE"} this day.`,
+  });
+
+  // 4 ── Electricity
+  if (t.electricityBorneBy === "tenant") {
     clauses.push({
-      id: "escalation",
-      trigger: `Escalation ${t.escalationPercent}%`,
-      title: "Escalation on Renewal",
-      body: `If the parties renew this agreement, the monthly ${isLicence ? "licence fee" : "rent"} shall stand increased by ${t.escalationPercent}% over the then-prevailing amount at the end of every ${afterMonths} months of occupancy. No other increase may be imposed during a running term.`,
+      id: "electricity",
+      core: true,
+      title: "Electricity Charges",
+      body: `The ${B} shall pay separately the electricity charges, according to the meter readings for the demised portion, directly to the T.N.E.B.`,
     });
   }
 
-  // ── 5. Term, notice, lock-in ────────────────────────────────────────────
-  const notice = n(t.noticePeriodMonths) || 1;
+  // 5 ── Deductions from the deposit
+  clauses.push({
+    id: "deductions",
+    core: true,
+    title: "Deductions on Vacating",
+    body: `The ${A} will be at liberty to deduct all such amounts as ${rentWord} dues, electricity charges and other arrears, and also any damages to the building, wood work, electrical fittings and plumbing taps, at the time of the ${B} vacating the portion.`,
+  });
+
+  // 6 ── Nails (conditional)
+  if (o.noWallDamage) {
+    clauses.push({
+      id: "nails",
+      trigger: "No nails",
+      title: "Nails and Wall Finishes",
+      body: `The ${B} shall not hammer any nails on the walls of the premises. If nails are hammered, the walls have to be cemented and the premises have to be painted in full and handed over at the time of vacating the said property.`,
+    });
+  }
+
+  // 7 ── Term
+  clauses.push({
+    id: "term",
+    core: true,
+    title: "Period of Tenancy",
+    body: `The tenancy shall be in force for a period of ${months} months commencing from ${formatDateNumeric(start)} to ${formatDateNumeric(end)}.`,
+  });
+
+  // 8 ── Renewal
+  clauses.push({
+    id: "renewal",
+    core: true,
+    title: "Renewal",
+    body: `Both the ${A} and the ${B} agree that the period of tenancy may be extended for a further period of ${months} months by mutual consent on fresh terms and conditions.${
+      n(t.escalationPercent) > 0
+        ? ` On such renewal the monthly ${rentWord} shall stand increased by ${t.escalationPercent}%.`
+        : ""
+    }`,
+  });
+
+  // 9 ── Alterations
+  clauses.push({
+    id: "alterations",
+    core: true,
+    title: "Alterations",
+    body: o.alterationsAllowed
+      ? `The ${B} may carry out non-structural interior work with the written consent of the ${A}, but shall not make any structural alterations or additions without such consent, and shall restore the premises before vacating.`
+      : `The ${B} shall not make any structural alterations or additions without the written consent of the ${A}.`,
+  });
+
+  // 10 ── Subletting
+  clauses.push({
+    id: "subletting",
+    core: true,
+    title: "Subletting",
+    body: o.sublettingAllowed
+      ? `The ${B} shall not sublet the demised premises or any part thereof to any third party without the prior written consent of the ${A}.`
+      : `The ${B} shall not sublet the demised premises or any part thereof to any third parties.`,
+  });
+
+  // 11 ── Inspection
+  clauses.push({
+    id: "inspection",
+    core: true,
+    title: "Right of Inspection",
+    body: `The ${A} or the ${A}'s authorised representatives shall be at liberty to inspect the demised premises at all reasonable times without any interruption by the ${B}.`,
+  });
+
+  // 12 ── Change of use
+  clauses.push({
+    id: "use",
+    core: true,
+    title: "Use of the Premises",
+    body: `The ${B} shall not alter the use of the demised premises, which are let for ${purpose.toLowerCase()}, without the written consent of the ${A}.`,
+  });
+
+  // 13 ── Default
+  clauses.push({
+    id: "default",
+    core: true,
+    title: "Default in Payment",
+    body: `The ${A} has every right to evict the ${B} irrespective of this agreement if the ${B} commits default in payment of monthly ${rentWord} for a continuous period of ${defaults} month${defaults === 1 ? "" : "s"}.`,
+  });
+
+  // 14 ── Notice
   clauses.push({
     id: "notice",
     core: true,
-    title: "Termination and Notice",
-    body: `Either party may terminate this agreement by giving the other ${notice} (${notice === 1 ? "one" : notice === 2 ? "two" : notice === 3 ? "three" : notice}) month${notice === 1 ? "" : "s"} prior written notice. In lieu of notice, the terminating party may pay ${isLicence ? "licence fee" : "rent"} for the unexpired notice period. The ${partyA} may terminate immediately if the ${isLicence ? "licence fee" : "rent"} remains unpaid for two consecutive months, or if the ${partyB} uses the Premises for any unlawful purpose.`,
+    title: "Termination",
+    body: `This agreement is terminable by ${notice} month${notice === 1 ? "" : "s"} notice in advance on either side.`,
   });
+
+  // 15 ── Governing law
+  clauses.push({
+    id: "law",
+    core: true,
+    title: "Governing Law",
+    body: `The law in force shall otherwise govern this agreement.`,
+  });
+
+  // 16 ── Anti-social use (conditional)
+  if (o.noLiquorOrIllegalUse) {
+    clauses.push({
+      id: "lawful-use",
+      trigger: "No liquor",
+      title: "Lawful Use",
+      body: `The ${B} shall not use the demised premises for any anti-social or illegal activities, and shall not consume or store liquor on the premises.`,
+    });
+  }
+
+  /* ── Beyond the sample: only where an answer asks for it ──────────────── */
 
   if (n(t.lockInMonths) > 0) {
     const lock = n(t.lockInMonths);
@@ -131,203 +239,77 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
       id: "lock-in",
       trigger: `Lock-in ${lock} months`,
       title: "Lock-in Period",
-      body: `The parties agree to a lock-in period of ${lock} months from ${formatDate(start)}. Neither party may terminate this agreement during the lock-in period save for a material breach. Should the ${partyB} vacate before the lock-in expires, the ${isLicence ? "licence fee" : "rent"} for the unexpired portion of the lock-in shall become payable and may be adjusted against the security deposit. Should the ${partyA} require the ${partyB} to vacate before the lock-in expires, the ${partyA} shall pay the ${partyB} an equivalent sum.`,
+      body: `Neither party shall terminate this agreement during the first ${lock} months of the term. If the ${B} vacates within that period, the ${rentWord} for the unexpired part of the lock-in shall be payable to the ${A}.`,
     });
   }
 
-  // ── 6. Maintenance ──────────────────────────────────────────────────────
-  if (t.maintenanceBorneBy === "included") {
+  if (t.maintenanceBorneBy === "tenant" && n(t.maintenanceAmount) > 0) {
     clauses.push({
-      id: "maintenance-included",
-      trigger: "Maintenance included",
-      title: "Maintenance Charges",
-      body: `The monthly ${isLicence ? "licence fee" : "rent"} stated above is inclusive of association and common-area maintenance charges. The ${partyA} shall remain responsible for paying such charges to the association and shall keep the ${partyB} indemnified against any demand on that account.`,
-    });
-  } else if (t.maintenanceBorneBy === "tenant") {
-    clauses.push({
-      id: "maintenance-tenant",
+      id: "maintenance",
       trigger: "Maintenance by tenant",
       title: "Maintenance Charges",
-      body: `In addition to the ${isLicence ? "licence fee" : "rent"}, the ${partyB} shall pay maintenance charges of ${inr(n(t.maintenanceAmount))} per month${n(t.maintenanceAmount) > 0 ? "" : " as levied by the association"} directly to the apartment owners' association or the ${partyA}, as directed. Any increase levied by the association shall be borne by the ${partyB}.`,
-    });
-  } else {
-    clauses.push({
-      id: "maintenance-landlord",
-      trigger: "Maintenance by landlord",
-      title: "Maintenance Charges",
-      body: `All association and common-area maintenance charges shall be borne by the ${partyA} and paid directly by the ${partyA}. The ${partyB} shall not be liable for any such demand.`,
+      body: `In addition to the ${rentWord}, the ${B} shall pay maintenance charges of ${inr(n(t.maintenanceAmount))} per month to the association or to the ${A} as directed.`,
     });
   }
 
-  // ── 7. Utilities & taxes ────────────────────────────────────────────────
-  clauses.push({
-    id: "utilities",
-    core: true,
-    title: "Utilities and Statutory Dues",
-    body: `Electricity consumption charges shall be borne by the ${t.electricityBorneBy === "tenant" ? partyB : partyA}, and water charges by the ${t.waterBorneBy === "tenant" ? partyB : partyA}, each paid on or before the due date. Property tax, and any other levy on the ownership of the Premises, shall be borne by the ${t.propertyTaxBorneBy === "landlord" ? partyA : partyB}. The ${partyB} shall hand over receipts for all utility payments at the end of the term, and shall clear every outstanding bill before vacating.`,
-  });
-
-  // ── 8. Use of premises ──────────────────────────────────────────────────
-  if (d.type === "commercial" || o.commercialUseAllowed) {
+  if (d.property.furnishing !== "unfurnished" && d.furniture.length > 0) {
     clauses.push({
-      id: "commercial-use",
-      trigger: "Commercial use",
-      title: "Permitted Commercial Use",
-      body: `The Premises shall be used solely for the purpose of ${o.businessNature || "the lawful business notified to the " + partyA} and for no other purpose. The ${partyB} shall obtain and maintain at its own cost every licence, registration, trade licence, and statutory approval required for that business, including under the Shops and Establishments Act and the Goods and Services Tax law. The ${partyB} shall not carry on any activity that is hazardous, that causes nuisance to neighbouring occupants, or that would void the insurance on the building. The ${partyA} shall not be answerable for any regulatory default of the ${partyB}'s business.`,
-    });
-  } else {
-    clauses.push({
-      id: "residential-use",
-      core: true,
-      title: "Use of the Premises",
-      body: `The Premises shall be used strictly for residential purposes by the ${partyB} and the ${partyB}'s immediate family. No trade, business, manufacturing, storage of goods for sale, or commercial activity of any kind shall be carried on at the Premises. Nothing illegal, hazardous, or offensive shall be brought onto or done at the Premises.`,
+      id: "inventory",
+      trigger: d.property.furnishing.replace("-", " "),
+      title: "Inventory of Articles",
+      body: `The premises are let on a ${d.property.furnishing.replace("-", " ")} basis. The articles handed over are listed in the Schedule of Articles annexed to this agreement. The ${B} shall return each article in the same condition, normal wear and tear excepted.`,
     });
   }
 
-  // ── 9. Furniture inventory ──────────────────────────────────────────────
-  if (d.property.furnishing !== "unfurnished") {
-    const items = d.furniture.filter((f) => f.name.trim());
-    clauses.push({
-      id: "furniture",
-      trigger: d.property.furnishing === "fully-furnished" ? "Fully furnished" : "Semi furnished",
-      title: "Fixtures, Fittings and Inventory",
-      body: `The Premises are let on a ${d.property.furnishing.replace("-", " ")} basis. ${
-        items.length
-          ? `The following articles are handed over to the ${partyB} in working condition: ${items
-              .map((f) => `${f.name}${n(f.quantity) > 1 ? ` (${f.quantity} nos., ${f.condition} condition)` : ` (${f.condition} condition)`}`)
-              .join("; ")}.`
-          : `A signed inventory of every article handed over forms Schedule B to this agreement.`
-      } The ${partyB} shall return each article in the same condition, normal wear and tear excepted. The cost of repairing or replacing any article damaged or lost during the term shall be borne by the ${partyB} and may be deducted from the security deposit. The ${partyB} shall not remove any article from the Premises.`,
-    });
-  }
-
-  // ── 10. Parking ─────────────────────────────────────────────────────────
   if (o.parkingIncluded) {
-    const slots = n(o.parkingSlots) || 1;
-    const vehicle =
-      o.parkingType === "both"
-        ? "two-wheeler and four-wheeler"
-        : o.parkingType === "four-wheeler"
-          ? "four-wheeler"
-          : "two-wheeler";
     clauses.push({
       id: "parking",
       trigger: "Parking included",
       title: "Parking",
-      body: `The ${partyA} shall provide the ${partyB} with ${slots} (${slots === 1 ? "one" : slots}) dedicated ${vehicle} parking slot${slots === 1 ? "" : "s"} within the premises for the exclusive use of the ${partyB}, at no additional charge. The ${partyB} shall park only in the allotted slot${slots === 1 ? "" : "s"} and shall not obstruct common passages. The ${partyA} shall not be liable for theft of or damage to any vehicle parked at the Premises.`,
-    });
-  } else {
-    clauses.push({
-      id: "no-parking",
-      trigger: "No parking",
-      title: "Parking",
-      body: `No parking slot is allotted to the ${partyB} under this agreement. The ${partyB} shall not park any vehicle within the premises or in any common area without the prior written permission of the ${partyA} and the building association.`,
+      body: `The ${A} shall provide the ${B} with ${o.parkingSlots} ${o.parkingType.replace("-", " ")} parking slot(s) within the premises. The ${A} shall not be liable for theft of or damage to any vehicle parked at the premises.`,
     });
   }
 
-  // ── 11. Pets ────────────────────────────────────────────────────────────
   if (o.petsAllowed) {
     clauses.push({
       id: "pets",
       trigger: "Pets allowed",
       title: "Pets",
-      body: `The ${partyB} may keep domestic pets at the Premises, subject to the bye-laws of the building association and to applicable municipal rules. The ${partyB} shall ensure that no pet causes nuisance, noise, or damage, shall keep all vaccinations current, and shall bear the full cost of repairing any damage caused by a pet. The ${partyB} shall have the Premises professionally cleaned and pest-treated before handing over possession.`,
-    });
-  } else {
-    clauses.push({
-      id: "no-pets",
-      trigger: "No pets",
-      title: "Pets",
-      body: `The ${partyB} shall not keep any pet or animal at the Premises without the prior written consent of the ${partyA}.`,
+      body: `The ${B} may keep domestic pets at the premises, subject to municipal rules and the bye-laws of the association, and shall make good any damage caused by them.`,
     });
   }
 
-  // ── 12. Subletting ──────────────────────────────────────────────────────
-  clauses.push({
-    id: "subletting",
-    core: true,
-    title: "Subletting and Assignment",
-    body: o.sublettingAllowed
-      ? `The ${partyB} may sublet or part with possession of the Premises, in whole or in part, only with the prior written consent of the ${partyA}. Any such subletting shall not relieve the ${partyB} of any obligation under this agreement, and the ${partyB} shall remain answerable to the ${partyA} for the acts of every occupant.`
-      : `The ${partyB} shall not sublet, assign, mortgage, or otherwise part with possession of the Premises or any part of it, nor permit any third party to occupy the Premises, under any circumstances. Breach of this clause shall entitle the ${partyA} to terminate this agreement forthwith.`,
-  });
+  if (d.type === "commercial" || o.commercialUseAllowed) {
+    clauses.push({
+      id: "commercial-use",
+      trigger: "Commercial use",
+      title: "Permitted Business",
+      body: `The premises shall be used solely for the purpose of ${o.businessNature || `the lawful business notified to the ${A}`} and for no other purpose. The ${B} shall obtain and maintain every licence, registration and statutory approval required for that business at the ${B}'s own cost.`,
+    });
+  }
 
-  // ── 13. Alterations ─────────────────────────────────────────────────────
-  clauses.push({
-    id: "alterations",
-    core: true,
-    title: "Alterations and Structural Changes",
-    body: o.alterationsAllowed
-      ? `The ${partyB} may carry out non-structural alterations, fittings, and interior work at its own cost with the prior written consent of the ${partyA}. All such work shall comply with the bye-laws of the building. Any fixture affixed to the Premises may be removed by the ${partyB} at the end of the term provided the Premises are restored to their original condition.`
-      : `The ${partyB} shall not make any structural alteration, addition, or permanent change to the Premises, nor drive nails or bore holes beyond what is ordinarily required to hang light fittings, without the prior written consent of the ${partyA}.`,
-  });
-
-  // ── 14. Repairs ─────────────────────────────────────────────────────────
-  clauses.push({
-    id: "repairs",
-    core: true,
-    title: "Repairs and Upkeep",
-    body: `The ${partyA} shall attend to major and structural repairs, including to the roof, external walls, main plumbing lines, and electrical mains, at the ${partyA}'s own cost and within a reasonable time of being notified. Minor and day-to-day repairs — including to taps, switches, fuses, and sanitary fittings — up to ${inr(1000)} per instance shall be borne by the ${partyB}. The ${partyB} shall keep the Premises clean and in good order and shall report any defect promptly.`,
-  });
-
-  // ── 15. Inspection ──────────────────────────────────────────────────────
-  clauses.push({
-    id: "inspection",
-    core: true,
-    title: "Right of Inspection",
-    body: `The ${partyA}, or a person authorised by the ${partyA}, may enter and inspect the Premises at a reasonable hour after giving the ${partyB} at least 24 hours' prior notice. During the final month of the term, the ${partyA} may show the Premises to prospective occupants on the same notice. The ${partyA} shall not enter the Premises without notice save in an emergency.`,
-  });
-
-  // ── 16. Handover ────────────────────────────────────────────────────────
-  clauses.push({
-    id: "handover",
-    core: true,
-    title: "Handing Over Possession",
-    body: `On the expiry or earlier termination of this agreement, the ${partyB} shall hand over vacant and peaceful possession of the Premises to the ${partyA} in the same condition in which it was received, normal wear and tear excepted, together with all keys, access cards, and the articles listed in the inventory. The ${partyB} shall not be entitled to claim any tenancy right, and time shall be of the essence for handing over.`,
-  });
-
-  // ── 17. Registration ────────────────────────────────────────────────────
-  if (o.registrationRequired || months >= 12) {
+  if (o.registrationRequired) {
     clauses.push({
       id: "registration",
-      trigger: months >= 12 ? "Term ≥ 12 months" : "Registration opted",
+      trigger: "Registration",
       title: "Registration",
-      body: `This agreement shall be presented for registration before the jurisdictional Sub-Registrar at ${d.property.city || "the office having jurisdiction"} within the time prescribed by the Registration Act, 1908. The stamp duty and registration charges payable shall be borne by the ${partyB}${months >= 12 ? " unless the parties agree in writing to share them equally" : ""}. Both parties shall appear before the Sub-Registrar and do all things necessary to complete registration.`,
+      body: `This agreement shall be registered before the jurisdictional Sub-Registrar. The registration charges and stamp duty shall be borne by the ${B} unless otherwise agreed in writing.`,
     });
   }
 
-  // ── 18. Custom clauses ──────────────────────────────────────────────────
-  o.customClauses
-    .filter((c) => c.trim())
-    .forEach((text, i) => {
-      clauses.push({
-        id: `custom-${i}`,
-        trigger: "Your clause",
-        title: `Special Condition ${i + 1}`,
-        body: text.trim(),
-      });
+  o.customClauses.forEach((text, i) => {
+    if (!text.trim()) return;
+    clauses.push({
+      id: `custom-${i}`,
+      trigger: "Your clause",
+      title: "Special Condition",
+      body: text.trim(),
     });
-
-  // ── 19. Governing law ───────────────────────────────────────────────────
-  clauses.push({
-    id: "governing-law",
-    core: true,
-    title: "Governing Law and Jurisdiction",
-    body: `This agreement shall be governed by and construed in accordance with the laws of India, and in particular the Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act, 2017. The courts at ${d.property.district || d.property.city || "Chennai"}, Tamil Nadu shall have exclusive jurisdiction over any dispute arising out of this agreement. The parties shall first attempt to resolve any dispute amicably, and failing that by mediation, before approaching the Rent Authority or a court.`,
-  });
-
-  // ── 20. Entire agreement ────────────────────────────────────────────────
-  clauses.push({
-    id: "entire",
-    core: true,
-    title: "Entire Agreement",
-    body: `This document records the entire understanding between the parties concerning the Premises and supersedes every prior discussion, representation, or arrangement, whether oral or written. No variation shall be effective unless made in writing and signed by both parties. If any clause is held unenforceable, the remaining clauses shall continue in full force.`,
   });
 
   return clauses;
 }
 
-/** Clause count without the user having to open the preview. */
 export function clauseStats(d: AgreementDraft) {
   const all = generateClauses(d);
   return {

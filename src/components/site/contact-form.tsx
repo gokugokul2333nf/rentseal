@@ -100,7 +100,7 @@ export function ContactForm() {
 
         {topic === "existing" ? (
           <Field label="Agreement number" help="Starts with RS — it's on your invoice and in your dashboard.">
-            {(id) => <Input id={id} name="agreementId" placeholder="RS-2026-448120" />}
+            {(id) => <Input id={id} name="agreementId" placeholder="LP-2026-448120" />}
           </Field>
         ) : null}
 
@@ -131,7 +131,7 @@ export function ContactForm() {
         </Button>
 
         <p className="text-center text-[12.5px] leading-relaxed text-navy-400">
-          We reply to everything, usually within two hours between 8am and 10pm. Your details are
+          We reply to everything, usually within two hours during working hours. Your details are
           used only to answer you — never added to a marketing list.
         </p>
       </div>

@@ -63,7 +63,7 @@ export function FaqSection({ limit = 8 }: { limit?: number }) {
                   <Phone className="size-4 shrink-0 text-brand-400" />
                   <span>
                     <span className="block text-[13.5px] font-semibold">{SITE.phone}</span>
-                    <span className="block text-[12px] text-white/45">8am – 10pm, all seven days</span>
+                    <span className="block text-[12px] text-white/45">Mon–Sat 9.30–9.30, Sun evening</span>
                   </span>
                 </a>
               </div>

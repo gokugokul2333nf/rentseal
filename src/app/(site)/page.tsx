@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AgreementTypes } from "@/components/landing/agreement-types";
+import { Certificates } from "@/components/landing/certificates";
 import { Cities } from "@/components/landing/cities";
 import { LeadForm } from "@/components/landing/lead-form";
 import { FaqSchema, FaqSection } from "@/components/landing/faq-section";
@@ -64,6 +65,7 @@ export default function HomePage() {
       <Cities />
       <LeadForm />
       <AgreementTypes />
+      <Certificates />
       <HowItWorks />
       <PricingCards compact />
       <Commitments />

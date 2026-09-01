@@ -40,7 +40,7 @@ function AgreementMock() {
             <span className="size-2.5 rounded-full bg-emerald-400/70" />
           </div>
           <span className="ml-1.5 text-[11.5px] font-semibold tracking-wide text-navy-400">
-            RS-2026-448120 · Draft
+            LP-2026-448120 · Draft
           </span>
         </div>
         <Badge tone="emerald" className="gap-1">
@@ -342,7 +342,7 @@ export function Hero() {
                 tint="bg-brand-600"
               />
               <FloatChip
-                className="-right-6 bottom-32 lg:-right-12"
+                className="-right-2 bottom-32 lg:-right-4"
                 delay={2.4}
                 icon={Truck}
                 title="Out for delivery"
@@ -353,8 +353,8 @@ export function Hero() {
                 className="-bottom-8 left-2 lg:-left-10"
                 delay={3.2}
                 icon={ShieldCheck}
-                title="Advocate verified"
-                sub="A. Ravichandran, Bar Council TN"
+                title="Notarised"
+                sub="Signatures attested by a notary"
                 tint="bg-navy-950"
               />
             </div>

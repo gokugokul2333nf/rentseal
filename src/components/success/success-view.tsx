@@ -15,6 +15,7 @@ import {
   Mail,
   MessageCircle,
   PenTool,
+  Phone,
   Scale,
   Stamp,
 } from "lucide-react";
@@ -25,17 +26,24 @@ import { cn } from "@/lib/utils";
 
 const PIPELINE = [
   {
-    id: "payment",
+    id: "received",
     icon: Check,
-    title: "Payment received",
-    body: "Receipt and GST invoice sent to your email.",
+    title: "Draft received",
+    body: "It is in front of our team with everything you entered.",
     ms: 0,
+  },
+  {
+    id: "call",
+    icon: Phone,
+    title: "We call to confirm",
+    body: "Within 30 minutes in working hours. We check the details and take payment on that call.",
+    ms: 900,
   },
   {
     id: "lawyer",
     icon: Scale,
-    title: "Advocate verification",
-    body: "An advocate enrolled with the Bar Council of Tamil Nadu is reading every clause.",
+    title: "Notary attestation",
+    body: "A notary public attests the signatures once both parties have signed.",
     ms: 1400,
   },
   {
@@ -118,7 +126,7 @@ export function SuccessView({ agreementId }: { agreementId: string }) {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="mt-7 text-[clamp(2rem,5vw,3rem)] leading-[1.1] font-bold tracking-[-0.03em] text-navy-950"
           >
-            That&apos;s it. Your agreement is being stamped.
+That&apos;s it — we have your agreement.
           </motion.h1>
 
           <motion.p
@@ -127,9 +135,11 @@ export function SuccessView({ agreementId }: { agreementId: string }) {
             transition={{ duration: 0.6, delay: 0.25 }}
             className="mt-5 text-[17px] leading-[1.7] text-navy-600"
           >
-            Payment confirmed for agreement{" "}
-            <span className="font-semibold text-navy-950">{agreementId}</span>. You can close this
-            page — everything below happens on its own, and we will message you at each step.
+            Draft{" "}
+            <span className="font-semibold text-navy-950">{agreementId}</span> is with our team.
+            Nothing has been charged — someone will call you to confirm the details and take
+            payment, and then we stamp it and get it to you. Quote that number if you call us
+            first.
           </motion.p>
 
           <motion.div
@@ -221,7 +231,7 @@ export function SuccessView({ agreementId }: { agreementId: string }) {
                 icon: Mail,
                 tint: "text-brand-600 bg-brand-50",
                 title: "Sent to your email",
-                body: "PDF plus the GST invoice, to both parties.",
+                body: "The stamped PDF and the invoice, to both parties.",
               },
               {
                 icon: MessageCircle,

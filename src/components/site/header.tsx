@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, Phone, Search, X } from "lucide-react";
-import { LEAD_ANCHOR, NAV_LINKS, SITE } from "@/lib/site";
+import { BUILDER_START, LEAD_ANCHOR, NAV_LINKS, SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
@@ -112,9 +112,9 @@ export function Header() {
         onMouseLeave={() => setOpenMenu(null)}
       >
         <nav className="container-page flex h-[68px] items-center justify-between gap-6" aria-label="Main">
-          <Logo />
+          <Logo className="shrink-0" />
 
-          <ul className="hidden items-center gap-1 lg:flex">
+          <ul className="hidden shrink-0 items-center gap-0.5 lg:flex">
             {NAV_LINKS.map((link) => {
               if (!("items" in link)) {
                 const active = pathname === link.href;
@@ -123,7 +123,7 @@ export function Header() {
                     <Link
                       href={link.href}
                       className={cn(
-                        "rounded-lg px-3.5 py-2 text-[14.5px] font-medium transition-colors",
+                        "rounded-lg px-3 py-2 text-[14.5px] font-medium whitespace-nowrap transition-colors",
                         active ? "text-brand-700" : "text-navy-600 hover:bg-navy-100/70 hover:text-navy-950",
                       )}
                     >
@@ -141,7 +141,7 @@ export function Header() {
                     onMouseEnter={() => setOpenMenu(link.label)}
                     onClick={() => setOpenMenu(isOpen ? null : link.label)}
                     className={cn(
-                      "flex items-center gap-1 rounded-lg px-3.5 py-2 text-[14.5px] font-medium transition-colors",
+                      "flex items-center gap-1 rounded-lg px-3 py-2 text-[14.5px] font-medium whitespace-nowrap transition-colors",
                       isOpen ? "bg-navy-100/70 text-navy-950" : "text-navy-600 hover:bg-navy-100/70 hover:text-navy-950",
                     )}
                   >
@@ -187,7 +187,7 @@ export function Header() {
             })}
           </ul>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex shrink-0 items-center gap-2.5">
             {/* Desktop: a real-looking field that opens the dialog. */}
             <button
               type="button"
@@ -211,15 +211,8 @@ export function Header() {
             >
               <Search className="size-[18px]" />
             </Button>
-            <a
-              href={`tel:${SITE.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-[14.5px] font-medium text-navy-600 transition-colors hover:bg-navy-100/70 hover:text-navy-950 lg:inline-flex"
-            >
-              <Phone className="size-4" />
-              {SITE.phone}
-            </a>
-            <ButtonLink href={LEAD_ANCHOR} size="sm" className="hidden sm:inline-flex">
-              Start my order
+            <ButtonLink href={BUILDER_START} size="sm" className="hidden sm:inline-flex">
+              Create agreement
               <ArrowRight className="size-4" />
             </ButtonLink>
             <Button
@@ -321,13 +314,16 @@ export function Header() {
               </div>
 
               <div className="shrink-0 space-y-2.5 border-t border-line bg-navy-50/60 p-5">
-                <ButtonLink href={LEAD_ANCHOR} size="lg" fullWidth>
-                  Start my order
+                <ButtonLink href={BUILDER_START} size="lg" fullWidth>
+                  Create agreement
                   <ArrowRight className="size-4" />
+                </ButtonLink>
+                <ButtonLink href={LEAD_ANCHOR} variant="secondary" size="lg" fullWidth>
+                  Order stamp paper
                 </ButtonLink>
                 <ButtonLink
                   href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, "")}`}
-                  variant="secondary"
+                  variant="ghost"
                   size="lg"
                   fullWidth
                 >

@@ -1,12 +1,66 @@
 "use client";
 
+import { createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { agreementTitle, generateClauses, propertyAddress } from "@/lib/clauses";
+import {
+  agreementTitle,
+  generateClauses,
+  propertyAddress,
+  scheduleDescription,
+} from "@/lib/clauses";
 import type { AgreementDraft } from "@/lib/types";
-import { addMonths, cn, formatDate, inr, maskAadhaar, rupeesInWords } from "@/lib/utils";
+import { cn, formatDate, inr, rupeesInWords } from "@/lib/utils";
+import type { Relation } from "@/lib/types";
+
+/**
+ * Printed in full, the way an executed agreement carries it.
+ *
+ * The instrument has to identify the parties completely — a masked number in
+ * the deed that gets stamped and signed is not the identification the document
+ * exists to record. Grouped in fours because that is how it is written.
+ */
+function formatAadhaar(value: string) {
+  const digits = value.replace(/\D/g, "");
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
+
+/** The deed refers back to the party, and the relationship fixes the gender. */
+function pronoun(relation: Relation) {
+  const female = relation === "daughter" || relation === "wife";
+  return female
+    ? { self: "herself", possessive: "her" }
+    : { self: "himself", possessive: "his" };
+}
+
+/**
+ * Whether the filled-in values are obscured.
+ *
+ * The clause wording stays readable — a customer has to be able to check what
+ * they are agreeing to. What is hidden is everything a screenshot would be
+ * worth taking for: the names, the Aadhaar numbers, the addresses and the
+ * money. Off for the copy the office prints.
+ */
+const Protect = createContext(false);
+
+/** Values are blurred rather than removed, so the sentence still reads. */
+function Secret({ children }: { children: React.ReactNode }) {
+  const protect = useContext(Protect);
+  if (!protect) return <>{children}</>;
+  return (
+    <span className="select-none blur-[4.5px]" aria-hidden="true">
+      {children}
+    </span>
+  );
+}
 
 function Blank({ children, w = "auto" }: { children?: React.ReactNode; w?: string }) {
-  if (children) return <span className="font-semibold text-navy-950">{children}</span>;
+  if (children) {
+    return (
+      <span className="font-semibold text-navy-950">
+        <Secret>{children}</Secret>
+      </span>
+    );
+  }
   return (
     <span
       className="inline-block translate-y-0.5 rounded border-b border-dashed border-navy-300 bg-amber-50/70 align-baseline"
@@ -17,24 +71,117 @@ function Blank({ children, w = "auto" }: { children?: React.ReactNode; w?: strin
 }
 
 /**
- * The instrument itself. Rendered live in the builder, in Review, and on the
- * print sheet — one source of truth so what you see is what gets stamped.
+ * Splits a clause body so the sensitive parts can be blurred in place.
+ *
+ * The amounts live inside the prose — "a monthly rent of Rs.12,000 (Rupees
+ * Twelve Thousand Only)" — so hiding only the fill-in-the-blank spans would
+ * leave the money legible in a screenshot.
+ */
+function redact(text: string, secrets: string[]) {
+  if (!secrets.length) return [{ text, secret: false }];
+  const escaped = secrets
+    .map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .sort((a, b) => b.length - a.length)
+    .join("|");
+  const parts: Array<{ text: string; secret: boolean }> = [];
+  const re = new RegExp(`(${escaped})`, "g");
+  let last = 0;
+  for (const m of text.matchAll(re)) {
+    if (m.index! > last) parts.push({ text: text.slice(last, m.index), secret: false });
+    parts.push({ text: m[0], secret: true });
+    last = m.index! + m[0].length;
+  }
+  if (last < text.length) parts.push({ text: text.slice(last), secret: false });
+  return parts;
+}
+
+/**
+ * Diagonal watermark, tiled across the whole document.
+ *
+ * The point of a watermark, unlike anything that tries to *prevent* a capture,
+ * is that it survives one. A photograph of the monitor carries it as surely as
+ * a Cmd+Shift+4 does, and no page can stop either of those. It carries the
+ * document number, so a leaked screenshot points at the order it came from.
+ *
+ * Drawn as a tiled SVG rather than repeated DOM nodes: it stays crisp at any
+ * zoom, costs one background-image, and cannot be deleted element by element
+ * from the inspector the way a stack of divs can.
+ */
+function watermarkStyle(id: string): React.CSSProperties {
+  const tile = 620;
+  const h = tile * 0.66;
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${h}">
+      <g transform="rotate(-30 ${tile / 2} ${h / 2})"
+         font-family="Helvetica, Arial, sans-serif" text-anchor="middle"
+         fill="#0F172A" fill-opacity="0.17">
+        <text x="${tile / 2}" y="${h / 2 - 12}"
+              font-size="66" font-weight="700" letter-spacing="3">DRAFT COPY</text>
+        <text x="${tile / 2}" y="${h / 2 + 30}"
+              font-size="23" font-weight="700" letter-spacing="3">${id} · NOT VALID UNTIL STAMPED</text>
+      </g>
+    </svg>`.trim();
+  return {
+    backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`,
+    backgroundRepeat: "repeat",
+    backgroundPosition: "center",
+  };
+}
+
+/**
+ * The instrument itself. Rendered live in the builder and in Review — one
+ * source of truth, so what is on screen is what the office prints.
+ *
+ * @param watermark  off for the copy that gets printed on stamp paper
  */
 export function AgreementDocument({
   draft,
   animate = true,
+  watermark = true,
+  protect = true,
   className,
 }: {
   draft: AgreementDraft;
   animate?: boolean;
+  watermark?: boolean;
+  /** Blur the names, ID numbers, addresses and amounts. */
+  protect?: boolean;
   className?: string;
 }) {
   const clauses = generateClauses(draft);
+  // Short strings are left alone — blurring "2" or "11" would speckle the whole
+  // deed and hide nothing worth hiding.
+  const secrets = protect
+    ? [
+        draft.landlord.fullName,
+        draft.tenant.fullName,
+        draft.landlord.parentName,
+        draft.tenant.parentName,
+        draft.landlord.address,
+        draft.tenant.address,
+        draft.landlord.aadhaar,
+        draft.tenant.aadhaar,
+        propertyAddress(draft),
+        scheduleDescription(draft),
+        draft.terms.monthlyRent && inr(parseFloat(draft.terms.monthlyRent)),
+        draft.terms.securityDeposit && inr(parseFloat(draft.terms.securityDeposit)),
+        draft.terms.monthlyRent && rupeesInWords(parseFloat(draft.terms.monthlyRent)),
+        draft.terms.securityDeposit && rupeesInWords(parseFloat(draft.terms.securityDeposit)),
+      ].filter((v): v is string => Boolean(v) && String(v).trim().length > 3)
+    : [];
   const t = draft.terms;
   const start = t.startDate ? new Date(t.startDate) : new Date();
-  const end = addMonths(start, t.durationMonths || 11);
-  const rent = parseFloat(t.monthlyRent || "0");
-  const deposit = parseFloat(t.securityDeposit || "0");
+  // The deed is dated when it is signed, not when the tenancy begins.
+  const executed = t.executionDate ? new Date(t.executionDate) : start;
+  const executedAt = t.executionPlace.trim() || draft.property.city;
+  const RELATION: Record<string, string> = {
+    son: "S/o",
+    daughter: "D/o",
+    wife: "W/o",
+    husband: "H/o",
+  };
+  // Rent, deposit and the end date are stated inside the clauses now, exactly
+  // as the sample states them, rather than in a summary table above them.
   const isLicence = draft.type === "leave-license";
   const partyA = isLicence ? "LICENSOR" : "LANDLORD";
   const partyB = isLicence ? "LICENSEE" : "TENANT";
@@ -42,156 +189,106 @@ export function AgreementDocument({
   const Wrapper = animate ? motion.div : "div";
 
   return (
+    <Protect.Provider value={protect}>
     <article
       className={cn(
-        "print-sheet bg-white font-sans text-[13px] leading-[1.85] text-navy-800",
+        "print-sheet relative bg-white font-sans text-[13px] leading-[1.85] text-navy-800",
         className,
       )}
     >
-      {/* e-Stamp header */}
-      <header className="avoid-break mb-7 border-b-2 border-navy-950 pb-5 text-center">
-        <p className="text-[9px] font-bold tracking-[0.24em] text-navy-500 uppercase">
-          Government of Tamil Nadu · Registration Department
-        </p>
-        <p className="mt-1 text-[9px] font-semibold tracking-[0.14em] text-navy-400 uppercase">
-          e-Stamp Certificate · Article 35, Indian Stamp Act 1899
-        </p>
-        <h1 className="mt-4 font-display text-[19px] font-bold tracking-tight text-navy-950 uppercase">
+      {watermark ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-6 z-10 select-none"
+          style={watermarkStyle(draft.id)}
+        />
+      ) : null}
+      {/* Title */}
+      <header data-doc="title" className="avoid-break mb-7 text-center">
+        <h1 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
           {agreementTitle(draft.type)}
         </h1>
-        <p className="mt-2 text-[11px] text-navy-500">
-          Certificate No. {draft.id} · Executed at{" "}
-          <Blank w="80px">{draft.property.city || undefined}</Blank> on {formatDate(start)}
+        <p className="mt-4 text-left">
+          This {agreementTitle(draft.type).toUpperCase()} is made and executed at{" "}
+          <Blank w="90px">{executedAt || undefined}</Blank> on this{" "}
+          <Blank w="120px">{t.executionDate ? formatDate(executed) : undefined}</Blank>.
         </p>
       </header>
 
       {/* Parties */}
-      <section className="avoid-break mb-6">
-        <p className="mb-3">
-          This {agreementTitle(draft.type)} is made on this {formatDate(start)} at{" "}
-          <Blank w="90px">{draft.property.city || undefined}</Blank>, Tamil Nadu,
+      <section data-doc="landlord" className="avoid-break mb-6">
+        <p className="mb-2 text-center text-[11px] font-bold tracking-[0.14em] text-navy-700">
+          BETWEEN
+        </p>
+        <p className="mb-4 text-justify">
+          <Blank w="150px">{draft.landlord.fullName || undefined}</Blank>
+          {draft.landlord.aadhaar ? (
+            <> (Aadhaar No: <Blank>{formatAadhaar(draft.landlord.aadhaar)}</Blank>)</>
+          ) : null}
+          {draft.landlord.parentName ? (
+            <>
+              , {RELATION[draft.landlord.relation] ?? "S/o"}:{" "}
+              <Blank>{draft.landlord.parentName}</Blank>
+            </>
+          ) : null}
+          , residing at <Blank w="220px">{draft.landlord.address || undefined}</Blank>, hereinafter
+          called as the{" "}
+          <strong className="font-bold text-navy-950">&ldquo;{partyA}&rdquo;</strong> (which
+          expression shall unless repugnant to the meaning or context thereof include{" "}
+          {pronoun(draft.landlord.relation).self}, {pronoun(draft.landlord.relation).possessive}{" "}
+          heirs, successors, executors, administrators and assigns) of the ONE PART.
         </p>
 
-        <div className="mb-3 pl-4">
-          <p className="mb-1 text-[10px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-            Between
-          </p>
-          <p>
-            <Blank w="150px">{draft.landlord.fullName || undefined}</Blank>
-            {draft.landlord.parentName ? (
-              <>
-                , son/daughter of <Blank>{draft.landlord.parentName}</Blank>
-              </>
-            ) : null}
-            {draft.landlord.age ? <>, aged about <Blank>{draft.landlord.age}</Blank> years</> : null}
-            , residing at <Blank w="220px">{draft.landlord.address || undefined}</Blank>
-            {draft.landlord.pan ? (
-              <>
-                , holding PAN <Blank>{draft.landlord.pan.toUpperCase()}</Blank>
-              </>
-            ) : null}
-            {draft.landlord.aadhaar ? (
-              <>
-                {" "}
-                and Aadhaar <Blank>{maskAadhaar(draft.landlord.aadhaar)}</Blank>
-              </>
-            ) : null}
-            , hereinafter referred to as the{" "}
-            <strong className="font-bold text-navy-950">&ldquo;{partyA}&rdquo;</strong> (which
-            expression shall include their heirs, executors, administrators and assigns) of the
-            ONE PART;
-          </p>
-        </div>
-
-        <div className="pl-4">
-          <p className="mb-1 text-[10px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-            And
-          </p>
-          <p>
-            <Blank w="150px">{draft.tenant.fullName || undefined}</Blank>
-            {draft.tenant.parentName ? (
-              <>
-                , son/daughter of <Blank>{draft.tenant.parentName}</Blank>
-              </>
-            ) : null}
-            {draft.tenant.age ? <>, aged about <Blank>{draft.tenant.age}</Blank> years</> : null}
-            , residing at <Blank w="220px">{draft.tenant.address || undefined}</Blank>
-            {draft.tenant.pan ? (
-              <>
-                , holding PAN <Blank>{draft.tenant.pan.toUpperCase()}</Blank>
-              </>
-            ) : null}
-            {draft.tenant.aadhaar ? (
-              <>
-                {" "}
-                and Aadhaar <Blank>{maskAadhaar(draft.tenant.aadhaar)}</Blank>
-              </>
-            ) : null}
-            , hereinafter referred to as the{" "}
-            <strong className="font-bold text-navy-950">&ldquo;{partyB}&rdquo;</strong> (which
-            expression shall include their heirs, executors, administrators and permitted
-            assigns) of the OTHER PART.
-          </p>
-        </div>
-      </section>
-
-      {/* Recitals */}
-      <section className="avoid-break mb-6">
-        <p className="mb-2 text-[10px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-          Whereas
+        <p className="mb-2 text-center text-[11px] font-bold tracking-[0.14em] text-navy-700">
+          AND
         </p>
-        <p className="pl-4">
-          The {partyA} is the absolute owner of and is lawfully seized and possessed of the
-          premises more particularly described in the Schedule below, and the {partyB} having
-          approached the {partyA} for occupation of the said premises, the {partyA} has agreed
-          to grant the same on the terms and conditions recorded in this deed.
+        <p className="text-justify">
+          <Blank w="150px">{draft.tenant.fullName || undefined}</Blank>
+          {draft.tenant.aadhaar ? (
+            <> (Aadhaar No: <Blank>{formatAadhaar(draft.tenant.aadhaar)}</Blank>)</>
+          ) : null}
+          {draft.tenant.parentName ? (
+            <>
+              , {RELATION[draft.tenant.relation] ?? "S/o"}:{" "}
+              <Blank>{draft.tenant.parentName}</Blank>
+            </>
+          ) : null}
+          , residing at <Blank w="220px">{draft.tenant.address || undefined}</Blank>, hereinafter
+          called as the{" "}
+          <strong className="font-bold text-navy-950">&ldquo;{partyB}&rdquo;</strong> (which
+          expression shall unless repugnant to the meaning or context thereof include{" "}
+          {pronoun(draft.tenant.relation).self}, {pronoun(draft.tenant.relation).possessive} heirs,
+          successors, executors, administrators and assigns) of the OTHER PART.
         </p>
       </section>
 
-      {/* Key terms table */}
-      <section className="avoid-break mb-7">
-        <p className="mb-2 text-[10px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-          Key terms at a glance
+      {/* Recital */}
+      <section data-doc="property" className="avoid-break mb-6">
+        <p className="text-justify">
+          WHEREAS the {partyA} is the absolute owner of the premises{" "}
+          <Blank w="200px">{propertyAddress(draft) || undefined}</Blank>, AND WHEREAS the {partyB}{" "}
+          has requested the {partyA} to rent-out{" "}
+          {draft.property.wholeProperty ? (
+            "the said premises"
+          ) : (
+            <Blank w="180px">{draft.property.portionDescription || undefined}</Blank>
+          )}{" "}
+          {draft.property.wholeProperty ? "" : "of the above said premises "}more fully described
+          in the schedule hereunder for{" "}
+          <strong className="font-bold text-navy-950">
+            {draft.type === "commercial" ? "COMMERCIAL PURPOSE" : "RESIDENTIAL PURPOSE"}
+          </strong>{" "}
+          and the {partyA} has agreed to the same on the following terms and conditions.
         </p>
-        <table className="w-full border-collapse text-[12px]">
-          <tbody>
-            {[
-              ["Monthly rent", rent > 0 ? `${inr(rent)} (${rupeesInWords(rent)})` : null],
-              ["Security deposit", deposit > 0 ? `${inr(deposit)} (${rupeesInWords(deposit)})` : null],
-              ["Term", `${t.durationMonths} months`],
-              ["Commencing", formatDate(start)],
-              ["Expiring", formatDate(end)],
-              ["Rent due on", `${t.rentDueDay} of every month`],
-              ["Notice period", `${t.noticePeriodMonths} month(s)`],
-              t.lockInMonths && parseFloat(t.lockInMonths) > 0
-                ? ["Lock-in period", `${t.lockInMonths} months`]
-                : null,
-            ]
-              .filter(Boolean)
-              .map((row) => {
-                const [label, value] = row as [string, string | null];
-                return (
-                  <tr key={label} className="border-b border-navy-100 last:border-0">
-                    <th className="w-[38%] py-2 pr-4 text-left align-top font-semibold text-navy-600">
-                      {label}
-                    </th>
-                    <td className="py-2 align-top">
-                      <Blank w="140px">{value ?? undefined}</Blank>
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
       </section>
 
       {/* Operative clauses */}
-      <section className="mb-7">
-        <p className="mb-4 text-[10px] font-bold tracking-[0.12em] text-navy-400 uppercase">
-          Now this deed witnesseth as follows
+      <section data-doc="terms" className="mb-7">
+        <p className="mb-4 text-[11px] font-bold tracking-[0.1em] text-navy-700">
+          NOW THIS DEED OF {agreementTitle(draft.type).toUpperCase()} WITNESSETH:
         </p>
 
-        <ol className="space-y-4">
+        <ol data-doc="clauses" className="space-y-3">
           <AnimatePresence initial={false} mode="popLayout">
             {clauses.map((clause, i) => (
               <Wrapper
@@ -207,17 +304,24 @@ export function AgreementDocument({
                   : {})}
                 className="overflow-hidden"
               >
-                <li className="avoid-break list-none">
-                  <h2 className="mb-1 flex items-baseline gap-2 font-display text-[13px] font-bold text-navy-950">
-                    <span className="tnum">{i + 1}.</span>
-                    <span>{clause.title}</span>
+                <li className="avoid-break flex list-none gap-2.5">
+                  <span className="tnum shrink-0 font-semibold text-navy-950">{i + 1}.</span>
+                  <span className="min-w-0 text-justify">
+                    {redact(clause.body, secrets).map((part, n) =>
+                      part.secret ? (
+                        <span key={n} className="select-none blur-[4.5px]" aria-hidden="true">
+                          {part.text}
+                        </span>
+                      ) : (
+                        <span key={n}>{part.text}</span>
+                      ),
+                    )}
                     {clause.trigger ? (
-                      <span className="no-print rounded-full bg-brand-100 px-2 py-0.5 text-[8.5px] font-bold tracking-wide text-brand-700 uppercase">
+                      <span className="no-print ml-2 rounded-full bg-brand-100 px-2 py-0.5 align-middle text-[8.5px] font-bold tracking-wide text-brand-700 uppercase">
                         {clause.trigger}
                       </span>
                     ) : null}
-                  </h2>
-                  <p className="pl-5 text-justify">{clause.body}</p>
+                  </span>
                 </li>
               </Wrapper>
             ))}
@@ -225,117 +329,60 @@ export function AgreementDocument({
         </ol>
       </section>
 
-      {/* Schedule A */}
-      <section className="avoid-break mb-7 border-t border-navy-200 pt-5">
-        <h2 className="mb-3 text-center font-display text-[13px] font-bold tracking-wide text-navy-950 uppercase">
-          Schedule A — Description of the Premises
+      {/* Schedule */}
+      <section className="avoid-break mb-7">
+        <h2 className="mb-2 text-center font-display text-[13px] font-bold tracking-wide text-navy-950 uppercase">
+          {draft.property.wholeProperty ? "Schedule of the Premises" : "Schedule of the Portion"}
         </h2>
         <p className="text-justify">
-          All that {draft.property.kind.replace("-", " ")} bearing{" "}
-          <Blank w="200px">{propertyAddress(draft) || undefined}</Blank>
+          All that piece and parcel of{" "}
+          <Blank w="220px">{scheduleDescription(draft) || undefined}</Blank>
           {draft.property.builtUpArea ? (
             <>
               , admeasuring approximately <Blank>{draft.property.builtUpArea}</Blank> square feet
-              of built-up area
             </>
           ) : null}
-          {draft.property.bedrooms && draft.type !== "commercial" ? (
-            <>
-              , comprising <Blank>{draft.property.bedrooms}</Blank> bedroom(s) and{" "}
-              <Blank>{draft.property.bathrooms}</Blank> bathroom(s)
-            </>
-          ) : null}
-          {draft.property.floor ? (
-            <>
-              , situated on the <Blank>{draft.property.floor}</Blank> floor
-            </>
-          ) : null}
-          , together with the fittings, fixtures and amenities existing therein.
-          {draft.property.amenities.length ? (
-            <>
-              {" "}
-              The following amenities are available to the {partyB}:{" "}
-              <strong className="font-semibold text-navy-950">
-                {draft.property.amenities.join(", ")}
-              </strong>
-              .
-            </>
-          ) : null}
+          .
         </p>
       </section>
 
-      {/* Schedule B — inventory */}
-      {draft.property.furnishing !== "unfurnished" && draft.furniture.some((f) => f.name.trim()) ? (
-        <section className="avoid-break mb-7">
-          <h2 className="mb-3 text-center font-display text-[13px] font-bold tracking-wide text-navy-950 uppercase">
-            Schedule B — Inventory of Fixtures and Fittings
-          </h2>
-          <table className="w-full border-collapse text-[12px]">
-            <thead>
-              <tr className="border-y border-navy-200 bg-navy-50">
-                <th className="w-10 py-2 pl-2 text-left font-semibold">#</th>
-                <th className="py-2 text-left font-semibold">Article</th>
-                <th className="w-20 py-2 text-center font-semibold">Quantity</th>
-                <th className="w-28 py-2 text-left font-semibold">Condition</th>
-              </tr>
-            </thead>
-            <tbody>
-              {draft.furniture
-                .filter((f) => f.name.trim())
-                .map((item, i) => (
-                  <tr key={item.id} className="border-b border-navy-100">
-                    <td className="tnum py-2 pl-2">{i + 1}</td>
-                    <td className="py-2 font-medium text-navy-900">{item.name}</td>
-                    <td className="tnum py-2 text-center">{item.quantity}</td>
-                    <td className="py-2 capitalize">{item.condition}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </section>
-      ) : null}
-
       {/* Execution */}
-      <section className="avoid-break border-t border-navy-200 pt-6">
-        <p className="mb-8 text-justify">
-          IN WITNESS WHEREOF the parties have set their hands to this deed on the day, month and
-          year first above written, in the presence of the witnesses named below.
+      <section className="avoid-break">
+        <p className="text-justify">
+          In witness whereof the {partyA.toLowerCase()} and the {partyB.toLowerCase()} have signed
+          this deed on the day, month and year above written in the presence of witnesses.
         </p>
 
-        <div className="grid grid-cols-2 gap-10">
-          {[
-            { role: partyA, name: draft.landlord.fullName },
-            { role: partyB, name: draft.tenant.fullName },
-          ].map((party) => (
-            <div key={party.role}>
-              <div className="h-14 border-b border-navy-400" />
-              <p className="mt-2 text-[11px] font-bold text-navy-950">{party.role}</p>
-              <p className="text-[11px] text-navy-500">
-                <Blank w="120px">{party.name || undefined}</Blank>
-              </p>
+        <div className="mt-10 flex items-end justify-between">
+          {[partyA, partyB].map((role) => (
+            <div key={role} className="w-[42%]">
+              <div className="border-t border-navy-400 pt-1.5">
+                <p className="text-[10.5px] font-bold tracking-wide text-navy-700">{role}</p>
+                <p className="text-[10.5px] text-navy-500">
+                  {role === partyA ? draft.landlord.fullName : draft.tenant.fullName}
+                </p>
+              </div>
             </div>
           ))}
         </div>
 
         {draft.options.witnessRequired ? (
-          <div className="mt-10 grid grid-cols-2 gap-10">
-            {["Witness 1", "Witness 2"].map((w) => (
-              <div key={w}>
-                <div className="h-14 border-b border-navy-400" />
-                <p className="mt-2 text-[11px] font-bold text-navy-950">{w}</p>
-                <p className="text-[11px] text-navy-400">Name, address and signature</p>
-              </div>
-            ))}
+          <div className="mt-9">
+            <p className="text-[11px] font-bold tracking-[0.12em] text-navy-700">WITNESSES:</p>
+            <div className="mt-5 flex items-end justify-between">
+              {["1.", "2."].map((label) => (
+                <div key={label} className="w-[42%]">
+                  <p className="mb-7 text-[11px] font-semibold text-navy-700">{label}</p>
+                  <div className="border-t border-navy-300 pt-1.5">
+                    <p className="text-[9.5px] text-navy-400">Name, address and signature</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
-
-        <p className="mt-10 border-t border-dashed border-navy-200 pt-4 text-center text-[9.5px] leading-relaxed text-navy-400">
-          Generated by RentSeal · Document {draft.id} · This instrument is executed
-          electronically and signed using Aadhaar e-Sign under Section 3A of the Information
-          Technology Act, 2000. Stamp duty paid to the Government of Tamil Nadu is evidenced by
-          the e-Stamp certificate affixed to page 1.
-        </p>
       </section>
     </article>
+    </Protect.Provider>
   );
 }

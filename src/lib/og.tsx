@@ -9,7 +9,7 @@ const BRAND = "#2563eb";
 /**
  * One card layout for every social preview on the site. Pages pass their own
  * eyebrow/title/facts; everything else — brand mark, colours, footer — stays
- * identical so shares are recognisable as RentSeal at a glance.
+ * identical so shares are recognisable as LP Stamp Paper at a glance.
  */
 export function ogImage({
   eyebrow,
@@ -66,7 +66,7 @@ export function ogImage({
               R
             </div>
             <div style={{ display: "flex", fontSize: 32, fontWeight: 800, color: "white" }}>
-              RentSeal
+              LP Stamp Paper
             </div>
           </div>
 

@@ -16,6 +16,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   return ogImage({
     eyebrow: "Drafted for Tamil Nadu",
     title: service.name,
-    facts: [`${service.clauses.length} clauses`, "e-Stamped · Aadhaar e-signed", "Advocate verified"],
+    facts: [`${service.clauses.length} clauses`, "e-Stamped · Aadhaar e-signed", "Notarised"],
   });
 }

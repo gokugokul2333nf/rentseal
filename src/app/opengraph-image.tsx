@@ -1,6 +1,6 @@
 import { OG_CONTENT_TYPE, OG_SIZE, ogImage } from "@/lib/og";
 
-export const alt = "RentSeal — stamp paper and rental agreements across Tamil Nadu";
+export const alt = "LP Stamp Paper — stamp paper and rental agreements across Tamil Nadu";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

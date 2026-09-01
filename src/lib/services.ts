@@ -25,7 +25,7 @@ export const SERVICES: ServiceContent[] = [
       "The 11-month agreement that covers most lettings in the state — flats, independent houses and villas. E-stamped, signed with Aadhaar OTP, and in your inbox the same day.",
     metaTitle: "Residential Rental Agreement Online in Tamil Nadu",
     metaDescription:
-      "Create an 11-month residential rental agreement for Tamil Nadu online. E-stamped, advocate verified, Aadhaar e-signed and delivered by email and WhatsApp from ₹349.",
+      "Create an 11-month residential rental agreement for Tamil Nadu online. E-stamped, notarised, Aadhaar e-signed and delivered by email and WhatsApp across Tamil Nadu.",
     whoFor: [
       "Owners letting a flat or house to a family",
       "Tenants who want the terms in writing before paying a deposit",
@@ -95,7 +95,7 @@ export const SERVICES: ServiceContent[] = [
       },
       {
         q: "The property is jointly owned. Whose name goes in?",
-        a: "Enter the first owner as the landlord and add the co-owners as a special condition in the Clauses step. Every owner should sign. On the Premium plan the advocate will confirm the structure for you.",
+        a: "Enter the first owner as the landlord and add the co-owners as a special condition in the Clauses step. Every owner should sign. Ask us on the confirming call if you are unsure how to structure it.",
       },
     ],
   },

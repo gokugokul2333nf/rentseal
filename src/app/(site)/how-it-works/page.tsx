@@ -12,7 +12,7 @@ import { LEAD_ANCHOR, SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "How It Works — From Blank Form to Signed Agreement",
   description:
-    "Every step explained: filling the form, generating clauses, paying, e-stamping, Aadhaar e-signing, and delivery by email and WhatsApp.",
+    "Every step explained: filling the form, generating clauses, sending it to us, the confirming call, payment, e-stamping, Aadhaar e-signing and delivery.",
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -33,24 +33,30 @@ const DETAIL = [
   },
   {
     n: "03",
-    title: "You read the whole thing before paying",
-    body: "The full document sits beside the form the entire time, updating as you type. Anything you have not filled in shows as a shaded blank so gaps are impossible to miss. Nothing is added after you pay — what you read is what gets stamped.",
-    aside: "Print or expand to full screen at any point.",
+    title: "You read the whole thing before anything is charged",
+    body: "The full document sits beside the form the entire time, updating as you type. Anything you have not filled in shows as a shaded blank so gaps are impossible to miss. Nothing is added later — what you read is what gets stamped.",
+    aside: "Expand it to full screen at any point.",
   },
   {
     n: "04",
+    title: "You send it, and we call you",
+    body: "Sending costs nothing and commits you to nothing. Your draft lands with our team along with everything you entered — the parties, the property, the term, the rent. Someone reads it, rings the number you gave, confirms the details and the final figure, and takes payment on that call. There is no checkout on this website.",
+    aside: "Within 30 minutes during working hours.",
+  },
+  {
+    n: "05",
     title: "We pay the government, at cost",
     body: "Stamp duty is computed at 1% of the total rent over the term plus the deposit and remitted in full to the Government of Tamil Nadu. It appears as its own line on your invoice, separate from our fee, and GST is charged only on our fee. If the Registration Department debits a different figure, we refund the difference.",
     aside: "Duty and registration fee shown separately, always.",
   },
   {
-    n: "05",
+    n: "06",
     title: "Both parties sign from wherever they are",
     body: "Each party gets a link on the mobile number you entered. They verify with an Aadhaar OTP and sign. This carries the same legal effect as a wet signature under Section 3A of the Information Technology Act, 2000. Nobody has to be in the same room, or the same city.",
     aside: "Typically both signatures land within the hour.",
   },
   {
-    n: "06",
+    n: "07",
     title: "It arrives, three ways at once",
     body: "The finished PDF downloads immediately, goes to both parties by email, and arrives on WhatsApp. It also stays in your dashboard permanently — so when you need it three years later for a deposit dispute or a bank KYC, it is one search away. We remind you 45 days before it expires.",
     aside: "Premium adds a printed stamped copy by courier.",

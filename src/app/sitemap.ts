@@ -4,8 +4,10 @@ import { DISTRICTS } from "@/lib/districts";
 import { SITE } from "@/lib/site";
 
 /**
- * Only live routes. The agreement builder, calculator and account pages live
- * under src/app/_disabled and are intentionally absent.
+ * Only indexable routes. The agreement builder at /create is live and linked
+ * from the nav, but each of its pages sets robots noindex — a half-filled draft
+ * is not a landing page — so it stays out of here. The calculator and account
+ * pages under src/app/_disabled are not built at all.
  *
  * Two location families are generated from DISTRICTS — rental agreement and
  * stamp paper — giving 38 pages each plus their index.
@@ -24,6 +26,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${SITE.url}/faq`, changeFrequency: "monthly", priority: 0.7 },
       { url: `${SITE.url}/about`, changeFrequency: "yearly", priority: 0.5 },
       { url: `${SITE.url}/contact`, changeFrequency: "yearly", priority: 0.6 },
+      { url: `${SITE.url}/certificates`, changeFrequency: "monthly", priority: 0.8 },
+      { url: `${SITE.url}/sitemap`, changeFrequency: "monthly", priority: 0.4 },
       { url: `${SITE.url}/legal/terms`, changeFrequency: "yearly", priority: 0.3 },
       { url: `${SITE.url}/legal/privacy`, changeFrequency: "yearly", priority: 0.3 },
       { url: `${SITE.url}/legal/refund`, changeFrequency: "yearly", priority: 0.3 },

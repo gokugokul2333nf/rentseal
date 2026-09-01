@@ -33,7 +33,7 @@ export interface StampDutyInput {
   plan?: PlanId;
   /** Force registration even for an 11-month term. */
   registerAnyway?: boolean;
-  /** Premium plan includes advocate vetting; Basic/Standard can add it on. */
+  /** Premium includes notary attestation; other plans can add it on. */
   lawyerReview?: boolean;
 }
 
@@ -62,7 +62,7 @@ export function calculateStampDuty({
 
   const fees = PLAN_FEES[plan];
   const platformFee = fees.platform;
-  // Premium bundles advocate vetting; other plans pay the add-on only if they opt in.
+  // Premium bundles notary attestation; other plans pay the add-on only if they opt in.
   const lawyerFee = plan === "premium" ? fees.lawyer : lawyerReview ? 700 : 0;
 
   // GST applies to our service fees only — never to a government levy.
