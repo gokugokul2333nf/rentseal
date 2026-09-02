@@ -29,6 +29,7 @@ import { AgreementDocument } from "./agreement-document";
 import { ClausesStep, PartyStep, PropertyStep, TermsStep } from "./steps";
 import { ReviewAndSendStep } from "./review-payment";
 import { VehicleStep } from "./vehicle-step";
+import { TemplateQuestionsStep } from "./template-questions";
 import { cn, inr } from "@/lib/utils";
 import type { AgreementType } from "@/lib/types";
 
@@ -39,6 +40,21 @@ const LETTING_STEPS: Step[] = [
   { key: "landlord", label: "Landlord details", short: "Landlord" },
   { key: "tenant", label: "Tenant details", short: "Tenant" },
   { key: "terms", label: "Agreement terms", short: "Terms" },
+  { key: "clauses", label: "Additional clauses", short: "Clauses" },
+  { key: "review", label: "Review and send", short: "Review" },
+];
+
+/**
+ * A verbatim deed asks only what it prints.
+ *
+ * The sixteen Tamil deeds and the service provider agreement each carry a
+ * different set of tokens — a loan deed names two people and a date, a house
+ * rent needs the property and the rent as well — so the questions come from
+ * the document rather than from a fixed six-step form. See template-fields.ts.
+ */
+const VERBATIM_STEPS: Step[] = [
+  { key: "who", label: "Who is signing", short: "Parties" },
+  { key: "particulars", label: "The particulars", short: "Details" },
   { key: "clauses", label: "Additional clauses", short: "Clauses" },
   { key: "review", label: "Review and send", short: "Review" },
 ];
@@ -88,6 +104,8 @@ function SaveIndicator() {
 const DOC_SECTION: Record<string, string | null> = {
   property: "property",
   vehicle: "property",
+  who: "landlord",
+  particulars: "terms",
   landlord: "landlord",
   tenant: "landlord",
   terms: "terms",
@@ -301,7 +319,9 @@ export function BuilderShell({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step, embedded]);
 
-  const STEPS = specFor(draft).family === "sale" ? SALE_STEPS : LETTING_STEPS;
+  const family = specFor(draft).family;
+  const STEPS =
+    family === "verbatim" ? VERBATIM_STEPS : family === "sale" ? SALE_STEPS : LETTING_STEPS;
   // A sale has one step fewer than a letting, so switching template at the last
   // step would index past the end of the list. Clamped on read rather than
   // written back, so the position is restored if they switch back.
@@ -316,6 +336,10 @@ export function BuilderShell({
         return <PropertyStep />;
       case "vehicle":
         return <VehicleStep />;
+      case "who":
+        return <TemplateQuestionsStep which="parties" />;
+      case "particulars":
+        return <TemplateQuestionsStep which="details" />;
       case "landlord":
         return <PartyStep which="landlord" />;
       case "tenant":
