@@ -35,10 +35,11 @@ function useTamilTyping(value: string, onChange: (next: string) => void, enabled
       return onChange(transliterate(buffer));
     }
 
-    // Backspace at the end. With nothing in the buffer the text came from
-    // somewhere else, so it is edited as plain text rather than re-derived —
-    // otherwise one backspace would wipe a pasted name.
-    if (next.length < value.length && value.startsWith(next)) {
+    // A single backspace at the end. Anything larger — select-all and delete,
+    // or a cut — is not one keystroke, and dropping one romanised character for
+    // it left the buffer stale: clearing the field and retyping rebuilt the old
+    // text on top of the new ("ச்ரீ நிலய" + "ஸ்ரீ நிலயம்").
+    if (next.length === value.length - 1 && value.startsWith(next)) {
       if (!roman) return onChange(next);
       const buffer = roman.slice(0, -1);
       setRoman(buffer);
