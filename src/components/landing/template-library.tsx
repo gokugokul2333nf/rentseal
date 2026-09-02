@@ -14,6 +14,7 @@ import {
   House,
   KeyRound,
   Landmark,
+  Languages,
   LayoutGrid,
   Map,
   PanelsTopLeft,
@@ -60,6 +61,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Bike,
   Users,
   CircleParking,
+  Languages,
 };
 
 const CATEGORY_TONE: Record<
@@ -71,6 +73,7 @@ const CATEGORY_TONE: Record<
   "Lease deed": "violet",
   "Leave & licence": "amber",
   Sale: "dark",
+  "Tamil — தமிழ்": "violet",
 };
 
 function TemplateCard({ template }: { template: AgreementTemplate }) {

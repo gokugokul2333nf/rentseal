@@ -182,6 +182,7 @@ export function AgreementDocument({
   const t = draft.terms;
   const spec = specFor(draft);
   const isSale = spec.family === "sale";
+  const isTamil = spec.family === "tamil";
   const start = t.startDate ? new Date(t.startDate) : new Date();
   // The deed is dated when it is signed, not when the tenancy begins.
   const executed = t.executionDate ? new Date(t.executionDate) : start;
@@ -218,6 +219,53 @@ export function AgreementDocument({
           style={watermarkStyle(draft.id)}
         />
       ) : null}
+      {isTamil ? (
+        <>
+          {clauses.map((clause) => (
+            <p
+              key={clause.id}
+              data-doc={clause.heading ? "title" : "clauses"}
+              className={
+                clause.heading
+                  ? "avoid-break mt-4 mb-3 text-center font-display text-[15px] font-bold text-navy-950"
+                  : "mb-2.5 text-justify"
+              }
+            >
+              {clause.body}
+            </p>
+          ))}
+
+          <section className="avoid-break mt-10">
+            <div className="flex items-end justify-between">
+              {[partyA, partyB].filter(Boolean).map((role) => (
+                <div key={role} className="w-[42%]">
+                  <div className="border-t border-navy-400 pt-1.5">
+                    <p className="text-[10.5px] font-bold tracking-wide text-navy-700">
+                      {role} — கையொப்பம்
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {draft.options.witnessRequired ? (
+              <div className="mt-9">
+                <p className="text-[11px] font-bold tracking-[0.12em] text-navy-700">சாட்சிகள்:</p>
+                <div className="mt-5 flex items-end justify-between">
+                  {["1.", "2."].map((label) => (
+                    <div key={label} className="w-[42%]">
+                      <p className="mb-7 text-[11px] font-semibold text-navy-700">{label}</p>
+                      <div className="border-t border-navy-300 pt-1.5">
+                        <p className="text-[9.5px] text-navy-400">பெயர், முகவரி, கையொப்பம்</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
+        </>
+      ) : (
+        <>
       {/* Title */}
       <header data-doc="title" className="avoid-break mb-7 text-center">
         <h1 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
@@ -464,6 +512,8 @@ export function AgreementDocument({
           </div>
         ) : null}
       </section>
+        </>
+      )}
     </article>
     </Protect.Provider>
   );

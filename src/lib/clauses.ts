@@ -1,5 +1,7 @@
 import type { AgreementDraft } from "./types";
 import { defaultTemplateFor, TEMPLATE_SPECS, type TemplateSpec } from "./agreement-templates";
+import { isTamilTemplateId, TAMIL_TEMPLATES } from "./tamil-templates";
+import { fillTamilText, tamilTokens } from "./tamil-fill";
 import { addMonths, formatDateNumeric, inr, rupeesInWords } from "./utils";
 
 export interface GeneratedClause {
@@ -10,6 +12,8 @@ export interface GeneratedClause {
   trigger?: string;
   /** Always present regardless of selections. */
   core?: boolean;
+  /** A centred title or section heading rather than a numbered clause. */
+  heading?: boolean;
 }
 
 /**
@@ -124,6 +128,21 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const A = spec.roleA;
   const B = spec.roleB;
   const rentWord = spec.moneyWord;
+
+  if (spec.family === "tamil" && isTamilTemplateId(d.templateId)) {
+    // The Tamil deeds are the whole document, headings and all, in the order
+    // the office wrote them. They carry their own numbering, so nothing is
+    // renumbered here.
+    const tokens = tamilTokens(d);
+    const own: GeneratedClause[] = TAMIL_TEMPLATES[d.templateId].body.map((block, i) => ({
+      id: `ta-${i + 1}`,
+      core: true,
+      title: block.heading ? "தலைப்பு" : "பத்தி",
+      body: fillTamilText(block.text, tokens),
+      heading: block.heading,
+    }));
+    return applyEdits(own, d.options);
+  }
 
   if (spec.family === "sale") {
     const own = saleClauses(d, spec);

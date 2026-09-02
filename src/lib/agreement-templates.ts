@@ -1,4 +1,5 @@
 import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
+import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS, type TamilTemplateId } from "./tamil-templates";
 
 /**
  * The drafting spec behind every template LP Stamp Paper offers.
@@ -18,7 +19,8 @@ import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
  * edit any clause before the deed is sent.
  */
 
-export type TemplateId =
+/** The templates drafted in English, from the office's Word originals. */
+export type EnglishTemplateId =
   | "two-wheeler-sale"
   | "residential-11-month"
   | "atm-space-rental"
@@ -46,6 +48,9 @@ export type TemplateId =
   | "warehouse-rental"
   ;
 
+/** Every template the builder can draw, in either language. */
+export type TemplateId = EnglishTemplateId | TamilTemplateId;
+
 export interface TemplateSpec {
   id: TemplateId;
   /** Which instrument this is drafted under. */
@@ -54,7 +59,9 @@ export interface TemplateSpec {
    * Lettings share sixteen generated clauses; a sale shares none of them, so
    * its `clauses` are the whole deed rather than an addition to a core.
    */
-  family?: "letting" | "sale";
+  family?: "letting" | "sale" | "tamil";
+  /** Tamil deeds are drafted and printed in Tamil; everything else in English. */
+  language?: "en" | "ta";
   /** The heading the deed carries, e.g. "SHOP RENTAL AGREEMENT". */
   deedTitle: string;
   /** What the two sides are called throughout — LANDLORD/TENANT, LESSOR/LESSEE, LICENSOR/LICENSEE. */
@@ -79,7 +86,7 @@ export interface TemplateSpec {
   clauses: string[];
 }
 
-export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
+const ENGLISH_SPECS: Record<EnglishTemplateId, TemplateSpec> = {
   "two-wheeler-sale": {
     id: "two-wheeler-sale",
     baseType: "sale",
@@ -840,6 +847,51 @@ export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
       "The TENANT shall be responsible for the loading and unloading of goods, shall use only the designated bay, and shall not obstruct the access road or the neighbouring units.",
     ],
   },
+};
+
+/**
+ * The Tamil deeds, as drafting specs.
+ *
+ * Derived from tamil-templates.ts rather than copied, so the sixteen live in
+ * one place. They are selectable in the builder exactly like the English
+ * templates — a customer picks one, answers the same questions, and the
+ * answers land inside the Tamil text.
+ */
+const TAMIL_SPECS = TAMIL_TEMPLATE_IDS.reduce(
+  (acc, id) => {
+    const t = TAMIL_TEMPLATES[id];
+    acc[id] = {
+        id,
+        baseType: t.baseType,
+        family: "tamil",
+        language: "ta",
+        deedTitle: t.nameTa,
+        roleA: t.roleA,
+        roleB: t.roleB || t.roleA,
+        moneyWord: "வாடகை",
+        purpose: t.nameTa,
+        scheduleHeading: "சொத்து விவரம்",
+        defaults: {
+          durationMonths: t.baseType === "residential" ? 11 : t.baseType === "lease" ? 36 : 0,
+          propertyKind: "apartment" as PropertyKind,
+          commercialUse: t.baseType === "commercial",
+          registrationRequired: t.baseType === "lease",
+        },
+        notes: [
+          "இந்த ஒப்பந்தம் தமிழில் தயாரிக்கப்படுகிறது.",
+          "படிவத்தில் நிரப்பப்படாத இடங்கள் ____ எனக் காட்டப்படும்; அவற்றை அலுவலகத்தில் நிரப்பலாம்.",
+          "சரியான மதிப்புள்ள முத்திரைத் தாளில் அச்சிடவும்.",
+        ],
+      clauses: [],
+    };
+    return acc;
+  },
+  {} as Record<TamilTemplateId, TemplateSpec>,
+);
+
+export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
+  ...ENGLISH_SPECS,
+  ...TAMIL_SPECS,
 };
 
 export const TEMPLATE_IDS = Object.keys(TEMPLATE_SPECS) as TemplateId[];

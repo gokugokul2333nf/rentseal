@@ -1,17 +1,18 @@
-import { ArrowDownToLine, Languages } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Languages } from "lucide-react";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS } from "@/lib/tamil-templates";
 import { Badge } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 /**
- * The Tamil deeds, offered as blank documents rather than through the builder.
+ * The Tamil deeds, drafted through the same builder as the English templates.
  *
- * They work differently from the English templates on purpose. The office has
- * always filled these in by hand at the counter, and their blanks sit inside
- * Tamil sentences rather than in fields a form could ask about — so the useful
- * thing is the deed itself, printed and ready for the stamp paper, not a
- * questionnaire in front of it.
+ * These are the office's own Tamil documents, not the English ones translated,
+ * so they are held verbatim and keep their own numbering. What the form can
+ * answer — the parties, the dates, the rent, the advance, the addresses — is
+ * substituted into the Tamil text; the rest of the blanks are written in at
+ * the counter, or edited in the builder before the deed is sent.
  */
 export function TamilTemplates({ heading = true }: { heading?: boolean } = {}) {
   return (
@@ -21,8 +22,8 @@ export function TamilTemplates({ heading = true }: { heading?: boolean } = {}) {
           <SectionHeading
             eyebrow="தமிழ் ஒப்பந்தங்கள்"
             icon={Languages}
-            title={`${TAMIL_TEMPLATE_IDS.length} Tamil deeds, ready to print`}
-            body="The documents the counter has always used — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection. Each opens as a blank PDF with both parties signing every page and the pages numbered."
+            title={`${TAMIL_TEMPLATE_IDS.length} Tamil deeds, drafted from your answers`}
+            body="The documents the counter has always used — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection. Drafted from the same form as the English ones: your answers land inside the Tamil text, and both parties sign every page."
           />
         ) : null}
 
@@ -31,10 +32,8 @@ export function TamilTemplates({ heading = true }: { heading?: boolean } = {}) {
             const t = TAMIL_TEMPLATES[id];
             return (
               <StaggerItem key={id} className="h-full">
-                <a
-                  href={`/api/tamil-deed?template=${id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={`/create/${id}`}
                   className="group flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lift"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -50,10 +49,10 @@ export function TamilTemplates({ heading = true }: { heading?: boolean } = {}) {
                     {t.roleB ? `${t.roleA} · ${t.roleB}` : t.roleA}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-1.5 border-t border-line pt-4 text-[13px] font-semibold text-brand-700">
-                    <ArrowDownToLine className="size-3.5" />
-                    Open the blank deed
+                    Draft this
+                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
-                </a>
+                </Link>
               </StaggerItem>
             );
           })}
@@ -61,9 +60,9 @@ export function TamilTemplates({ heading = true }: { heading?: boolean } = {}) {
 
         <Reveal delay={0.15}>
           <p className="mt-8 text-[13px] leading-relaxed text-navy-500">
-            Every blank is filled in at the counter. Print onto non-judicial stamp paper of the
-            right value — the deed does not create the stamp duty, and buying too little is what
-            gets an agreement refused.
+            Whatever the form does not ask about stays as a blank rule for the counter, and any
+            paragraph can be reworded before the deed is sent. Print onto non-judicial stamp paper
+            of the right value — buying too little is what gets an agreement refused.
           </p>
         </Reveal>
       </div>

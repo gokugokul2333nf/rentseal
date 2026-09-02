@@ -1,5 +1,7 @@
+import path from "node:path";
 import {
   Document,
+  Font,
   Page,
   Text,
   View,
@@ -62,6 +64,26 @@ function aadhaar(value: string) {
  * it, so the first page starts 4.5 inches down and every later page starts at
  * the normal margin. 72pt to the inch.
  */
+/**
+ * Tamil needs a shaping engine — the vowel signs are written before the
+ * consonant they belong to and have to be reordered, and conjuncts have to be
+ * formed. @react-pdf does this through fontkit, but the standard PDF fonts
+ * carry no Tamil at all, so a face has to be embedded. Noto Sans Tamil is used
+ * because the SIL Open Font License lets it ship with the app; the licence
+ * travels with it in src/lib/fonts/.
+ */
+const FONT_DIR = path.join(process.cwd(), "src", "lib", "fonts");
+Font.register({
+  family: "NotoSansTamil",
+  fonts: [
+    { src: path.join(FONT_DIR, "NotoSansTamil-Regular.ttf"), fontWeight: "normal" },
+    { src: path.join(FONT_DIR, "NotoSansTamil-Bold.ttf"), fontWeight: "bold" },
+  ],
+});
+// Tamil has no hyphenation worth applying, and the default English hyphenator
+// breaks the words mid-syllable.
+Font.registerHyphenationCallback((word) => [word]);
+
 const A4_HEIGHT = 841.89;
 const FIRST_PAGE_TOP_IN = 4.5;
 const PAGE_PADDING_TOP = 48;
@@ -122,6 +144,20 @@ const s = StyleSheet.create({
   witnessRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 26 },
   witnessNum: { fontFamily: "Times-Bold", fontSize: 10, marginBottom: 26 },
   hint: { fontSize: 8, color: "#888888" },
+
+  /* Tamil deeds: the office's own document, set in Tamil throughout. */
+  ta: { fontFamily: "NotoSansTamil", fontSize: 10.5, lineHeight: 1.75 },
+  taHeading: {
+    fontFamily: "NotoSansTamil",
+    fontWeight: "bold",
+    fontSize: 12.5,
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  taPara: { fontFamily: "NotoSansTamil", marginBottom: 8, textAlign: "justify" },
+  taFootSig: { fontFamily: "NotoSansTamil", fontWeight: "bold", fontSize: 8 },
+  taFootMeta: { fontFamily: "NotoSansTamil" },
 
   /* Sale deeds: the vehicle is identified by a labelled block, not a schedule. */
   detailRow: { flexDirection: "row", marginBottom: 5 },
@@ -315,6 +351,7 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
   const B = spec.roleB;
   const purpose = spec.purpose;
   const isSale = spec.family === "sale";
+  const isTamil = spec.family === "tamil";
 
   return (
     <Document
@@ -324,24 +361,34 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
     >
       <Page size="A4" style={s.page}>
         {/* Both sides initial every page, so no page can be swapped after signing. */}
-        <Text style={s.footSigLeft} fixed>
-          {A} — signature
+        <Text style={isTamil ? [s.footSigLeft, s.taFootSig] : s.footSigLeft} fixed>
+          {A} {isTamil ? "— கையொப்பம்" : "— signature"}
         </Text>
-        <Text style={s.footSigRight} fixed>
-          {B} — signature
+        <Text style={isTamil ? [s.footSigRight, s.taFootSig] : s.footSigRight} fixed>
+          {B} {isTamil ? "— கையொப்பம்" : "— signature"}
         </Text>
         <Text
-          style={s.footMeta}
+          // Times-Roman has no Tamil glyphs, so the Tamil footer needs the
+          // embedded face too — "பக்கம்" rendered as broken boxes without it.
+          style={isTamil ? [s.footMeta, s.taFootMeta] : s.footMeta}
           render={({ pageNumber, totalPages }) =>
-            `${draft.id}  ·  ${SITE.name}  ·  Page ${pageNumber} of ${totalPages}  ·  ` +
-            `Draft for stamping — not yet executed`
+            isTamil
+              ? `${draft.id}  ·  ${SITE.name}  ·  பக்கம் ${pageNumber} / ${totalPages}`
+              : `${draft.id}  ·  ${SITE.name}  ·  Page ${pageNumber} of ${totalPages}  ·  ` +
+                `Draft for stamping — not yet executed`
           }
           fixed
         />
         {/* Clears the stamp paper's pre-printed header. First page only. */}
         <View style={{ height: FIRST_PAGE_GAP }} />
 
-        {isSale ? (
+        {isTamil ? (
+          clauses.map((clause) => (
+            <Text key={clause.id} style={clause.heading ? s.taHeading : s.taPara}>
+              {clause.body}
+            </Text>
+          ))
+        ) : isSale ? (
           <SaleBody draft={draft} clauses={clauses} />
         ) : (
           <>

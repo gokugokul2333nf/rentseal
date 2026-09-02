@@ -25,6 +25,7 @@ const CATEGORY_TONE: Record<
   "Lease deed": "violet",
   "Leave & licence": "amber",
   Sale: "dark",
+  "Tamil — தமிழ்": "violet",
 };
 
 const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
@@ -33,6 +34,8 @@ const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
   "Lease deed": "Twelve months and over, registrable, with the strongest evidentiary position.",
   "Leave & licence": "Permission to occupy without granting a tenancy, so possession comes back cleanly.",
   Sale: "Ownership changes hands outright. No term to run, and nothing to give back.",
+  "Tamil — தமிழ்":
+    "The office's own Tamil deeds. Your answers go into the Tamil text; the rest is filled in at the counter.",
 };
 
 /**

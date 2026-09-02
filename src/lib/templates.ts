@@ -1,5 +1,6 @@
 import type { AgreementType } from "./types";
 import type { TemplateId } from "./agreement-templates";
+import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS } from "./tamil-templates";
 
 export interface AgreementTemplate {
   /**
@@ -12,13 +13,39 @@ export interface AgreementTemplate {
   description: string;
   /** Which of the four service pages this template is drafted under. */
   baseType: AgreementType;
-  category: "Residential" | "Commercial" | "Lease deed" | "Leave & licence" | "Sale";
+  category:
+    | "Residential"
+    | "Commercial"
+    | "Lease deed"
+    | "Leave & licence"
+    | "Sale"
+    | "Tamil — தமிழ்";
   term: string;
   icon: string;
   popular?: boolean;
 }
 
-export const TEMPLATES: AgreementTemplate[] = [
+/**
+ * The Tamil deeds, listed alongside the English ones.
+ *
+ * Derived from tamil-templates.ts so the sixteen are described in one place.
+ * They are drafted through the same builder — picking one swaps the whole
+ * document into Tamil and the form's answers land inside it.
+ */
+const TAMIL_CATALOGUE: AgreementTemplate[] = TAMIL_TEMPLATE_IDS.map((id) => {
+  const t = TAMIL_TEMPLATES[id];
+  return {
+    id,
+    name: t.nameTa,
+    description: `${t.nameEn}. Drafted in Tamil — ${t.roleB ? `${t.roleA} and ${t.roleB}` : t.roleA}.`,
+    baseType: t.baseType,
+    category: "Tamil — தமிழ்" as const,
+    term: t.baseType === "residential" ? "11 months" : t.baseType === "lease" ? "36 months" : "One-off",
+    icon: "Languages",
+  };
+});
+
+const ENGLISH_TEMPLATES: AgreementTemplate[] = [
   /* ───────────── Residential ───────────── */
   {
     id: "residential-11-month",
@@ -254,6 +281,8 @@ export const TEMPLATES: AgreementTemplate[] = [
   },
 ];
 
+export const TEMPLATES: AgreementTemplate[] = [...ENGLISH_TEMPLATES, ...TAMIL_CATALOGUE];
+
 export function getTemplatesByCategory() {
   const order: AgreementTemplate["category"][] = [
     "Residential",
@@ -261,6 +290,7 @@ export function getTemplatesByCategory() {
     "Lease deed",
     "Leave & licence",
     "Sale",
+    "Tamil — தமிழ்",
   ];
   return order.map((category) => ({
     category,
