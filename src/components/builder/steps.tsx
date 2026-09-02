@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
 import { TemplatePicker } from "./template-picker";
+import { TamilInput, TamilTextarea } from "@/components/ui/tamil-input";
+import { specFor } from "@/lib/clauses";
 import { ClauseEditor } from "./clause-editor";
 import { CITIES, EXTRA_DISTRICTS } from "@/lib/site";
 import { checkPincode, districtFromPincode } from "@/lib/pincode";
@@ -69,6 +71,8 @@ export function StepIntro({ title, body }: { title: string; body: string }) {
 
 export function PropertyStep() {
   const { draft, update } = useAgreement();
+  // A Tamil deed carries the address in Tamil, so these accept romanised typing.
+  const tamil = specFor(draft).family === "tamil";
   const p = draft.property;
   const commercial = draft.type === "commercial";
 
@@ -127,11 +131,12 @@ export function PropertyStep() {
           </Field>
           <Field label="Building / apartment name">
             {(id) => (
-              <Input
+              <TamilInput
                 id={id}
                 value={p.buildingName}
-                onChange={(e) => update({ property: { buildingName: e.target.value } })}
+                onChange={(buildingName) => update({ property: { buildingName } })}
                 placeholder="e.g. Sriram Samruddhi"
+                tamil={tamil}
               />
             )}
           </Field>
@@ -140,21 +145,23 @@ export function PropertyStep() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Street" required>
             {(id) => (
-              <Input
+              <TamilInput
                 id={id}
                 value={p.street}
-                onChange={(e) => update({ property: { street: e.target.value } })}
+                onChange={(street) => update({ property: { street } })}
                 placeholder="e.g. 2nd Cross Street"
+                tamil={tamil}
               />
             )}
           </Field>
           <Field label="Locality / area" required>
             {(id) => (
-              <Input
+              <TamilInput
                 id={id}
                 value={p.locality}
-                onChange={(e) => update({ property: { locality: e.target.value } })}
+                onChange={(locality) => update({ property: { locality } })}
                 placeholder="e.g. Adyar"
+                tamil={tamil}
               />
             )}
           </Field>
@@ -351,8 +358,11 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
   const { draft, setParty } = useAgreement();
   const party = draft[which];
   const isLandlord = which === "landlord";
-  const isLicence = draft.type === "leave-license";
-  const label = isLandlord ? (isLicence ? "licensor" : "landlord") : isLicence ? "licensee" : "tenant";
+  const spec = specFor(draft);
+  // A Tamil deed needs Tamil names and addresses, so the free-text fields
+  // accept romanised typing and convert it.
+  const tamil = spec.family === "tamil";
+  const label = isLandlord ? spec.roleA.toLowerCase() : spec.roleB.toLowerCase();
 
   return (
     <>
@@ -410,11 +420,12 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Full name (as on Aadhaar)" required>
             {(id) => (
-              <Input
+              <TamilInput
                 id={id}
                 value={party.fullName}
-                onChange={(e) => setParty(which, { fullName: e.target.value })}
+                onChange={(fullName) => setParty(which, { fullName })}
                 placeholder="e.g. Lakshmi Narayanan"
+                tamil={tamil}
               />
             )}
           </Field>
@@ -436,11 +447,13 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
                   <option value="wife">W/o</option>
                   <option value="husband">H/o</option>
                 </Select>
-                <Input
+                <TamilInput
                   id={id}
                   value={party.parentName}
-                  onChange={(e) => setParty(which, { parentName: e.target.value })}
+                  onChange={(parentName) => setParty(which, { parentName })}
                   placeholder="e.g. Subramanian"
+                  tamil={tamil}
+                  className="flex-1"
                 />
               </div>
             )}
@@ -527,11 +540,12 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
           }
         >
           {(id) => (
-            <Textarea
+            <TamilTextarea
               id={id}
               value={party.address}
-              onChange={(e) => setParty(which, { address: e.target.value })}
+              onChange={(address) => setParty(which, { address })}
               placeholder="Door no, street, locality, city, PIN"
+              tamil={tamil}
             />
           )}
         </Field>
