@@ -1,7 +1,7 @@
 import type { AgreementDraft } from "./types";
 import { TAMIL_TEMPLATES, type TamilBlock, type TamilTemplateId } from "./tamil-templates";
 import { tamilDateParts, tamilNumberWords } from "./tamil-words";
-import { propertyAddress } from "./clauses";
+import { addMonths, formatDateNumeric } from "./utils";
 
 /**
  * Filling a Tamil deed from the builder's answers.
@@ -25,12 +25,34 @@ function aadhaar(value: string) {
   return digits ? digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim() : "";
 }
 
+/**
+ * The property address for a Tamil deed.
+ *
+ * The shared propertyAddress() ends "…, Tiruvallur District, Tamil Nadu" in
+ * English, which reads as a splice in the middle of a Tamil sentence. Same
+ * parts, same order, Tamil words.
+ */
+function tamilPropertyAddress(draft: AgreementDraft): string {
+  const p = draft.property;
+  return [
+    [p.doorNo, p.buildingName].filter(Boolean).join(", "),
+    p.street,
+    p.locality,
+    [p.city, p.pincode].filter(Boolean).join(" — "),
+    p.district ? `${p.district} மாவட்டம், தமிழ்நாடு` : "தமிழ்நாடு",
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
 export function tamilTokens(draft: AgreementDraft): Record<string, string> {
   const t = draft.terms;
   const executed = t.executionDate ? new Date(t.executionDate) : null;
   const date = executed ? tamilDateParts(executed) : null;
   const rent = money(t.monthlyRent);
   const deposit = money(t.securityDeposit);
+  const start = t.startDate ? new Date(t.startDate) : null;
+  const end = start ? addMonths(start, t.durationMonths || 11) : null;
 
   return {
     execYear: date?.year ?? "",
@@ -38,11 +60,15 @@ export function tamilTokens(draft: AgreementDraft): Record<string, string> {
     execDay: date?.day ?? "",
     nameA: draft.landlord.fullName,
     nameB: draft.tenant.fullName,
+    parentA: draft.landlord.parentName,
+    parentB: draft.tenant.parentName,
+    startDate: start ? formatDateNumeric(start) : "",
+    endDate: end ? formatDateNumeric(end) : "",
     aadhaarA: aadhaar(draft.landlord.aadhaar),
     aadhaarB: aadhaar(draft.tenant.aadhaar),
     addressA: draft.landlord.address,
     addressB: draft.tenant.address,
-    propertyAddress: propertyAddress(draft),
+    propertyAddress: tamilPropertyAddress(draft),
     rent: rent ? rent.toLocaleString("en-IN") : "",
     rentWords: rent ? tamilNumberWords(rent) : "",
     deposit: deposit ? deposit.toLocaleString("en-IN") : "",
