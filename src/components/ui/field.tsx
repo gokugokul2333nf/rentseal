@@ -77,7 +77,13 @@ export function Input({
   prefix,
   suffix,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & { prefix?: string; suffix?: string }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  prefix?: string;
+  suffix?: string;
+  /** React 19 passes ref as an ordinary prop; the Tamil keyboard needs one to
+   *  put a letter at the caret rather than at the end. */
+  ref?: React.Ref<HTMLInputElement>;
+}) {
   if (prefix || suffix) {
     return (
       <div className="relative flex items-center">
@@ -104,7 +110,9 @@ export function Input({
 export function Textarea({
   className,
   ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  ref?: React.Ref<HTMLTextAreaElement>;
+}) {
   return <textarea className={cn(CONTROL, "min-h-[104px] resize-y py-3 leading-relaxed", className)} {...props} />;
 }
 
