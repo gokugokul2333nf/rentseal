@@ -848,14 +848,27 @@ export function isTemplateId(value: string): value is TemplateId {
   return value in TEMPLATE_SPECS;
 }
 
-/** The template a bare instrument type falls back to when none was picked. */
-export const DEFAULT_TEMPLATE_BY_TYPE: Record<AgreementType, TemplateId> = {
+/**
+ * The template a bare instrument route opens when none was picked.
+ *
+ * Partial on purpose: the "deed" instrument — loans, mortgages, affidavits,
+ * no-objection certificates — exists only in the Tamil set, so there is no
+ * English template to default it to and no /create/deed route to need one.
+ */
+export const DEFAULT_TEMPLATE_BY_TYPE: Partial<Record<AgreementType, TemplateId>> = {
   residential: "residential-11-month",
   commercial: "shop-rental",
   lease: "long-term-lease",
   "leave-license": "leave-licence-11-month",
   sale: "two-wheeler-sale",
 };
+
+/** Used wherever an instrument has to resolve to something drawable. */
+export const FALLBACK_TEMPLATE: TemplateId = "residential-11-month";
+
+export function defaultTemplateFor(type: AgreementType): TemplateId {
+  return DEFAULT_TEMPLATE_BY_TYPE[type] ?? FALLBACK_TEMPLATE;
+}
 
 export function templateSpec(id: TemplateId): TemplateSpec {
   return TEMPLATE_SPECS[id];

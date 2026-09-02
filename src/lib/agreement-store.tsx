@@ -17,7 +17,7 @@ import type {
   PlanId,
 } from "./types";
 import {
-  DEFAULT_TEMPLATE_BY_TYPE,
+  defaultTemplateFor,
   TEMPLATE_SPECS,
   type TemplateId,
 } from "./agreement-templates";
@@ -48,7 +48,7 @@ type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]>
 function switchInstrument(
   previous: AgreementDraft,
   type: AgreementType,
-  templateId: TemplateId = DEFAULT_TEMPLATE_BY_TYPE[type],
+  templateId: TemplateId = defaultTemplateFor(type),
 ): AgreementDraft {
   const fresh = createDraft(type, templateId);
   return {
@@ -134,7 +134,7 @@ export function AgreementProvider({
   initialTemplateId?: TemplateId;
 }) {
   const [draft, setDraft] = useState<AgreementDraft>(() =>
-    createDraft(initialType, initialTemplateId ?? DEFAULT_TEMPLATE_BY_TYPE[initialType]),
+    createDraft(initialType, initialTemplateId ?? defaultTemplateFor(initialType)),
   );
   const [hydrated, setHydrated] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
@@ -159,7 +159,7 @@ export function AgreementProvider({
       if (raw) {
         const parsed = JSON.parse(raw) as AgreementDraft;
         if (parsed?.id && parsed?.terms) {
-          const want = initialTemplateId ?? DEFAULT_TEMPLATE_BY_TYPE[initialType];
+          const want = initialTemplateId ?? defaultTemplateFor(initialType);
           const merged = mergeDeep(
             createDraft(initialType, want),
             parsed as DeepPartial<AgreementDraft>,

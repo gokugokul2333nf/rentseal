@@ -4,7 +4,7 @@ import type {
   Party,
 } from "./types";
 import {
-  DEFAULT_TEMPLATE_BY_TYPE,
+  defaultTemplateFor,
   TEMPLATE_SPECS,
   type TemplateId,
 } from "./agreement-templates";
@@ -55,13 +55,13 @@ export function tomorrowISO() {
  */
 export function createDraft(
   type: AgreementType = "residential",
-  templateId: TemplateId = DEFAULT_TEMPLATE_BY_TYPE[type],
+  templateId: TemplateId = defaultTemplateFor(type),
 ): AgreementDraft {
   // Every default a template carries — its term, what kind of property it is
   // drawn for, whether it is registrable — comes from the signed-off document,
   // so picking "Warehouse" fills in 36 months and a warehouse without anyone
   // typing it.
-  const spec = TEMPLATE_SPECS[templateId] ?? TEMPLATE_SPECS[DEFAULT_TEMPLATE_BY_TYPE[type]];
+  const spec = TEMPLATE_SPECS[templateId] ?? TEMPLATE_SPECS[defaultTemplateFor(type)];
   const dflt = spec.defaults;
   return {
     id: PENDING_ID,

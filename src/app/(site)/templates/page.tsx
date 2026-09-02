@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { ArrowRight, LayoutGrid } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { TemplateLibrary } from "@/components/landing/template-library";
+import { TamilTemplates } from "@/components/landing/tamil-templates";
 import { ButtonLink } from "@/components/ui/button";
 import { BUILDER_START, SITE } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
+import { TAMIL_TEMPLATE_IDS } from "@/lib/tamil-templates";
 
-const title = `${TEMPLATES.length} Rental & Lease Agreement Templates — Tamil Nadu`;
-const description = `Browse ${TEMPLATES.length} Tamil Nadu compliant agreement templates across residential, commercial, lease and leave-and-licence instruments. Each one is drafted, e-stamped and Aadhaar e-signed.`;
+const title = `${TEMPLATES.length + TAMIL_TEMPLATE_IDS.length} Agreement Templates in English and Tamil — Tamil Nadu`;
+const description = `Browse ${TEMPLATES.length} English templates across residential, commercial, lease, leave-and-licence and sale, plus ${TAMIL_TEMPLATE_IDS.length} Tamil deeds ready to print — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection.`;
 
 export const metadata: Metadata = {
   title,
@@ -25,7 +27,7 @@ export default function TemplatesPage() {
         eyebrow="Template library"
         icon={LayoutGrid}
         crumbs={CRUMBS}
-        title={`${TEMPLATES.length} templates, built on four instruments`}
+        title={`${TEMPLATES.length} English templates and ${TAMIL_TEMPLATE_IDS.length} Tamil deeds`}
         body="Every template here is a Tamil Nadu compliant draft. Pick the situation that matches yours and the right clauses come with it — you are never starting from a blank page or a generic download."
       >
         <ButtonLink href={BUILDER_START} size="lg" className="group">
@@ -35,6 +37,8 @@ export default function TemplatesPage() {
       </PageHero>
 
       <TemplateLibrary heading={false} />
+
+      <TamilTemplates />
 
       <BreadcrumbSchema crumbs={CRUMBS} baseUrl={SITE.url} />
     </>

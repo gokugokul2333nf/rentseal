@@ -10,7 +10,14 @@ export type AgreementType =
    * a seller rather than a landlord and a tenant, a price rather than a rent,
    * and none of the term, deposit or vacating clauses the other four share.
    */
-  | "sale";
+  | "sale"
+  /**
+   * The deeds that are neither a letting nor a sale — a loan, a mortgage, an
+   * indemnity, an affidavit, a no-objection certificate, a construction
+   * contract. The Tamil set has always covered these; they share no clauses
+   * with the rental instruments and are held verbatim.
+   */
+  | "deed";
 
 export type PlanId = "basic" | "standard" | "premium";
 

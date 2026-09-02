@@ -1,5 +1,5 @@
 import type { AgreementDraft } from "./types";
-import { DEFAULT_TEMPLATE_BY_TYPE, TEMPLATE_SPECS, type TemplateSpec } from "./agreement-templates";
+import { defaultTemplateFor, TEMPLATE_SPECS, type TemplateSpec } from "./agreement-templates";
 import { addMonths, formatDateNumeric, inr, rupeesInWords } from "./utils";
 
 export interface GeneratedClause {
@@ -19,7 +19,7 @@ export interface GeneratedClause {
  * customer must not be shown a blank deed because of it.
  */
 export function specFor(d: AgreementDraft): TemplateSpec {
-  return TEMPLATE_SPECS[d.templateId] ?? TEMPLATE_SPECS[DEFAULT_TEMPLATE_BY_TYPE[d.type]];
+  return TEMPLATE_SPECS[d.templateId] ?? TEMPLATE_SPECS[defaultTemplateFor(d.type)];
 }
 
 function n(value: string | number) {
