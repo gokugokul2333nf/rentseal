@@ -6,7 +6,12 @@ import { Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import type { AgreementType } from "@/lib/types";
 
-const ICONS: Record<AgreementType, React.ComponentType<{ className?: string }>> = {
+/**
+ * Partial on purpose: this section lists the instruments that have a service
+ * page behind them. A sale is drafted straight from /create and has none, so
+ * requiring an entry for it here would be requiring a link that 404s.
+ */
+const ICONS: Partial<Record<AgreementType, React.ComponentType<{ className?: string }>>> = {
   residential: Home,
   commercial: Building2,
   lease: Briefcase,
@@ -26,7 +31,7 @@ export function AgreementTypes() {
 
         <Stagger className="mt-11 grid gap-5 md:grid-cols-2" amount={0.1}>
           {AGREEMENT_TYPES.map((type) => {
-            const Icon = ICONS[type.id];
+            const Icon = ICONS[type.id] ?? FileStack;
             return (
               <StaggerItem key={type.id}>
                 <Link

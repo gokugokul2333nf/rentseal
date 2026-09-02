@@ -9,7 +9,7 @@ import type { AgreementTemplate } from "@/lib/templates";
 
 export const metadata: Metadata = {
   title: "Choose Your Agreement — All Templates",
-  description: `Pick from ${TEMPLATES.length} Tamil Nadu agreement templates — residential, commercial, lease deeds and leave-and-licence. Every one is drafted from the signed-off wording, with its own clauses. Free until you pay.`,
+  description: `Pick from ${TEMPLATES.length} Tamil Nadu agreement templates — residential, commercial, lease deeds, leave-and-licence and vehicle sale. Every one is drafted from the signed-off wording, with its own clauses. Free until you pay.`,
   alternates: { canonical: "/create" },
   // The self-serve builder is built but switched off — see the README. These
   // routes still render, so keep them out of the index until it goes live.
@@ -18,12 +18,13 @@ export const metadata: Metadata = {
 
 const CATEGORY_TONE: Record<
   AgreementTemplate["category"],
-  "brand" | "emerald" | "violet" | "amber"
+  "brand" | "emerald" | "violet" | "amber" | "dark"
 > = {
   Residential: "brand",
   Commercial: "emerald",
   "Lease deed": "violet",
   "Leave & licence": "amber",
+  Sale: "dark",
 };
 
 const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
@@ -31,6 +32,7 @@ const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
   Commercial: "Trade premises. Longer terms, and the business clauses come with them.",
   "Lease deed": "Twelve months and over, registrable, with the strongest evidentiary position.",
   "Leave & licence": "Permission to occupy without granting a tenancy, so possession comes back cleanly.",
+  Sale: "Ownership changes hands outright. No term to run, and nothing to give back.",
 };
 
 /**
@@ -127,7 +129,9 @@ export default function CreatePage() {
                         <div className="relative mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
                           <span className="inline-flex items-center gap-1.5 text-[12px] text-navy-500">
                             <Clock3 className="size-3.5" />
-                            {spec ? `${spec.defaults.durationMonths} months` : template.term}
+                            {spec && spec.defaults.durationMonths > 0
+                              ? `${spec.defaults.durationMonths} months`
+                              : template.term}
                           </span>
                           <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-700">
                             Draft this

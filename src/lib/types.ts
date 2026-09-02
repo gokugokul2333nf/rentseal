@@ -4,7 +4,13 @@ export type AgreementType =
   | "residential"
   | "commercial"
   | "lease"
-  | "leave-license";
+  | "leave-license"
+  /**
+   * Not a letting. A sale transfers ownership outright, so it has a buyer and
+   * a seller rather than a landlord and a tenant, a price rather than a rent,
+   * and none of the term, deposit or vacating clauses the other four share.
+   */
+  | "sale";
 
 export type PlanId = "basic" | "standard" | "premium";
 
@@ -138,6 +144,32 @@ export interface FurnitureItem {
   condition: "new" | "good" | "fair";
 }
 
+/**
+ * The thing being sold, for the sale instruments.
+ *
+ * Kept separate from PropertyDetails because a vehicle is not premises: it has
+ * no address, no floor and no schedule, and what identifies it — the
+ * registration, engine and chassis numbers — has no counterpart in a letting.
+ */
+export interface SaleDetails {
+  /** Only two-wheelers so far. */
+  kind: "two-wheeler";
+  registrationNumber: string;
+  makeModel: string;
+  manufactureYear: string;
+  engineNumber: string;
+  chassisNumber: string;
+  /** Rupees. The whole consideration, paid before or at handover. */
+  price: string;
+  handoverDate: string;
+  /** Executed sale notes exist to the minute — "handed over at 7.30 PM". */
+  handoverTime: string;
+  /** Days the buyer has to get the registration certificate transferred. */
+  transferWithinDays: string;
+  /** Keys and the papers that came with the vehicle. */
+  documentsHandedOver: boolean;
+}
+
 export interface AgreementDraft {
   id: string;
   type: AgreementType;
@@ -147,6 +179,8 @@ export interface AgreementDraft {
   landlord: Party;
   tenant: Party;
   property: PropertyDetails;
+  /** Populated for the sale instruments; ignored by the lettings. */
+  sale: SaleDetails;
   terms: AgreementTerms;
   options: AgreementOptions;
   furniture: FurnitureItem[];

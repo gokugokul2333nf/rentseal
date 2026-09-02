@@ -34,7 +34,11 @@ export function TemplatePicker() {
           </h3>
           <p className="mt-1 text-[13px] leading-relaxed text-navy-500">
             {current
-              ? `Currently drafting the ${current.deedTitle.toLowerCase()} — ${current.defaults.durationMonths} months, ${current.roleA.toLowerCase()} and ${current.roleB.toLowerCase()}.`
+              ? `Currently drafting the ${current.deedTitle.toLowerCase()} — ${
+                  current.defaults.durationMonths > 0
+                    ? `${current.defaults.durationMonths} months, `
+                    : ""
+                }${current.roleA.toLowerCase()} and ${current.roleB.toLowerCase()}.`
               : "Pick the template closest to your situation."}
           </p>
         </div>
@@ -90,7 +94,9 @@ export function TemplatePicker() {
                           {t.name}
                         </span>
                         <span className="mt-0.5 block text-[12px] leading-snug text-navy-500">
-                          {spec ? `${spec.defaults.durationMonths} months` : t.term}
+                          {spec && spec.defaults.durationMonths > 0
+                            ? `${spec.defaults.durationMonths} months`
+                            : t.term}
                           {spec?.clauses.length
                             ? ` · ${spec.clauses.length} extra clause${spec.clauses.length === 1 ? "" : "s"}`
                             : ""}

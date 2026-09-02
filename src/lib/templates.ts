@@ -12,18 +12,11 @@ export interface AgreementTemplate {
   description: string;
   /** Which of the four service pages this template is drafted under. */
   baseType: AgreementType;
-  category: "Residential" | "Commercial" | "Lease deed" | "Leave & licence";
+  category: "Residential" | "Commercial" | "Lease deed" | "Leave & licence" | "Sale";
   term: string;
   icon: string;
   popular?: boolean;
 }
-
-export const SERVICE_SLUG_BY_TYPE: Record<AgreementType, string> = {
-  residential: "residential-rental-agreement",
-  commercial: "commercial-rental-agreement",
-  lease: "lease-agreement",
-  "leave-license": "leave-and-license",
-};
 
 export const TEMPLATES: AgreementTemplate[] = [
   /* ───────────── Residential ───────────── */
@@ -239,6 +232,17 @@ export const TEMPLATES: AgreementTemplate[] = [
     term: "3–11 months",
     icon: "Users",
   },
+  /* ───────────── Sale ───────────── */
+  {
+    id: "two-wheeler-sale",
+    name: "Two-Wheeler Sale Agreement",
+    description:
+      "Records the sale of a bike or scooter — price, vehicle numbers, the moment of handover, and who carries the challans from then on.",
+    baseType: "sale",
+    category: "Sale",
+    term: "One-off",
+    icon: "Bike",
+  },
   {
     id: "parking-space-licence",
     name: "Parking Space Licence Agreement",
@@ -256,6 +260,7 @@ export function getTemplatesByCategory() {
     "Commercial",
     "Lease deed",
     "Leave & licence",
+    "Sale",
   ];
   return order.map((category) => ({
     category,

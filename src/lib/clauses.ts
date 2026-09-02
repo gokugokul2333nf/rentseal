@@ -32,6 +32,17 @@ export function agreementTitle(d: AgreementDraft) {
   return specFor(d).deedTitle;
 }
 
+/**
+ * The operative words. "NOW THIS DEED OF LEASE DEED WITNESSETH" is what you get
+ * from gluing a fixed prefix to a title that already ends in DEED.
+ */
+export function witnessethLine(d: AgreementDraft) {
+  const title = agreementTitle(d).toUpperCase();
+  return /\bDEED$/.test(title)
+    ? `NOW THIS ${title} WITNESSETH:`
+    : `NOW THIS DEED OF ${title} WITNESSETH:`;
+}
+
 export function scheduleHeading(d: AgreementDraft) {
   return specFor(d).scheduleHeading;
 }
@@ -76,6 +87,35 @@ export function propertyAddress(d: AgreementDraft) {
  * Clauses the sample does not have appear only when an answer calls for them —
  * parking, pets, furniture, commercial use, registration.
  */
+/** Human date and time of handover, as an executed sale note records it. */
+export function handoverMoment(d: AgreementDraft) {
+  const date = d.sale.handoverDate ? formatDateNumeric(new Date(d.sale.handoverDate)) : "____";
+  const time = d.sale.handoverTime.trim();
+  return time ? `${date} at ${time}` : date;
+}
+
+/**
+ * A sale, which shares nothing with the lettings.
+ *
+ * There is no rent, no deposit, no term and no vacating, so the sixteen
+ * generated clauses below do not apply at all — the template's own clauses are
+ * the whole deed. Transcribed from the document the office supplied, with the
+ * handover moment and transfer period filled in from the builder.
+ */
+function saleClauses(d: AgreementDraft, spec: TemplateSpec): GeneratedClause[] {
+  const days = n(d.sale.transferWithinDays) || 30;
+  const fill: Record<string, string> = {
+    "{{handover}}": handoverMoment(d),
+    "{{transferDays}}": `${days} day${days === 1 ? "" : "s"}`,
+  };
+  return spec.clauses.map((body, i) => ({
+    id: `tpl-${i + 1}`,
+    core: true,
+    title: "Term of Sale",
+    body: Object.entries(fill).reduce((text, [k, v]) => text.split(k).join(v), body),
+  }));
+}
+
 export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const clauses: GeneratedClause[] = [];
   const t = d.terms;
@@ -84,6 +124,20 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const A = spec.roleA;
   const B = spec.roleB;
   const rentWord = spec.moneyWord;
+
+  if (spec.family === "sale") {
+    const own = saleClauses(d, spec);
+    d.options.customClauses.forEach((text, i) => {
+      if (!text.trim()) return;
+      own.push({
+        id: `custom-${i}`,
+        trigger: "Your clause",
+        title: "Special Condition",
+        body: text.trim(),
+      });
+    });
+    return applyEdits(own, d.options);
+  }
 
   const rent = n(t.monthlyRent);
   const deposit = n(t.securityDeposit);
@@ -119,7 +173,7 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
     id: "deposit-refund",
     core: true,
     title: "Refund of Deposit",
-    body: `The aforesaid security deposit will not carry any interest and the ${A} shall return this amount to the ${B} at the time of vacating and delivering vacant possession of the demised premises as it is let-out to ${B === "TENANT" ? "the TENANT" : "the LICENSEE"} this day.`,
+    body: `The aforesaid security deposit will not carry any interest and the ${A} shall return this amount to the ${B} at the time of vacating and delivering vacant possession of the demised premises as it is let-out to the ${B} this day.`,
   });
 
   // 4 ── Electricity
@@ -327,8 +381,17 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
     });
   });
 
-  // Struck-out and rewritten clauses are applied last so an edit survives
-  // whatever produced the clause -- core, template or the customer's own.
+  return applyEdits(clauses, o);
+}
+
+/**
+ * Struck-out and rewritten clauses, applied last so an edit survives whatever
+ * produced the clause — core, template or the customer's own.
+ */
+function applyEdits(
+  clauses: GeneratedClause[],
+  o: AgreementDraft["options"],
+): GeneratedClause[] {
   return clauses
     .filter((c) => c.core || !o.removedClauseIds?.includes(c.id))
     .map((c) => {

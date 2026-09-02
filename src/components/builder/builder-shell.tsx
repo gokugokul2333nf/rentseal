@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
-import { clauseStats } from "@/lib/clauses";
+import { clauseStats, specFor } from "@/lib/clauses";
 import { calculateStampDuty } from "@/lib/stamp-duty";
 import { AGREEMENT_TYPES } from "@/lib/site";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -28,17 +28,35 @@ import { Logo } from "@/components/ui/logo";
 import { AgreementDocument } from "./agreement-document";
 import { ClausesStep, PartyStep, PropertyStep, TermsStep } from "./steps";
 import { ReviewAndSendStep } from "./review-payment";
+import { VehicleStep } from "./vehicle-step";
 import { cn, inr } from "@/lib/utils";
 import type { AgreementType } from "@/lib/types";
 
-const STEPS = [
+type Step = { key: string; label: string; short: string };
+
+const LETTING_STEPS: Step[] = [
   { key: "property", label: "Property", short: "Property" },
   { key: "landlord", label: "Landlord details", short: "Landlord" },
   { key: "tenant", label: "Tenant details", short: "Tenant" },
   { key: "terms", label: "Agreement terms", short: "Terms" },
   { key: "clauses", label: "Additional clauses", short: "Clauses" },
   { key: "review", label: "Review and send", short: "Review" },
-] as const;
+];
+
+/**
+ * A sale asks different questions, so it gets different steps.
+ *
+ * There is no property, no rent and no term to agree, and the price and
+ * handover belong with the vehicle rather than in a terms step of their own —
+ * which leaves five steps instead of six.
+ */
+const SALE_STEPS: Step[] = [
+  { key: "vehicle", label: "Vehicle", short: "Vehicle" },
+  { key: "landlord", label: "Seller details", short: "Seller" },
+  { key: "tenant", label: "Buyer details", short: "Buyer" },
+  { key: "clauses", label: "Additional clauses", short: "Clauses" },
+  { key: "review", label: "Review and send", short: "Review" },
+];
 
 function SaveIndicator() {
   const { saving, savedAt } = useAgreement();
@@ -69,6 +87,7 @@ function SaveIndicator() {
 /** Which part of the deed each step is writing, so the preview can follow along. */
 const DOC_SECTION: Record<string, string | null> = {
   property: "property",
+  vehicle: "property",
   landlord: "landlord",
   tenant: "landlord",
   terms: "terms",
@@ -282,14 +301,21 @@ export function BuilderShell({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step, embedded]);
 
-  const progress = Math.round(((step + 1) / STEPS.length) * 100);
+  const STEPS = specFor(draft).family === "sale" ? SALE_STEPS : LETTING_STEPS;
+  // A sale has one step fewer than a letting, so switching template at the last
+  // step would index past the end of the list. Clamped on read rather than
+  // written back, so the position is restored if they switch back.
+  const stepIndex = Math.min(step, STEPS.length - 1);
+  const progress = Math.round(((stepIndex + 1) / STEPS.length) * 100);
   // The last step is the whole width — it already contains the document.
-  const isFinalStep = STEPS[step].key === "review";
+  const isFinalStep = STEPS[stepIndex].key === "review";
 
   const body = () => {
-    switch (STEPS[step].key) {
+    switch (STEPS[stepIndex].key) {
       case "property":
         return <PropertyStep />;
+      case "vehicle":
+        return <VehicleStep />;
       case "landlord":
         return <PartyStep which="landlord" />;
       case "tenant":
@@ -369,8 +395,8 @@ export function BuilderShell({
           )}
         >
           {STEPS.map((s, i) => {
-            const done = i < step;
-            const current = i === step;
+            const done = i < stepIndex;
+            const current = i === stepIndex;
             return (
               <button
                 key={s.key}
@@ -451,7 +477,7 @@ export function BuilderShell({
 
             <AnimatePresence mode="wait">
               <motion.div
-                key={STEPS[step].key}
+                key={STEPS[stepIndex].key}
                 initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
@@ -469,7 +495,7 @@ export function BuilderShell({
                   variant="secondary"
                   size="lg"
                   onClick={() => setStep((s) => Math.max(0, s - 1))}
-                  disabled={step === 0}
+                  disabled={stepIndex === 0}
                 >
                   <ArrowLeft className="size-4" />
                   Back
@@ -477,14 +503,14 @@ export function BuilderShell({
 
                 <div className="flex items-center gap-3">
                   <span className="hidden text-[13px] text-navy-400 sm:inline">
-                    Step {step + 1} of {STEPS.length}
+                    Step {stepIndex + 1} of {STEPS.length}
                   </span>
                   <Button
                     size="lg"
                     onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
                     className="group"
                   >
-                    {STEPS[step + 1]?.key === "review" ? "Review and send" : "Continue"}
+                    {STEPS[stepIndex + 1]?.key === "review" ? "Review and send" : "Continue"}
                     <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </Button>
                 </div>
@@ -522,7 +548,7 @@ export function BuilderShell({
               <div className={cn("sticky", embedded ? "top-[88px]" : "top-[124px]")}>
                 <DocumentRail
                   onOpenPreview={() => setPreviewOpen(true)}
-                  section={DOC_SECTION[STEPS[step].key]}
+                  section={DOC_SECTION[STEPS[stepIndex].key]}
                 />
               </div>
             </aside>

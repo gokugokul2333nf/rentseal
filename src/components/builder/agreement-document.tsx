@@ -8,6 +8,8 @@ import {
   propertyAddress,
   scheduleDescription,
   scheduleHeading,
+  specFor,
+  witnessethLine,
 } from "@/lib/clauses";
 import type { AgreementDraft } from "@/lib/types";
 import { cn, formatDate, inr, rupeesInWords } from "@/lib/utils";
@@ -168,9 +170,18 @@ export function AgreementDocument({
         draft.terms.securityDeposit && inr(parseFloat(draft.terms.securityDeposit)),
         draft.terms.monthlyRent && rupeesInWords(parseFloat(draft.terms.monthlyRent)),
         draft.terms.securityDeposit && rupeesInWords(parseFloat(draft.terms.securityDeposit)),
+        // A sale is identified by the vehicle rather than an address, so these
+        // are the lines worth blurring in a preview.
+        draft.sale.registrationNumber,
+        draft.sale.engineNumber,
+        draft.sale.chassisNumber,
+        draft.sale.price && inr(parseFloat(draft.sale.price)),
+        draft.sale.price && rupeesInWords(parseFloat(draft.sale.price)),
       ].filter((v): v is string => Boolean(v) && String(v).trim().length > 3)
     : [];
   const t = draft.terms;
+  const spec = specFor(draft);
+  const isSale = spec.family === "sale";
   const start = t.startDate ? new Date(t.startDate) : new Date();
   // The deed is dated when it is signed, not when the tenancy begins.
   const executed = t.executionDate ? new Date(t.executionDate) : start;
@@ -183,9 +194,12 @@ export function AgreementDocument({
   };
   // Rent, deposit and the end date are stated inside the clauses now, exactly
   // as the sample states them, rather than in a summary table above them.
-  const isLicence = draft.type === "leave-license";
-  const partyA = isLicence ? "LICENSOR" : "LANDLORD";
-  const partyB = isLicence ? "LICENSEE" : "TENANT";
+  // From the template, not from the instrument: a lease deed has a lessor and
+  // a lessee and a sale has a seller and a buyer. The PDF has always taken the
+  // roles from the spec, so hardcoding them here made the preview disagree
+  // with the document that actually gets sent.
+  const partyA = spec.roleA;
+  const partyB = spec.roleB;
 
   const Wrapper = animate ? motion.div : "div";
 
@@ -209,13 +223,67 @@ export function AgreementDocument({
         <h1 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
           {agreementTitle(draft)}
         </h1>
+        {isSale ? (
+          <p className="mt-4 text-left">
+            <span className="font-semibold">Date: </span>
+            <Blank w="120px">{t.executionDate ? formatDate(executed) : undefined}</Blank>
+          </p>
+        ) : (
         <p className="mt-4 text-left">
           This {agreementTitle(draft).toUpperCase()} is made and executed at{" "}
           <Blank w="90px">{executedAt || undefined}</Blank> on this{" "}
           <Blank w="120px">{t.executionDate ? formatDate(executed) : undefined}</Blank>.
         </p>
+        )}
       </header>
 
+      {isSale ? (
+        <section data-doc="property" className="avoid-break mb-6">
+          <p className="mb-5 text-justify">
+            I, <Blank w="150px">{draft.landlord.fullName || undefined}</Blank>
+            {draft.landlord.aadhaar ? (
+              <> (Aadhaar No: <Blank>{formatAadhaar(draft.landlord.aadhaar)}</Blank>)</>
+            ) : null}
+            , hereby confirm that I have sold my {draft.sale.kind} to{" "}
+            <Blank w="150px">{draft.tenant.fullName || undefined}</Blank>
+            {draft.tenant.aadhaar ? (
+              <> (Aadhaar No: <Blank>{formatAadhaar(draft.tenant.aadhaar)}</Blank>)</>
+            ) : null}{" "}
+            for a total amount of{" "}
+            <Blank w="90px">
+              {draft.sale.price ? `${inr(parseFloat(draft.sale.price))}/-` : undefined}
+            </Blank>{" "}
+            (
+            <Blank w="170px">
+              {draft.sale.price ? rupeesInWords(parseFloat(draft.sale.price)) : undefined}
+            </Blank>
+            ).
+          </p>
+
+          <p className="mb-3 text-center text-[11px] font-bold tracking-[0.14em] text-navy-700">
+            VEHICLE DETAILS
+          </p>
+          <dl className="space-y-1.5">
+            {[
+              ["Vehicle No.", draft.sale.registrationNumber],
+              [
+                "Make & Model",
+                [draft.sale.makeModel, draft.sale.manufactureYear].filter(Boolean).join(" · "),
+              ],
+              ["Engine No.", draft.sale.engineNumber],
+              ["Chassis No.", draft.sale.chassisNumber],
+            ].map(([label, value]) => (
+              <div key={label} className="flex gap-3">
+                <dt className="w-32 shrink-0 font-semibold">{label}</dt>
+                <dd className="flex-1">
+                  <Blank w="150px">{value || undefined}</Blank>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : (
+        <>
       {/* Parties */}
       <section data-doc="landlord" className="avoid-break mb-6">
         <p className="mb-2 text-center text-[11px] font-bold tracking-[0.14em] text-navy-700">
@@ -283,11 +351,16 @@ export function AgreementDocument({
         </p>
       </section>
 
+        </>
+      )}
+
       {/* Operative clauses */}
       <section data-doc="terms" className="mb-7">
-        <p className="mb-4 text-[11px] font-bold tracking-[0.1em] text-navy-700">
-          NOW THIS DEED OF {agreementTitle(draft).toUpperCase()} WITNESSETH:
-        </p>
+        {isSale ? null : (
+          <p className="mb-4 text-[11px] font-bold tracking-[0.1em] text-navy-700">
+            {witnessethLine(draft)}
+          </p>
+        )}
 
         <ol data-doc="clauses" className="space-y-3">
           <AnimatePresence initial={false} mode="popLayout">
@@ -330,7 +403,8 @@ export function AgreementDocument({
         </ol>
       </section>
 
-      {/* Schedule */}
+      {/* Schedule — a letting only; a sale identifies the vehicle above. */}
+      {isSale ? null : 
       <section className="avoid-break mb-7">
         <h2 className="mb-2 text-center font-display text-[13px] font-bold tracking-wide text-navy-950 uppercase">
           {draft.property.wholeProperty
@@ -349,13 +423,17 @@ export function AgreementDocument({
           .
         </p>
       </section>
+      }
 
       {/* Execution */}
       <section className="avoid-break">
-        <p className="text-justify">
-          In witness whereof the {partyA.toLowerCase()} and the {partyB.toLowerCase()} have signed
-          this deed on the day, month and year above written in the presence of witnesses.
-        </p>
+        {isSale ? null : (
+          <p className="text-justify">
+            In witness whereof the {partyA.toLowerCase()} and the {partyB.toLowerCase()} have
+            signed this deed on the day, month and year above written in the presence of
+            witnesses.
+          </p>
+        )}
 
         <div className="mt-10 flex items-end justify-between">
           {[partyA, partyB].map((role) => (

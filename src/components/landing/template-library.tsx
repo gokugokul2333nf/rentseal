@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   BedDouble,
+  Bike,
   Briefcase,
   Building,
   Building2,
@@ -56,18 +57,20 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Sprout,
   KeyRound,
   BedDouble,
+  Bike,
   Users,
   CircleParking,
 };
 
 const CATEGORY_TONE: Record<
   AgreementTemplate["category"],
-  "brand" | "emerald" | "violet" | "amber"
+  "brand" | "emerald" | "violet" | "amber" | "dark"
 > = {
   Residential: "brand",
   Commercial: "emerald",
   "Lease deed": "violet",
   "Leave & licence": "amber",
+  Sale: "dark",
 };
 
 function TemplateCard({ template }: { template: AgreementTemplate }) {

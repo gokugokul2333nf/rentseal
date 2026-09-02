@@ -19,6 +19,7 @@ import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
  */
 
 export type TemplateId =
+  | "two-wheeler-sale"
   | "residential-11-month"
   | "atm-space-rental"
   | "agricultural-land-lease"
@@ -47,8 +48,13 @@ export type TemplateId =
 
 export interface TemplateSpec {
   id: TemplateId;
-  /** Which of the four instruments this is drafted under. */
+  /** Which instrument this is drafted under. */
   baseType: AgreementType;
+  /**
+   * Lettings share sixteen generated clauses; a sale shares none of them, so
+   * its `clauses` are the whole deed rather than an addition to a core.
+   */
+  family?: "letting" | "sale";
   /** The heading the deed carries, e.g. "SHOP RENTAL AGREEMENT". */
   deedTitle: string;
   /** What the two sides are called throughout — LANDLORD/TENANT, LESSOR/LESSEE, LICENSOR/LICENSEE. */
@@ -74,6 +80,36 @@ export interface TemplateSpec {
 }
 
 export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
+  "two-wheeler-sale": {
+    id: "two-wheeler-sale",
+    baseType: "sale",
+    family: "sale",
+    deedTitle: "TWO-WHEELER SALE AGREEMENT",
+    roleA: "SELLER",
+    roleB: "BUYER",
+    moneyWord: "sale consideration",
+    purpose: "SALE",
+    scheduleHeading: "VEHICLE DETAILS",
+    defaults: {
+      durationMonths: 0,
+      propertyKind: "apartment",
+      commercialUse: false,
+      registrationRequired: false,
+    },
+    notes: [
+      "Fill in the registration, engine and chassis numbers exactly as they appear on the RC. A wrong digit is what stops the transfer at the RTO.",
+      "The buyer must apply for transfer of ownership in Form 29/30 within the period agreed here. Until that is done the vehicle stays in the seller's name.",
+      "Until transfer, challans and liabilities follow the registered owner on paper. This agreement fixes the handover date and time so responsibility can be shown to have passed.",
+      "Both parties sign, and two witnesses sign with their names and addresses.",
+      "This is a drafting aid, not legal advice. Have it checked if the transaction is unusual.",
+    ],
+    clauses: [
+      "The vehicle has been handed over to the BUYER on {{handover}} along with the available vehicle documents and keys.",
+      "The BUYER agrees to transfer the ownership of the vehicle into the BUYER's name within {{transferDays}} of this agreement.",
+      "From the date and time of handover, the BUYER shall be responsible for the vehicle and for any challans, fines, accidents, damages or other liabilities arising from the use of the vehicle.",
+      "Both parties have agreed to the above terms and have signed this agreement voluntarily.",
+    ],
+  },
   "residential-11-month": {
     id: "residential-11-month",
     baseType: "residential",
@@ -818,6 +854,7 @@ export const DEFAULT_TEMPLATE_BY_TYPE: Record<AgreementType, TemplateId> = {
   commercial: "shop-rental",
   lease: "long-term-lease",
   "leave-license": "leave-licence-11-month",
+  sale: "two-wheeler-sale",
 };
 
 export function templateSpec(id: TemplateId): TemplateSpec {

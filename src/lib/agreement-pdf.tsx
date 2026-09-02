@@ -13,8 +13,9 @@ import {
   scheduleDescription,
   scheduleHeading,
   specFor,
+  witnessethLine,
 } from "./clauses";
-import { formatDate } from "./utils";
+import { formatDate, inr, rupeesInWords } from "./utils";
 import { SITE } from "./site";
 import type { AgreementDraft, Relation } from "./types";
 
@@ -122,6 +123,15 @@ const s = StyleSheet.create({
   witnessNum: { fontFamily: "Times-Bold", fontSize: 10, marginBottom: 26 },
   hint: { fontSize: 8, color: "#888888" },
 
+  /* Sale deeds: the vehicle is identified by a labelled block, not a schedule. */
+  detailRow: { flexDirection: "row", marginBottom: 5 },
+  detailLabel: { width: 118, fontFamily: "Times-Bold" },
+  detailValue: { flex: 1 },
+  saleSignRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 40 },
+  saleSignCell: { width: "44%" },
+  saleSignHead: { fontFamily: "Times-Bold", fontSize: 10.5, letterSpacing: 1, marginBottom: 14 },
+  saleSignField: { marginBottom: 16 },
+
   /* The strip that repeats at the foot of every page.
    *
    * Two @react-pdf quirks are baked into these three styles, both verified
@@ -202,6 +212,98 @@ function Party({
   );
 }
 
+
+/** A labelled line in the vehicle block: "Engine No.  G3N4E0490089". */
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={s.detailRow}>
+      <Text style={s.detailLabel}>{label}</Text>
+      <Text style={s.detailValue}>{fill(value, 30)}</Text>
+    </View>
+  );
+}
+
+/**
+ * A sale deed, which is a different document from a letting rather than a
+ * variation on one. It states the parties, the consideration and the thing
+ * sold, and then passes responsibility across at a stated moment — there is no
+ * term to run and nothing to give back.
+ */
+function SaleBody({ draft, clauses }: { draft: AgreementDraft; clauses: ReturnType<typeof generateClauses> }) {
+  const spec = specFor(draft);
+  const sale = draft.sale;
+  const price = Number(sale.price.replace(/[^\d.]/g, "")) || 0;
+  const seller = draft.landlord;
+  const buyer = draft.tenant;
+  const id = (p: typeof seller) => {
+    const digits = p.aadhaar.replace(/\D/g, "");
+    return digits ? ` (Aadhaar No: ${digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim()})` : "";
+  };
+  const executed = draft.terms.executionDate ? new Date(draft.terms.executionDate) : new Date();
+
+  return (
+    <>
+      <Text style={s.title}>{spec.deedTitle}</Text>
+
+      <Text style={s.para}>
+        <Text style={s.bold}>Date: </Text>
+        {formatDate(executed)}
+      </Text>
+
+      <Text style={s.para}>
+        I, {fill(seller.fullName, 26)}
+        {id(seller)}, hereby confirm that I have sold my {sale.kind} to{" "}
+        {fill(buyer.fullName, 26)}
+        {id(buyer)} for a total amount of {rupees(inr(price))}/- (
+        {rupeesInWords(price)}).
+      </Text>
+
+      <Text style={s.scheduleHead}>{spec.scheduleHeading}</Text>
+      <Detail label="Vehicle No." value={sale.registrationNumber} />
+      <Detail label="Make & Model" value={[sale.makeModel, sale.manufactureYear].filter(Boolean).join(" · ")} />
+      <Detail label="Engine No." value={sale.engineNumber} />
+      <Detail label="Chassis No." value={sale.chassisNumber} />
+
+      <View style={{ marginTop: 12 }} />
+      {clauses.map((clause, i) => (
+        <View key={clause.id} style={s.clauseRow} wrap={false}>
+          <Text style={s.clauseNum}>{i + 1}.</Text>
+          <Text style={s.clauseBody}>{rupees(clause.body)}</Text>
+        </View>
+      ))}
+
+      <View style={s.saleSignRow} wrap={false}>
+        {[
+          [spec.roleA, seller.fullName],
+          [spec.roleB, buyer.fullName],
+        ].map(([role, name]) => (
+          <View key={role} style={s.saleSignCell}>
+            <Text style={s.saleSignHead}>{role}</Text>
+            <Text style={s.saleSignField}>Name: {fill(name, 22)}</Text>
+            <Text style={s.saleSignField}>Signature:</Text>
+          </View>
+        ))}
+      </View>
+
+      {draft.options.witnessRequired ? (
+        <View wrap={false}>
+          <Text style={s.witnessHead}>WITNESSES:</Text>
+          <View style={s.witnessRow}>
+            {["1.", "2."].map((num) => (
+              <View key={num} style={s.signBlock}>
+                <Text style={s.witnessNum}>{num}</Text>
+                <View style={s.signRule}>
+                  <Text style={s.hint}>Name, address and signature</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
+    </>
+  );
+}
+
 export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
   const clauses = generateClauses(draft);
   const t = draft.terms;
@@ -212,6 +314,7 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
   const A = spec.roleA;
   const B = spec.roleB;
   const purpose = spec.purpose;
+  const isSale = spec.family === "sale";
 
   return (
     <Document
@@ -238,6 +341,10 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
         {/* Clears the stamp paper's pre-printed header. First page only. */}
         <View style={{ height: FIRST_PAGE_GAP }} />
 
+        {isSale ? (
+          <SaleBody draft={draft} clauses={clauses} />
+        ) : (
+          <>
         <Text style={s.title}>{title}</Text>
 
         <Text style={s.para}>
@@ -260,7 +367,7 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
           and the {A} has agreed to the same on the following terms and conditions.
         </Text>
 
-        <Text style={s.witnesseth}>NOW THIS DEED OF {title} WITNESSETH:</Text>
+        <Text style={s.witnesseth}>{witnessethLine(draft)}</Text>
 
         {clauses.map((clause, i) => (
           <View key={clause.id} style={s.clauseRow} wrap={false}>
@@ -314,7 +421,8 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
             </View>
           </View>
         ) : null}
-
+          </>
+        )}
       </Page>
     </Document>
   );

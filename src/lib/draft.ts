@@ -88,6 +88,21 @@ export function createDraft(
       furnishing: dflt.furnishing ?? "semi-furnished",
       amenities: [],
     },
+    sale: {
+      kind: "two-wheeler",
+      registrationNumber: "",
+      makeModel: "",
+      manufactureYear: "",
+      engineNumber: "",
+      chassisNumber: "",
+      price: "",
+      handoverDate: "",
+      handoverTime: "",
+      // A month is the usual understanding; the RTO gives fourteen days from
+      // the date of sale for the seller's Form 29 intimation.
+      transferWithinDays: "30",
+      documentsHandedOver: true,
+    },
     terms: {
       executionDate: "",
       executionPlace: "",
