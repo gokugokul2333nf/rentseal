@@ -52,8 +52,30 @@ export function tamilTokens(draft: AgreementDraft): Record<string, string> {
   };
 }
 
+/**
+ * The tokens in the service provider agreement, which is between two companies
+ * rather than two people.
+ */
+export function contractTokens(draft: AgreementDraft): Record<string, string> {
+  const t = draft.terms;
+  const executed = t.executionDate ? new Date(t.executionDate) : null;
+  const fee = money(t.securityDeposit);
+  const party = (p: AgreementDraft["landlord"]) => p.companyName?.trim() || p.fullName;
+  return {
+    companyName: party(draft.landlord),
+    providerName: party(draft.tenant),
+    executionPlace: t.executionPlace,
+    executionDate: executed
+      ? executed.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+      : "",
+    amount: fee ? fee.toLocaleString("en-IN") : "",
+    // Always a rule: the document uses it where the counter writes something in.
+    blank: "",
+  };
+}
+
 /** Substitutes the answered tokens; anything unanswered reads as a blank rule. */
-export function fillTamilText(text: string, tokens: Record<string, string>): string {
+export function fillTokens(text: string, tokens: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
     const value = tokens[key];
     return value && value.trim() ? value.trim() : RULE;
@@ -62,8 +84,5 @@ export function fillTamilText(text: string, tokens: Record<string, string>): str
 
 export function fillTamilBody(id: TamilTemplateId, draft: AgreementDraft): TamilBlock[] {
   const tokens = tamilTokens(draft);
-  return TAMIL_TEMPLATES[id].body.map((b) => ({
-    ...b,
-    text: fillTamilText(b.text, tokens),
-  }));
+  return TAMIL_TEMPLATES[id].body.map((b) => ({ ...b, text: fillTokens(b.text, tokens) }));
 }

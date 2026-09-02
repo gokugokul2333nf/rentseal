@@ -1,7 +1,6 @@
 import type { AgreementDraft } from "./types";
 import { defaultTemplateFor, TEMPLATE_SPECS, type TemplateSpec } from "./agreement-templates";
-import { isTamilTemplateId, TAMIL_TEMPLATES } from "./tamil-templates";
-import { fillTamilText, tamilTokens } from "./tamil-fill";
+import { contractTokens, fillTokens, tamilTokens } from "./tamil-fill";
 import { addMonths, formatDateNumeric, inr, rupeesInWords } from "./utils";
 
 export interface GeneratedClause {
@@ -129,16 +128,16 @@ export function generateClauses(d: AgreementDraft): GeneratedClause[] {
   const B = spec.roleB;
   const rentWord = spec.moneyWord;
 
-  if (spec.family === "tamil" && isTamilTemplateId(d.templateId)) {
-    // The Tamil deeds are the whole document, headings and all, in the order
-    // the office wrote them. They carry their own numbering, so nothing is
-    // renumbered here.
-    const tokens = tamilTokens(d);
-    const own: GeneratedClause[] = TAMIL_TEMPLATES[d.templateId].body.map((block, i) => ({
-      id: `ta-${i + 1}`,
+  if (spec.family === "verbatim" && spec.body?.length) {
+    // The document is kept as the office wrote it, headings and all, in its own
+    // order and with its own numbering — so nothing is renumbered here. Only
+    // the tokens are filled; the remaining blanks belong to the counter.
+    const tokens = spec.language === "ta" ? tamilTokens(d) : contractTokens(d);
+    const own: GeneratedClause[] = spec.body.map((block, i) => ({
+      id: `doc-${i + 1}`,
       core: true,
-      title: block.heading ? "தலைப்பு" : "பத்தி",
-      body: fillTamilText(block.text, tokens),
+      title: block.heading ? "Heading" : "Paragraph",
+      body: fillTokens(block.text, tokens),
       heading: block.heading,
     }));
     return applyEdits(own, d.options);

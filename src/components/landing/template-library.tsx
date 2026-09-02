@@ -10,6 +10,7 @@ import {
   DoorOpen,
   Factory,
   FileSignature,
+  Handshake,
   Home,
   House,
   KeyRound,
@@ -62,6 +63,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Users,
   CircleParking,
   Languages,
+  Handshake,
 };
 
 const CATEGORY_TONE: Record<
@@ -73,6 +75,7 @@ const CATEGORY_TONE: Record<
   "Lease deed": "violet",
   "Leave & licence": "amber",
   Sale: "dark",
+  "Business contract": "emerald",
   "Tamil — தமிழ்": "violet",
 };
 

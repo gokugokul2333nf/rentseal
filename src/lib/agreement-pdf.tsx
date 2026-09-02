@@ -158,6 +158,13 @@ const s = StyleSheet.create({
   taPara: { fontFamily: "NotoSansTamil", marginBottom: 8, textAlign: "justify" },
   taFootSig: { fontFamily: "NotoSansTamil", fontWeight: "bold", fontSize: 8 },
   taFootMeta: { fontFamily: "NotoSansTamil" },
+  verbatimHeading: {
+    fontFamily: "Times-Bold",
+    fontSize: 11,
+    marginTop: 10,
+    marginBottom: 6,
+    letterSpacing: 0.3,
+  },
 
   /* Sale deeds: the vehicle is identified by a labelled block, not a schedule. */
   detailRow: { flexDirection: "row", marginBottom: 5 },
@@ -351,7 +358,11 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
   const B = spec.roleB;
   const purpose = spec.purpose;
   const isSale = spec.family === "sale";
-  const isTamil = spec.family === "tamil";
+  // Two different questions: whether the document is kept verbatim, and
+  // whether it is set in Tamil. The service provider agreement is the first
+  // without being the second.
+  const isVerbatim = spec.family === "verbatim";
+  const isTamil = spec.language === "ta";
 
   return (
     <Document
@@ -382,9 +393,20 @@ export function AgreementPdf({ draft }: { draft: AgreementDraft }) {
         {/* Clears the stamp paper's pre-printed header. First page only. */}
         <View style={{ height: FIRST_PAGE_GAP }} />
 
-        {isTamil ? (
+        {isVerbatim ? (
           clauses.map((clause) => (
-            <Text key={clause.id} style={clause.heading ? s.taHeading : s.taPara}>
+            <Text
+              key={clause.id}
+              style={
+                isTamil
+                  ? clause.heading
+                    ? s.taHeading
+                    : s.taPara
+                  : clause.heading
+                    ? s.verbatimHeading
+                    : s.para
+              }
+            >
               {clause.body}
             </Text>
           ))

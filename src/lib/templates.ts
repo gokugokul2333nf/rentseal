@@ -19,6 +19,7 @@ export interface AgreementTemplate {
     | "Lease deed"
     | "Leave & licence"
     | "Sale"
+    | "Business contract"
     | "Tamil — தமிழ்";
   term: string;
   icon: string;
@@ -259,6 +260,18 @@ const ENGLISH_TEMPLATES: AgreementTemplate[] = [
     term: "3–11 months",
     icon: "Users",
   },
+  /* ───────────── Business contract ───────────── */
+  {
+    id: "service-provider",
+    name: "Service Provider Agreement",
+    description:
+      "A company engages a provider to market and source within a territory, against a franchise fee. Thirteen clauses and three annexures.",
+    baseType: "deed",
+    category: "Business contract",
+    term: "As agreed",
+    icon: "Handshake",
+  },
+
   /* ───────────── Sale ───────────── */
   {
     id: "two-wheeler-sale",
@@ -290,6 +303,7 @@ export function getTemplatesByCategory() {
     "Lease deed",
     "Leave & licence",
     "Sale",
+    "Business contract",
     "Tamil — தமிழ்",
   ];
   return order.map((category) => ({

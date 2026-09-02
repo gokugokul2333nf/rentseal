@@ -72,7 +72,7 @@ export function StepIntro({ title, body }: { title: string; body: string }) {
 export function PropertyStep() {
   const { draft, update } = useAgreement();
   // A Tamil deed carries the address in Tamil, so these accept romanised typing.
-  const tamil = specFor(draft).family === "tamil";
+  const tamil = specFor(draft).language === "ta";
   const p = draft.property;
   const commercial = draft.type === "commercial";
 
@@ -361,7 +361,7 @@ export function PartyStep({ which }: { which: "landlord" | "tenant" }) {
   const spec = specFor(draft);
   // A Tamil deed needs Tamil names and addresses, so the free-text fields
   // accept romanised typing and convert it.
-  const tamil = spec.family === "tamil";
+  const tamil = spec.language === "ta";
   const label = isLandlord ? spec.roleA.toLowerCase() : spec.roleB.toLowerCase();
 
   return (

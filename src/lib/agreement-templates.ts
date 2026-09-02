@@ -1,5 +1,6 @@
 import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS, type TamilTemplateId } from "./tamil-templates";
+import { SERVICE_PROVIDER_BODY } from "./service-provider-template";
 
 /**
  * The drafting spec behind every template LP Stamp Paper offers.
@@ -21,6 +22,7 @@ import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS, type TamilTemplateId } from "./tam
 
 /** The templates drafted in English, from the office's Word originals. */
 export type EnglishTemplateId =
+  | "service-provider"
   | "two-wheeler-sale"
   | "residential-11-month"
   | "atm-space-rental"
@@ -59,9 +61,16 @@ export interface TemplateSpec {
    * Lettings share sixteen generated clauses; a sale shares none of them, so
    * its `clauses` are the whole deed rather than an addition to a core.
    */
-  family?: "letting" | "sale" | "tamil";
+  /**
+   * "verbatim" means the document is kept paragraph for paragraph as the office
+   * wrote it, rather than assembled from the shared clause set — true of every
+   * Tamil deed and of the service provider agreement.
+   */
+  family?: "letting" | "sale" | "verbatim";
   /** Tamil deeds are drafted and printed in Tamil; everything else in English. */
   language?: "en" | "ta";
+  /** The whole document, for the verbatim templates. */
+  body?: Array<{ text: string; heading?: boolean }>;
   /** The heading the deed carries, e.g. "SHOP RENTAL AGREEMENT". */
   deedTitle: string;
   /** What the two sides are called throughout — LANDLORD/TENANT, LESSOR/LESSEE, LICENSOR/LICENSEE. */
@@ -87,6 +96,33 @@ export interface TemplateSpec {
 }
 
 const ENGLISH_SPECS: Record<EnglishTemplateId, TemplateSpec> = {
+  "service-provider": {
+    id: "service-provider",
+    baseType: "deed",
+    family: "verbatim",
+    language: "en",
+    deedTitle: "SERVICE PROVIDER AGREEMENT",
+    roleA: "COMPANY",
+    roleB: "SERVICE PROVIDER",
+    moneyWord: "franchise fee",
+    purpose: "MARKETING, SOURCING AND ALLIED ACTIVITIES",
+    scheduleHeading: "ANNEXURES",
+    defaults: {
+      durationMonths: 0,
+      propertyKind: "office",
+      commercialUse: true,
+      registrationRequired: false,
+    },
+    notes: [
+      "A business-to-business contract: both sides are companies, so fill in the registered name, the registered address and the CIN, not a personal address.",
+      "The three annexures carry the substance — the services, the territory and the fee. An agreement signed with them blank is an agreement about nothing.",
+      "Stamp duty on an agreement of this kind is nominal in Tamil Nadu, but it must still be stamped before signature.",
+      "Both sides sign, and the person signing for a company must be authorised to.",
+      "This is a drafting aid, not legal advice. Have it checked if the arrangement is unusual.",
+    ],
+    clauses: [],
+    body: SERVICE_PROVIDER_BODY,
+  },
   "two-wheeler-sale": {
     id: "two-wheeler-sale",
     baseType: "sale",
@@ -863,7 +899,7 @@ const TAMIL_SPECS = TAMIL_TEMPLATE_IDS.reduce(
     acc[id] = {
         id,
         baseType: t.baseType,
-        family: "tamil",
+        family: "verbatim",
         language: "ta",
         deedTitle: t.nameTa,
         roleA: t.roleA,
@@ -883,6 +919,7 @@ const TAMIL_SPECS = TAMIL_TEMPLATE_IDS.reduce(
           "சரியான மதிப்புள்ள முத்திரைத் தாளில் அச்சிடவும்.",
         ],
       clauses: [],
+      body: t.body,
     };
     return acc;
   },
