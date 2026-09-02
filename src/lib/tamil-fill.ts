@@ -1,7 +1,7 @@
 import type { AgreementDraft } from "./types";
 import { TAMIL_TEMPLATES, type TamilBlock, type TamilTemplateId } from "./tamil-templates";
 import { tamilDateParts, tamilNumberWords } from "./tamil-words";
-import { addMonths, formatDateNumeric } from "./utils";
+import { addMonths, formatDateNumeric, rupeesInWords } from "./utils";
 
 /**
  * Filling a Tamil deed from the builder's answers.
@@ -149,6 +149,10 @@ export function contractTokens(draft: AgreementDraft): Record<string, string> {
       ? executed.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
       : "",
     amount: fee ? fee.toLocaleString("en-IN") : "",
+    amountWords: fee ? rupeesInWords(fee).replace(/^Rupees\s*/i, "").replace(/\s*Only$/i, "") : "",
+    repayBy: t.startDate
+      ? new Date(t.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+      : "",
     // Always a rule: the document uses it where the counter writes something in.
     blank: "",
   };

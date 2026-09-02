@@ -1,6 +1,7 @@
 import type { AgreementType } from "./types";
 import type { TemplateId } from "./agreement-templates";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS } from "./tamil-templates";
+import { DEED_TEMPLATES, DEED_TEMPLATE_IDS } from "./deed-templates";
 
 export interface AgreementTemplate {
   /**
@@ -20,6 +21,7 @@ export interface AgreementTemplate {
     | "Leave & licence"
     | "Sale"
     | "Business contract"
+    | "Deeds & undertakings"
     | "Tamil — தமிழ்";
   term: string;
   icon: string;
@@ -33,6 +35,20 @@ export interface AgreementTemplate {
  * They are drafted through the same builder — picking one swaps the whole
  * document into Tamil and the form's answers land inside it.
  */
+/** The standalone deeds — indemnity, affidavit, undertaking, private loan. */
+const DEED_CATALOGUE: AgreementTemplate[] = DEED_TEMPLATE_IDS.map((id) => {
+  const t = DEED_TEMPLATES[id];
+  return {
+    id,
+    name: t.name,
+    description: t.description,
+    baseType: t.baseType,
+    category: "Deeds & undertakings" as const,
+    term: "One-off",
+    icon: "FileSignature",
+  };
+});
+
 const TAMIL_CATALOGUE: AgreementTemplate[] = TAMIL_TEMPLATE_IDS.map((id) => {
   const t = TAMIL_TEMPLATES[id];
   return {
@@ -294,7 +310,11 @@ const ENGLISH_TEMPLATES: AgreementTemplate[] = [
   },
 ];
 
-export const TEMPLATES: AgreementTemplate[] = [...ENGLISH_TEMPLATES, ...TAMIL_CATALOGUE];
+export const TEMPLATES: AgreementTemplate[] = [
+  ...ENGLISH_TEMPLATES,
+  ...DEED_CATALOGUE,
+  ...TAMIL_CATALOGUE,
+];
 
 export function getTemplatesByCategory() {
   const order: AgreementTemplate["category"][] = [
@@ -304,6 +324,7 @@ export function getTemplatesByCategory() {
     "Leave & licence",
     "Sale",
     "Business contract",
+    "Deeds & undertakings",
     "Tamil — தமிழ்",
   ];
   return order.map((category) => ({

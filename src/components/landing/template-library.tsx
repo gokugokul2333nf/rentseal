@@ -76,6 +76,7 @@ const CATEGORY_TONE: Record<
   "Leave & licence": "amber",
   Sale: "dark",
   "Business contract": "emerald",
+  "Deeds & undertakings": "violet",
   "Tamil — தமிழ்": "violet",
 };
 

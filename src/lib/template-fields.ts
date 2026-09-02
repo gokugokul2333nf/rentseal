@@ -82,7 +82,8 @@ const FIELDS: Record<string, Omit<TemplateField, "token">> = {
   },
   executionPlace: { kind: "text", label: "Executed at", path: "terms.executionPlace" },
   executionDate: { kind: "date", label: "Date of the agreement", path: "terms.executionDate" },
-  amount: { kind: "money", label: "Franchise fee", path: "terms.securityDeposit" },
+  amount: { kind: "money", label: "Amount", path: "terms.securityDeposit" },
+  repayBy: { kind: "date", label: "Repayable on or before", path: "terms.startDate" },
 
   propertyAddress: {
     kind: "propertyAddress",
@@ -112,6 +113,7 @@ const DERIVED = new Set([
   "endDate",
   "rentWords",
   "depositWords",
+  "amountWords",
   "blank",
 ]);
 
@@ -121,7 +123,7 @@ const ORDER = [
   "providerName", "nameB", "parentB", "aadhaarB", "addressB",
   "propertyAddress",
   "execYear", "executionDate", "executionPlace",
-  "startDate", "rent", "deposit", "amount", "rentDueDay", "noticeMonths",
+  "startDate", "repayBy", "rent", "deposit", "amount", "rentDueDay", "noticeMonths",
 ];
 
 export function tokensUsedBy(spec: TemplateSpec): Set<string> {

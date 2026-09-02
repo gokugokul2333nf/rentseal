@@ -1,6 +1,7 @@
 import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS, type TamilTemplateId } from "./tamil-templates";
 import { SERVICE_PROVIDER_BODY } from "./service-provider-template";
+import { DEED_TEMPLATES, DEED_TEMPLATE_IDS, type DeedTemplateId } from "./deed-templates";
 
 /**
  * The drafting spec behind every template LP Stamp Paper offers.
@@ -51,7 +52,7 @@ export type EnglishTemplateId =
   ;
 
 /** Every template the builder can draw, in either language. */
-export type TemplateId = EnglishTemplateId | TamilTemplateId;
+export type TemplateId = EnglishTemplateId | TamilTemplateId | DeedTemplateId;
 
 export interface TemplateSpec {
   id: TemplateId;
@@ -926,9 +927,44 @@ const TAMIL_SPECS = TAMIL_TEMPLATE_IDS.reduce(
   {} as Record<TamilTemplateId, TemplateSpec>,
 );
 
+/** The four standalone deeds, on the same verbatim footing as the Tamil set. */
+const DEED_SPECS = DEED_TEMPLATE_IDS.reduce(
+  (acc, id) => {
+    const t = DEED_TEMPLATES[id];
+    acc[id] = {
+      id,
+      baseType: t.baseType,
+      family: "verbatim",
+      language: "en",
+      deedTitle: t.deedTitle,
+      roleA: t.roleA,
+      roleB: t.roleB || t.roleA,
+      moneyWord: "amount",
+      purpose: t.name,
+      scheduleHeading: "SCHEDULE",
+      defaults: {
+        durationMonths: 0,
+        propertyKind: "apartment",
+        commercialUse: false,
+        registrationRequired: false,
+      },
+      notes: [
+        "Fill every blank. Anything left blank is a gap in the document, not a formality.",
+        "Print on non-judicial stamp paper of the right value, and have it attested where the document calls for it.",
+        "This is a drafting aid, not legal advice. Have it checked if the matter is unusual.",
+      ],
+      clauses: [],
+      body: t.body,
+    };
+    return acc;
+  },
+  {} as Record<DeedTemplateId, TemplateSpec>,
+);
+
 export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
   ...ENGLISH_SPECS,
   ...TAMIL_SPECS,
+  ...DEED_SPECS,
 };
 
 export const TEMPLATE_IDS = Object.keys(TEMPLATE_SPECS) as TemplateId[];
