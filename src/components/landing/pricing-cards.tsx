@@ -31,7 +31,11 @@ export function PricingCards({
             title="One transparent fee. Government charges at cost."
             body="You see the platform fee and the stamp duty as separate lines before you pay. We never mark up a government charge — you can verify every rupee against the Registration Department's own rate."
           />
-        ) : null}
+        ) : (
+          // The plan names are h3. Without the section heading above them the
+          // outline jumped from the page h1 straight to h3.
+          <h2 className="sr-only">Plans and pricing</h2>
+        )}
 
         <div className="mt-11 grid items-start gap-6 lg:grid-cols-3">
           {PLANS.map((plan, i) => {

@@ -322,3 +322,31 @@ body.guard-no-select [contenteditable="true"] {
     color: #000;
   }
 }
+
+/*
+  A card's entrance, without a JavaScript animation library behind it.
+
+  The catalogue draws sixty-two of these at once. As Framer components that was
+  sixty-two observers and sixty-two frame subscriptions on the busiest page of
+  the site, for an animation that is one keyframe and one delay.
+*/
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.card-rise {
+  animation: card-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-rise {
+    animation: none;
+  }
+}

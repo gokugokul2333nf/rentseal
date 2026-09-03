@@ -8,7 +8,7 @@ import { BUILDER_START, SITE } from "@/lib/site";
 
 const title = "Rental Agreement in Tamil Nadu — All 38 Districts";
 const description =
-  "Create a legally valid rental agreement anywhere in Tamil Nadu. E-stamped at the government rate, Aadhaar e-signed and delivered by email and WhatsApp. Pick your district for local Sub-Registrar Offices and delivery times.";
+  "A legally valid rental agreement anywhere in Tamil Nadu, e-stamped at the government rate. Pick your district for its Sub-Registrar Offices.";
 
 export const metadata: Metadata = {
   title,

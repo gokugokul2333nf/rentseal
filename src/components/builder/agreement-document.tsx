@@ -271,11 +271,13 @@ export function AgreementDocument({
         </>
       ) : (
         <>
-      {/* Title */}
+      {/* Title. An h2, not an h1: the page's own heading names the document
+          being drafted, and this is the title printed inside the preview of
+          it — two h1s on the page, one of them a rendering of a deed. */}
       <header data-doc="title" className="avoid-break mb-7 text-center">
-        <h1 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
+        <h2 className="font-display text-[17px] font-bold tracking-[0.08em] text-navy-950 uppercase">
           {agreementTitle(draft)}
-        </h1>
+        </h2>
         {isSale ? (
           <p className="mt-4 text-left">
             <span className="font-semibold">Date: </span>

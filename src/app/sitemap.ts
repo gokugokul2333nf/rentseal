@@ -13,7 +13,10 @@ import { SITE } from "@/lib/site";
  * stamp paper — giving 38 pages each plus their index.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-24");
+  // Stamped at build time. A hard-coded date goes stale the day after it is
+  // written, and a wrong lastModified is worse than none: a crawler that has
+  // been told nothing changed has no reason to come back.
+  const lastModified = new Date();
 
   const staticPages: MetadataRoute.Sitemap = (
     [

@@ -7,9 +7,9 @@ import { ButtonLink } from "@/components/ui/button";
 import { DISTRICTS } from "@/lib/districts";
 import { LEAD_ANCHOR, SITE } from "@/lib/site";
 
-const title = "Government Authorised Stamp Paper, Delivered to Your Doorstep";
+const title = "Government Authorised Stamp Paper — Tamil Nadu";
 const description =
-  "Fill in the details online and receive genuine, government authorised stamp paper at your door anywhere in Tamil Nadu — ₹20 to ₹500 denominations and e-Stamps for any value, at face value, same day in the Chennai metro.";
+  "Genuine, government authorised stamp paper delivered to your door anywhere in Tamil Nadu. ₹20 to ₹500 and e-Stamps for any value, at face value, same day in Chennai.";
 
 export const metadata: Metadata = {
   title,

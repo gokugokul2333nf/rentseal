@@ -37,8 +37,8 @@ export async function generateMetadata({
   const district = getDistrict(slug);
   if (!district) return {};
 
-  const title = `Rental Agreement in ${district.name} — Online, e-Stamped`;
-  const description = `Create a legally valid rental agreement anywhere in ${district.name} district. E-stamped at the government rate, Aadhaar e-signed and delivered by email and WhatsApp. Covering ${district.sroTowns.length} Sub-Registrar Offices across the district.`;
+  const title = `Rental Agreement in ${district.name}`;
+  const description = `Rental agreements in ${district.name} district, e-stamped at the government rate and delivered to you. Covering ${district.sroTowns.length} Sub-Registrar Offices.`;
 
   return {
     title,

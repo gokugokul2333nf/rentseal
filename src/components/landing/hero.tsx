@@ -55,9 +55,12 @@ function AgreementMock() {
         <p className="text-[9px] font-bold tracking-[0.22em] text-navy-400 uppercase">
           Government of Tamil Nadu · e-Stamp
         </p>
-        <h3 className="mt-2 font-display text-[15px] font-bold tracking-tight text-navy-950">
+        {/* Set as text, not a heading. It is the title printed on a drawing
+            of an agreement, and marking it up as h3 put a level-three heading
+            straight under the page's h1 in the outline. */}
+        <p className="mt-2 font-display text-[15px] font-bold tracking-tight text-navy-950">
           RESIDENTIAL RENTAL AGREEMENT
-        </h3>
+        </p>
         <p className="mt-1 text-[10.5px] text-navy-400">
           Executed at Chennai on 12 August 2026
         </p>

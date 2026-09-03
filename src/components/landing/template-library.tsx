@@ -1,3 +1,6 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,7 +19,7 @@ import {
   KeyRound,
   Landmark,
   Languages,
-  LayoutGrid,
+
   Map,
   PanelsTopLeft,
   RefreshCw,
@@ -34,10 +37,8 @@ import {
 import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
 import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
-import { Stagger, StaggerItem } from "@/components/ui/motion";
 import { TemplateThumb } from "./template-thumb";
 import { SITE } from "@/lib/site";
-import { SectionHeading } from "@/components/ui/section-heading";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Home,
@@ -131,13 +132,35 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
  * and roughly 3,700px of scroll leading to only four unique destinations.
  * `heading={false}` hides the section heading when the page already has one.
  */
+/**
+ * Whether an entrance animation should play at all.
+ *
+ * The cards fade up from nothing, and a browser does not advance an animation
+ * — CSS or otherwise — in a tab nobody is looking at. Applied unconditionally
+ * that leaves sixty-two cards stranded at zero opacity on any page loaded out
+ * of sight, which is the same way the whole site once went blank in a
+ * background tab.
+ *
+ * So the markup is visible by default and the animation is added afterwards,
+ * only when there is someone there to see it. Rendering it off on the server
+ * also keeps the first paint identical to the HTML.
+ */
+function useEntrance() {
+  return useSyncExternalStore(
+    (notify) => {
+      document.addEventListener("visibilitychange", notify);
+      return () => document.removeEventListener("visibilitychange", notify);
+    },
+    () => document.visibilityState === "visible",
+    () => false,
+  );
+}
+
 export function TemplateLibrary({
-  heading = true,
   templates,
   query,
   onClear,
 }: {
-  heading?: boolean;
   /** A filtered subset. Omitted, the whole catalogue is shown. */
   templates?: AgreementTemplate[];
   /** What was searched for, so the empty state can name it. */
@@ -145,19 +168,11 @@ export function TemplateLibrary({
   onClear?: () => void;
 } = {}) {
   const groups = getTemplatesByCategory(templates).filter((g) => g.templates.length > 0);
+  const entrance = useEntrance();
 
   return (
     <section id="templates" className="section">
       <div className="container-page">
-        {heading ? (
-          <SectionHeading
-            eyebrow="Template library"
-            icon={LayoutGrid}
-            title={`${TEMPLATES.length} agreement templates, ready to draft`}
-            body="Every template below is a Tamil Nadu compliant draft built on one of our four instruments — pick the one that matches your situation and the right clauses come with it."
-          />
-        ) : null}
-
         {groups.length === 0 ? (
           <div className="rounded-2xl border border-line bg-white p-10 text-center shadow-soft">
             <p className="font-display text-[18px] font-bold text-navy-950">
@@ -182,21 +197,33 @@ export function TemplateLibrary({
           <div className="space-y-14">
             {groups.map(({ category, templates: group }) => (
               <div key={category}>
-                <div className="flex items-center gap-3">
+                {/* A real heading per family. The cards are h3, so without an
+                    h2 here the outline stepped from the page h1 to h3 — and
+                    "Affidavits", "Lease deed" and the rest are the words people
+                    search for. */}
+                <h2 className="flex items-center gap-3 text-[13px] font-medium text-navy-500">
                   <Badge tone={CATEGORY_TONE[category]}>{category}</Badge>
-                  <span className="text-[13px] font-medium text-navy-500">
+                  <span>
                     {group.length} template{group.length === 1 ? "" : "s"}
                   </span>
                   <span aria-hidden="true" className="h-px flex-1 bg-line" />
-                </div>
+                </h2>
 
-                <Stagger className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" amount={0.05}>
-                  {group.map((template) => (
-                    <StaggerItem key={template.id} className="h-full">
+                <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {group.map((template, i) => (
+                    <div
+                      key={template.id}
+                      // Sixty-two cards were sixty-two Framer components, each
+                      // with its own observer and its own frame subscription,
+                      // on the heaviest page of the site. The entrance is the
+                      // same; it is four lines of CSS and no JavaScript now.
+                      className={entrance ? "card-rise h-full" : "h-full"}
+                      style={entrance ? { animationDelay: `${Math.min(i, 7) * 55}ms` } : undefined}
+                    >
                       <TemplateCard template={template} />
-                    </StaggerItem>
+                    </div>
                   ))}
-                </Stagger>
+                </div>
               </div>
             ))}
           </div>

@@ -23,7 +23,7 @@ export const SITE = {
   legalName: "LP Enterprises",
   tagline: "Licensed stamp paper and notarised agreements across Tamil Nadu",
   description:
-    "Licensed non-judicial stamp paper and e-Stamp certificates at face value, delivered anywhere in Tamil Nadu — same day in Chennai. Rental agreements, sale deeds, affidavits and powers of attorney drafted and notarised.",
+    "Licensed non-judicial stamp paper and e-Stamps at face value, delivered anywhere in Tamil Nadu — same day in Chennai. Agreements, deeds and affidavits drafted too.",
   url: "https://lpstamppaper.com",
   /** Landline. Dialled as 044 within India; the tel: link strips the spaces. */
   phone: "044 4006 8402",
@@ -97,16 +97,15 @@ export const NAV_LINKS = [
 /**
  * The two ways to buy, and both need to be reachable.
  *
- * BUILDER_START is the product: the seven-step drafter that ends in payment.
- * It was orphaned — the only link to it in the whole codebase sat in
- * app/_disabled/, a folder Next does not serve — so every one of the twenty-odd
- * calls to action on the site funnelled into the callback form instead, and
- * nobody could reach the thing the homepage advertises.
+ * BUILDER_START is the way into the product: the catalogue, where the reader
+ * picks a document and goes on into the drafter. It used to be /create, which
+ * printed the same sixty-two cards as /templates at a second URL; that route
+ * now redirects here, so a call to action costs one request rather than two.
  *
  * LEAD_ANCHOR stays as the assisted path, for stamp paper on its own and for
  * anyone who would rather talk to someone first.
  */
-export const BUILDER_START = "/create";
+export const BUILDER_START = "/templates";
 export const LEAD_ANCHOR = "/#get-started";
 
 export const FOOTER_LINKS = [

@@ -108,7 +108,7 @@ export const SERVICES: ServiceContent[] = [
       "Built for business premises, with the trade licence, GST, fit-out and business-use obligations that a residential template simply doesn't carry.",
     metaTitle: "Commercial Rental Agreement Online — Tamil Nadu",
     metaDescription:
-      "Draft a commercial rental agreement for an office, shop, showroom or warehouse in Tamil Nadu. Trade licence, GST and fit-out clauses included. E-stamped and e-signed online.",
+      "A commercial rental agreement for an office, shop, showroom or warehouse in Tamil Nadu, with trade licence, GST and fit-out clauses included.",
     whoFor: [
       "Owners letting office space, a shop or a godown",
       "Businesses taking premises and needing a clean paper trail for GST",
@@ -189,7 +189,7 @@ export const SERVICES: ServiceContent[] = [
     h1: "Lease deed for terms of a year and above",
     intro:
       "When the term runs 12 months or longer, registration stops being optional. A lease deed gives you the strongest evidentiary position available — and we handle the registration mechanics.",
-    metaTitle: "Lease Deed Registration in Tamil Nadu — Online Drafting",
+    metaTitle: "Lease Deed Registration in Tamil Nadu",
     metaDescription:
       "Draft and register a lease deed in Tamil Nadu for terms of 12 months or more. Stamp duty and registration fee computed, Sub-Registrar appointment arranged.",
     whoFor: [

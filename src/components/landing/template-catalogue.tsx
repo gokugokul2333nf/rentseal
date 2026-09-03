@@ -79,7 +79,7 @@ export function TemplateCatalogue() {
         </div>
       </PageHero>
 
-      <TemplateLibrary heading={false} templates={results} query={query.trim()} onClear={() => setQuery("")} />
+      <TemplateLibrary templates={results} query={query.trim()} onClear={() => setQuery("")} />
     </>
   );
 }

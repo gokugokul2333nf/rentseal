@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   motion,
   useInView,
@@ -12,6 +12,34 @@ import {
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Whether an entrance should start from nothing.
+ *
+ * Every reveal on this site begins at opacity 0 and is carried to 1 when an
+ * IntersectionObserver says the element is on screen. In a tab nobody is
+ * looking at, that callback may never arrive and the frame loop that would
+ * finish the animation is not running either — so a page loaded out of sight
+ * paints its headings, its copy and its sections at zero opacity and leaves
+ * them there. It has happened twice: once through Framer's own frame loop, and
+ * again through a CSS keyframe that looked like a way around it.
+ *
+ * The rule that prevents a third time is that content is visible unless
+ * somebody is there to watch it appear. `initial={false}` mounts an element at
+ * the end of its animation, so this returning false — on the server, and in a
+ * hidden tab — means the markup is simply shown. When the tab is looked at, the
+ * subscription fires and the reveals behave as designed from there down.
+ */
+function useEntrance() {
+  return useSyncExternalStore(
+    (notify) => {
+      document.addEventListener("visibilitychange", notify);
+      return () => document.removeEventListener("visibilitychange", notify);
+    },
+    () => document.visibilityState === "visible",
+    () => false,
+  );
+}
 
 /**
  * Scroll-triggered reveal. Fires once.
@@ -34,10 +62,11 @@ export function Reveal({
   as?: "div" | "section" | "li" | "span";
 }) {
   const MotionTag = motion[as];
+  const entrance = useEntrance();
   return (
     <MotionTag
       className={className}
-      initial={{ opacity: 0, y }}
+      initial={entrance ? { opacity: 0, y } : false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, delay, ease: EASE }}
@@ -67,11 +96,12 @@ export function Stagger({
   className?: string;
   amount?: number;
 }) {
+  const entrance = useEntrance();
   return (
     <motion.div
       className={className}
       variants={staggerParent}
-      initial="hidden"
+      initial={entrance ? "hidden" : false}
       whileInView="show"
       viewport={{ once: true, amount }}
     >

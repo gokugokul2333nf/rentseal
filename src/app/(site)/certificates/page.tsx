@@ -10,9 +10,9 @@ import { LEAD_ANCHOR, SITE } from "@/lib/site";
 import { inr } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Certificates & Registrations — PAN, Voter ID, Ration Card, Passport",
+  title: "Certificates & Registrations — Tamil Nadu",
   description:
-    "Community, income, nativity, OBC, unmarried and widow certificates, ration card, voter ID, PAN, passport and MSME registration. What each one costs and exactly which documents to bring.",
+    "Community, income, nativity and OBC certificates, ration card, voter ID, PAN, passport and MSME registration — what each costs and which documents to bring.",
   alternates: { canonical: "/certificates" },
 };
 

@@ -14,7 +14,7 @@ import { SITE } from "@/lib/site";
 import { DENOMINATIONS } from "@/lib/stamp-paper";
 
 export const metadata: Metadata = {
-  title: "Stamp Paper Delivery & Rental Agreements Across Tamil Nadu",
+  title: "Stamp Paper & Rental Agreements in Tamil Nadu",
   description: SITE.description,
   alternates: { canonical: "/" },
 };

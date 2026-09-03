@@ -12,8 +12,8 @@ import { TAMIL_TEMPLATE_IDS } from "@/lib/tamil-templates";
  */
 const ENGLISH_COUNT = TEMPLATES.length - TAMIL_TEMPLATE_IDS.length;
 
-const title = `${TEMPLATES.length} Agreement and Deed Templates in English and Tamil — Tamil Nadu`;
-const description = `Browse ${ENGLISH_COUNT} English templates across residential, commercial, lease, leave-and-licence, sale, business contracts, deeds and affidavits, plus ${TAMIL_TEMPLATE_IDS.length} Tamil deeds — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection.`;
+const title = `${TEMPLATES.length} Agreement & Deed Templates — Tamil Nadu`;
+const description = `${ENGLISH_COUNT} English templates and ${TAMIL_TEMPLATE_IDS.length} Tamil deeds — rent, lease, sale, loan, mortgage, indemnity, affidavit and no-objection. Drafted for Tamil Nadu, ready to print.`;
 
 export const metadata: Metadata = {
   title,

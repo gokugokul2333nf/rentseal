@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { SERVICES, getService } from "@/lib/services";
-import { BUILDER_START, LEAD_ANCHOR, SITE } from "@/lib/site";
+import { LEAD_ANCHOR, SITE } from "@/lib/site";
 
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
@@ -62,7 +62,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         body={service.intro}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href={`${BUILDER_START}/${service.id}`} size="lg" className="group">
+          {/* The drafter, not the catalogue: this page is already about one
+              instrument, so it opens that one rather than asking again.
+              BUILDER_START points at the catalogue now, and building the URL
+              from it produced /templates/residential, which is nothing. */}
+          <ButtonLink href={`/create/${service.id}`} size="lg" className="group">
             Draft this agreement
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>

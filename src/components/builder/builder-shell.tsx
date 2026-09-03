@@ -478,6 +478,12 @@ export function BuilderShell({
           )}
         >
           <div className="min-w-0 lg:order-2">
+            {/* Twelve of the drafting pages had no h1 at all: the letting and
+                sale steps open with one, the verbatim deeds open with the
+                document bar. Naming the page is what a screen reader reads
+                first, so it is stated here for every template and shown to
+                everyone else by the bar below. */}
+            <h1 className="sr-only">Create a {draftingName}</h1>
             {/* Switching instrument keeps the parties and the address and
                 nothing else — say so, rather than letting it look like the old
                 draft simply came back. */}
