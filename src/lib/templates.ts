@@ -3,6 +3,7 @@ import type { TemplateId } from "./agreement-templates";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS } from "./tamil-templates";
 import { DEED_TEMPLATES, DEED_TEMPLATE_IDS } from "./deed-templates";
 import { AFFIDAVIT_TEMPLATES, AFFIDAVIT_TEMPLATE_IDS } from "./affidavit-templates";
+import { CONTRACT_TEMPLATES, CONTRACT_TEMPLATE_IDS } from "./contract-templates";
 
 export interface AgreementTemplate {
   /**
@@ -62,6 +63,27 @@ const AFFIDAVIT_CATALOGUE: AgreementTemplate[] = AFFIDAVIT_TEMPLATE_IDS.map((id)
     category: "Affidavits" as const,
     term: "One-off",
     icon: "Scale",
+  };
+});
+
+/**
+ * The sale agreements, the corporate guarantee and the two memoranda.
+ *
+ * These sit under the category their instrument belongs to rather than in a set
+ * of their own: an agreement for sale is a sale whatever it is written on, and
+ * a memorandum of deposit of title deeds is a deed.
+ */
+const CONTRACT_CATALOGUE: AgreementTemplate[] = CONTRACT_TEMPLATE_IDS.map((id) => {
+  const t = CONTRACT_TEMPLATES[id];
+  const sale = t.baseType === "sale";
+  return {
+    id,
+    name: t.name,
+    description: t.description,
+    baseType: t.baseType,
+    category: (sale ? "Sale" : id === "corporate-guarantee" ? "Business contract" : "Deeds & undertakings") as AgreementTemplate["category"],
+    term: "One-off",
+    icon: sale ? "ShoppingBag" : id === "corporate-guarantee" ? "Handshake" : "Landmark",
   };
 });
 
@@ -330,6 +352,7 @@ export const TEMPLATES: AgreementTemplate[] = [
   ...ENGLISH_TEMPLATES,
   ...DEED_CATALOGUE,
   ...AFFIDAVIT_CATALOGUE,
+  ...CONTRACT_CATALOGUE,
   ...TAMIL_CATALOGUE,
 ];
 

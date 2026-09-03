@@ -7,6 +7,11 @@ import {
   AFFIDAVIT_TEMPLATE_IDS,
   type AffidavitTemplateId,
 } from "./affidavit-templates";
+import {
+  CONTRACT_TEMPLATES,
+  CONTRACT_TEMPLATE_IDS,
+  type ContractTemplateId,
+} from "./contract-templates";
 
 /**
  * The drafting spec behind every template LP Stamp Paper offers.
@@ -61,7 +66,8 @@ export type TemplateId =
   | EnglishTemplateId
   | TamilTemplateId
   | DeedTemplateId
-  | AffidavitTemplateId;
+  | AffidavitTemplateId
+  | ContractTemplateId;
 
 export interface TemplateSpec {
   id: TemplateId;
@@ -1005,11 +1011,47 @@ const AFFIDAVIT_SPECS = AFFIDAVIT_TEMPLATE_IDS.reduce(
   {} as Record<AffidavitTemplateId, TemplateSpec>,
 );
 
+/** The four sale agreements, the corporate guarantee and the two memoranda. */
+const CONTRACT_SPECS = CONTRACT_TEMPLATE_IDS.reduce(
+  (acc, id) => {
+    const t = CONTRACT_TEMPLATES[id];
+    acc[id] = {
+      id,
+      baseType: t.baseType,
+      family: "verbatim",
+      language: "en",
+      deedTitle: t.deedTitle,
+      roleA: t.roleA,
+      roleB: t.roleB || t.roleA,
+      moneyWord: "amount",
+      purpose: t.name,
+      scheduleHeading: "SCHEDULE",
+      defaults: {
+        durationMonths: 0,
+        propertyKind: "apartment",
+        commercialUse: false,
+        registrationRequired: false,
+      },
+      notes: [
+        "Fill every blank. A rule left empty is a gap in the document, not a formality.",
+        "The figures are left blank on purpose where the document names more than one — a price, an advance and a balance are three different sums.",
+        "Print on non-judicial stamp paper of the value this instrument attracts, and register it where registration is compulsory.",
+        "This is a drafting aid, not legal advice. Have it checked if the matter is unusual.",
+      ],
+      clauses: [],
+      body: t.body,
+    };
+    return acc;
+  },
+  {} as Record<ContractTemplateId, TemplateSpec>,
+);
+
 export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
   ...ENGLISH_SPECS,
   ...TAMIL_SPECS,
   ...DEED_SPECS,
   ...AFFIDAVIT_SPECS,
+  ...CONTRACT_SPECS,
 };
 
 export const TEMPLATE_IDS = Object.keys(TEMPLATE_SPECS) as TemplateId[];
