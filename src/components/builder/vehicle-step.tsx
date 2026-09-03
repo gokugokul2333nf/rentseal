@@ -3,7 +3,7 @@
 import { Bike } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
 import { Field, Input, Toggle } from "@/components/ui/field";
-import { TemplatePicker } from "./template-picker";
+import { CurrentTemplate } from "./current-template";
 import { inr, rupeesInWords } from "@/lib/utils";
 
 /**
@@ -24,7 +24,7 @@ export function VehicleStep() {
 
   return (
     <>
-      <TemplatePicker />
+      <CurrentTemplate />
 
       <div className="mt-8">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-navy-950">

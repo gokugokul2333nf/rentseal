@@ -36,6 +36,7 @@ import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
 import { TemplateThumb } from "./template-thumb";
+import { SITE } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -130,8 +131,20 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
  * and roughly 3,700px of scroll leading to only four unique destinations.
  * `heading={false}` hides the section heading when the page already has one.
  */
-export function TemplateLibrary({ heading = true }: { heading?: boolean } = {}) {
-  const groups = getTemplatesByCategory();
+export function TemplateLibrary({
+  heading = true,
+  templates,
+  query,
+  onClear,
+}: {
+  heading?: boolean;
+  /** A filtered subset. Omitted, the whole catalogue is shown. */
+  templates?: AgreementTemplate[];
+  /** What was searched for, so the empty state can name it. */
+  query?: string;
+  onClear?: () => void;
+} = {}) {
+  const groups = getTemplatesByCategory(templates).filter((g) => g.templates.length > 0);
 
   return (
     <section id="templates" className="section">
@@ -145,27 +158,49 @@ export function TemplateLibrary({ heading = true }: { heading?: boolean } = {}) 
           />
         ) : null}
 
-        <div className="space-y-14">
-          {groups.map(({ category, templates }) => (
-            <div key={category}>
-              <div className="flex items-center gap-3">
-                <Badge tone={CATEGORY_TONE[category]}>{category}</Badge>
-                <span className="text-[13px] font-medium text-navy-500">
-                  {templates.length} template{templates.length === 1 ? "" : "s"}
-                </span>
-                <span aria-hidden="true" className="h-px flex-1 bg-line" />
-              </div>
+        {groups.length === 0 ? (
+          <div className="rounded-2xl border border-line bg-white p-10 text-center shadow-soft">
+            <p className="font-display text-[18px] font-bold text-navy-950">
+              Nothing here matches {query ? `“${query}”` : "that"}
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-[14px] leading-relaxed text-navy-500">
+              Try the plain word for the document — rent, lease, shop, godown, loan, affidavit — or
+              ring the office on {SITE.phone}. If we draft it and it is not on this list, we will
+              add it.
+            </p>
+            {onClear ? (
+              <button
+                type="button"
+                onClick={onClear}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-navy-950 px-5 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-navy-900"
+              >
+                Show all {TEMPLATES.length} documents
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <div className="space-y-14">
+            {groups.map(({ category, templates: group }) => (
+              <div key={category}>
+                <div className="flex items-center gap-3">
+                  <Badge tone={CATEGORY_TONE[category]}>{category}</Badge>
+                  <span className="text-[13px] font-medium text-navy-500">
+                    {group.length} template{group.length === 1 ? "" : "s"}
+                  </span>
+                  <span aria-hidden="true" className="h-px flex-1 bg-line" />
+                </div>
 
-              <Stagger className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" amount={0.05}>
-                {templates.map((template) => (
-                  <StaggerItem key={template.id} className="h-full">
-                    <TemplateCard template={template} />
-                  </StaggerItem>
-                ))}
-              </Stagger>
-            </div>
-          ))}
-        </div>
+                <Stagger className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" amount={0.05}>
+                  {group.map((template) => (
+                    <StaggerItem key={template.id} className="h-full">
+                      <TemplateCard template={template} />
+                    </StaggerItem>
+                  ))}
+                </Stagger>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

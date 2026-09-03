@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { ArrowRight, LayoutGrid } from "lucide-react";
-import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
-import { TemplateLibrary } from "@/components/landing/template-library";
-import { ButtonLink } from "@/components/ui/button";
-import { BUILDER_START, SITE } from "@/lib/site";
+import { BreadcrumbSchema } from "@/components/site/page-hero";
+import { TemplateCatalogue } from "@/components/landing/template-catalogue";
+import { SITE } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
 import { TAMIL_TEMPLATE_IDS } from "@/lib/tamil-templates";
 
@@ -29,21 +27,7 @@ const CRUMBS = [{ label: "Home", href: "/" }, { label: "Templates" }];
 export default function TemplatesPage() {
   return (
     <>
-      <PageHero
-        eyebrow="Template library"
-        icon={LayoutGrid}
-        crumbs={CRUMBS}
-        title={`${ENGLISH_COUNT} English templates and ${TAMIL_TEMPLATE_IDS.length} Tamil deeds`}
-        body="Every document here is a Tamil Nadu compliant draft — lettings, leases, sale deeds, business contracts, affidavits and the office’s own Tamil deeds. Pick the one that matches your situation and the right clauses come with it."
-      >
-        <ButtonLink href={BUILDER_START} size="lg" className="group">
-          Create agreement
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </ButtonLink>
-      </PageHero>
-
-      <TemplateLibrary heading={false} />
-
+      <TemplateCatalogue />
       <BreadcrumbSchema crumbs={CRUMBS} baseUrl={SITE.url} />
     </>
   );

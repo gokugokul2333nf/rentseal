@@ -22,6 +22,7 @@ import { useAgreement } from "@/lib/agreement-store";
 import { clauseStats, specFor } from "@/lib/clauses";
 import { calculateStampDuty } from "@/lib/stamp-duty";
 import { AGREEMENT_TYPES } from "@/lib/site";
+import { TEMPLATES } from "@/lib/templates";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
@@ -303,6 +304,13 @@ export function BuilderShell({
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type) ??
     AGREEMENT_TYPES.find((t) => t.id === type);
 
+  // AGREEMENT_TYPES names only the four letting instruments, so a deed, an
+  // affidavit or a sale agreement had no name to print and the notice read
+  // "Now drafting a ." The document's own name is the right answer for all of
+  // them, and a better one than the instrument even where an instrument exists.
+  const draftingName =
+    TEMPLATES.find((t) => t.id === draft.templateId)?.name ?? meta?.name ?? specFor(draft).deedTitle;
+
   // Reconciling the restored draft against the route is the provider's job and
   // it does it once, at hydration. Repeating it here on every change of
   // draft.type undid the template picker the moment it moved instrument:
@@ -477,7 +485,7 @@ export function BuilderShell({
               <div className="no-print mb-5 flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-brand-200 bg-brand-50/70 p-4">
                 <p className="max-w-xl text-[13px] leading-relaxed text-navy-700">
                   <span className="font-semibold text-navy-950">
-                    Now drafting a {meta?.name}.
+                    Now drafting a {draftingName}.
                   </span>{" "}
                   We kept the parties and the property address from your last draft. The
                   term, clauses and everything else start fresh from this instrument.

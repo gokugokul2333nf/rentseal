@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
-import { TemplatePicker } from "./template-picker";
+import { CurrentTemplate } from "./current-template";
 import { TamilInput, TamilTextarea } from "@/components/ui/tamil-input";
 import { specFor } from "@/lib/clauses";
 import { ClauseEditor } from "./clause-editor";
@@ -100,7 +100,7 @@ export function PropertyStep() {
 
   return (
     <>
-      <TemplatePicker />
+      <CurrentTemplate />
 
       <StepIntro
         title="Where is the property?"

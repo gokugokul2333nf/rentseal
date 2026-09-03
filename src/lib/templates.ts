@@ -333,7 +333,8 @@ export const TEMPLATES: AgreementTemplate[] = [
   ...TAMIL_CATALOGUE,
 ];
 
-export function getTemplatesByCategory() {
+/** Groups the catalogue, or any subset of it, in reading order. */
+export function getTemplatesByCategory(list: AgreementTemplate[] = TEMPLATES) {
   const order: AgreementTemplate["category"][] = [
     "Residential",
     "Commercial",
@@ -347,6 +348,6 @@ export function getTemplatesByCategory() {
   ];
   return order.map((category) => ({
     category,
-    templates: TEMPLATES.filter((t) => t.category === category),
+    templates: list.filter((t) => t.category === category),
   }));
 }

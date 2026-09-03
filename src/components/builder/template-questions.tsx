@@ -9,7 +9,7 @@ import { CITIES, EXTRA_DISTRICTS } from "@/lib/site";
 import { districtFromPincode } from "@/lib/pincode";
 import { inr } from "@/lib/utils";
 import { StepIntro } from "./steps";
-import { TemplatePicker } from "./template-picker";
+import { CurrentTemplate } from "./current-template";
 
 /**
  * The questions this particular deed needs, and no others.
@@ -171,7 +171,7 @@ export function TemplateQuestionsStep({ which }: { which: "parties" | "details" 
     const b = fields.filter((f) => f.party === "B");
     return (
       <>
-        <TemplatePicker />
+        <CurrentTemplate />
         <div className="mt-8">
           <StepIntro
             title="Who is signing?"
