@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { ArrowRight, Stamp } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { DistrictIndex } from "@/components/site/district-index";
+import { StampPaperHow } from "@/components/site/stamp-paper-how";
 import { ButtonLink } from "@/components/ui/button";
 import { DISTRICTS } from "@/lib/districts";
 import { LEAD_ANCHOR, SITE } from "@/lib/site";
 
-const title = "Stamp Paper in Tamil Nadu — All 38 Districts";
+const title = "Government Authorised Stamp Paper, Delivered to Your Doorstep";
 const description =
-  "Buy non-judicial stamp paper and e-Stamp certificates anywhere in Tamil Nadu at face value. ₹20 to ₹500 denominations plus e-Stamps for any value, delivered same day in the Chennai metro.";
+  "Fill in the details online and receive genuine, government authorised stamp paper at your door anywhere in Tamil Nadu — ₹20 to ₹500 denominations and e-Stamps for any value, at face value, same day in the Chennai metro.";
 
 export const metadata: Metadata = {
   title,
@@ -26,12 +27,12 @@ export default function StampPaperIndex() {
         eyebrow="District-wise delivery"
         icon={Stamp}
         crumbs={crumbs}
-        title="Stamp paper delivered to all 38 districts of Tamil Nadu"
-        body="Licensed non-judicial paper and e-Stamp certificates at exactly the printed value, plus a flat delivery charge stated before you confirm. Same day in the Chennai metro, next working day in the major cities, two to three days everywhere else."
+        title="Government authorised stamp paper, delivered to your doorstep"
+        body="Fill in the details online and receive genuine, government authorised stamp paper delivered to your door — legally valid, at exactly the printed value, with a flat delivery charge stated before you confirm. Same day in the Chennai metro, next working day in the major cities, two to three days everywhere else."
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-            Order stamp paper
+            Get started
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
           <ButtonLink href="/rental-agreement" variant="secondary" size="lg">
@@ -39,6 +40,8 @@ export default function StampPaperIndex() {
           </ButtonLink>
         </div>
       </PageHero>
+
+      <StampPaperHow />
 
       <DistrictIndex base="stamp-paper" noun="Stamp paper" />
 
