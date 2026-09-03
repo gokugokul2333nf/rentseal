@@ -2,6 +2,11 @@ import type { AgreementType, FurnishingLevel, PropertyKind } from "./types";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS, type TamilTemplateId } from "./tamil-templates";
 import { SERVICE_PROVIDER_BODY } from "./service-provider-template";
 import { DEED_TEMPLATES, DEED_TEMPLATE_IDS, type DeedTemplateId } from "./deed-templates";
+import {
+  AFFIDAVIT_TEMPLATES,
+  AFFIDAVIT_TEMPLATE_IDS,
+  type AffidavitTemplateId,
+} from "./affidavit-templates";
 
 /**
  * The drafting spec behind every template LP Stamp Paper offers.
@@ -52,7 +57,11 @@ export type EnglishTemplateId =
   ;
 
 /** Every template the builder can draw, in either language. */
-export type TemplateId = EnglishTemplateId | TamilTemplateId | DeedTemplateId;
+export type TemplateId =
+  | EnglishTemplateId
+  | TamilTemplateId
+  | DeedTemplateId
+  | AffidavitTemplateId;
 
 export interface TemplateSpec {
   id: TemplateId;
@@ -961,10 +970,46 @@ const DEED_SPECS = DEED_TEMPLATE_IDS.reduce(
   {} as Record<DeedTemplateId, TemplateSpec>,
 );
 
+/** The affidavits, on the same verbatim footing as the deeds. */
+const AFFIDAVIT_SPECS = AFFIDAVIT_TEMPLATE_IDS.reduce(
+  (acc, id) => {
+    const t = AFFIDAVIT_TEMPLATES[id];
+    acc[id] = {
+      id,
+      baseType: "deed",
+      family: "verbatim",
+      language: "en",
+      deedTitle: t.deedTitle,
+      roleA: t.roleA,
+      roleB: t.roleB || t.roleA,
+      moneyWord: "amount",
+      purpose: t.name,
+      scheduleHeading: "SCHEDULE",
+      defaults: {
+        durationMonths: 0,
+        propertyKind: "apartment",
+        commercialUse: false,
+        registrationRequired: false,
+      },
+      notes: [
+        "Fill every blank. Anything left blank is a gap in the affidavit, not a formality.",
+        "An affidavit has to be sworn before the right officer — a notary, or the authority that asked for it.",
+        "Print on non-judicial stamp paper of the value that authority requires.",
+        "This is a drafting aid, not legal advice. Have it checked if the matter is unusual.",
+      ],
+      clauses: [],
+      body: t.body,
+    };
+    return acc;
+  },
+  {} as Record<AffidavitTemplateId, TemplateSpec>,
+);
+
 export const TEMPLATE_SPECS: Record<TemplateId, TemplateSpec> = {
   ...ENGLISH_SPECS,
   ...TAMIL_SPECS,
   ...DEED_SPECS,
+  ...AFFIDAVIT_SPECS,
 };
 
 export const TEMPLATE_IDS = Object.keys(TEMPLATE_SPECS) as TemplateId[];

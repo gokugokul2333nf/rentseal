@@ -27,6 +27,7 @@ const CATEGORY_TONE: Record<
   Sale: "dark",
   "Business contract": "emerald",
   "Deeds & undertakings": "violet",
+  Affidavits: "amber",
   "Tamil — தமிழ்": "violet",
 };
 
@@ -39,7 +40,9 @@ const CATEGORY_BLURB: Record<AgreementTemplate["category"], string> = {
   "Business contract":
     "Between two companies rather than two people — services, territory and fees.",
   "Deeds & undertakings":
-    "One-off documents: an indemnity, an affidavit, an undertaking, a private loan.",
+    "One-off documents: an indemnity, an undertaking, a private loan.",
+  Affidavits:
+    "Sworn declarations — property, a lost document, a study gap, consent for a child to travel.",
   "Tamil — தமிழ்":
     "The office's own Tamil deeds. Your answers go into the Tamil text; the rest is filled in at the counter.",
 };

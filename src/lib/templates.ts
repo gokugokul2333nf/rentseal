@@ -2,6 +2,7 @@ import type { AgreementType } from "./types";
 import type { TemplateId } from "./agreement-templates";
 import { TAMIL_TEMPLATES, TAMIL_TEMPLATE_IDS } from "./tamil-templates";
 import { DEED_TEMPLATES, DEED_TEMPLATE_IDS } from "./deed-templates";
+import { AFFIDAVIT_TEMPLATES, AFFIDAVIT_TEMPLATE_IDS } from "./affidavit-templates";
 
 export interface AgreementTemplate {
   /**
@@ -22,6 +23,7 @@ export interface AgreementTemplate {
     | "Sale"
     | "Business contract"
     | "Deeds & undertakings"
+    | "Affidavits"
     | "Tamil — தமிழ்";
   term: string;
   icon: string;
@@ -46,6 +48,20 @@ const DEED_CATALOGUE: AgreementTemplate[] = DEED_TEMPLATE_IDS.map((id) => {
     category: "Deeds & undertakings" as const,
     term: "One-off",
     icon: "FileSignature",
+  };
+});
+
+/** The affidavits — sworn declarations, one deponent apiece. */
+const AFFIDAVIT_CATALOGUE: AgreementTemplate[] = AFFIDAVIT_TEMPLATE_IDS.map((id) => {
+  const t = AFFIDAVIT_TEMPLATES[id];
+  return {
+    id,
+    name: t.name,
+    description: t.description,
+    baseType: t.baseType,
+    category: "Affidavits" as const,
+    term: "One-off",
+    icon: "Scale",
   };
 });
 
@@ -313,6 +329,7 @@ const ENGLISH_TEMPLATES: AgreementTemplate[] = [
 export const TEMPLATES: AgreementTemplate[] = [
   ...ENGLISH_TEMPLATES,
   ...DEED_CATALOGUE,
+  ...AFFIDAVIT_CATALOGUE,
   ...TAMIL_CATALOGUE,
 ];
 
@@ -325,6 +342,7 @@ export function getTemplatesByCategory() {
     "Sale",
     "Business contract",
     "Deeds & undertakings",
+    "Affidavits",
     "Tamil — தமிழ்",
   ];
   return order.map((category) => ({

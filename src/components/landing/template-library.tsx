@@ -20,6 +20,7 @@ import {
   Map,
   PanelsTopLeft,
   RefreshCw,
+  Scale,
   ShoppingBag,
   Sofa,
   Sprout,
@@ -64,6 +65,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   CircleParking,
   Languages,
   Handshake,
+  Scale,
 };
 
 const CATEGORY_TONE: Record<
@@ -77,6 +79,7 @@ const CATEGORY_TONE: Record<
   Sale: "dark",
   "Business contract": "emerald",
   "Deeds & undertakings": "violet",
+  Affidavits: "amber",
   "Tamil — தமிழ்": "violet",
 };
 

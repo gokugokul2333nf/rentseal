@@ -14,7 +14,8 @@ import type { ContractBlock } from "./service-provider-template";
  */
 
 export interface DeedTemplate {
-  id: DeedTemplateId;
+  /** Widened so the affidavit set can reuse this shape. */
+  id: string;
   baseType: AgreementType;
   name: string;
   deedTitle: string;
