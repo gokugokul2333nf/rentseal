@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
-import { LEAD_ANCHOR } from "@/lib/site";
+import { BUILDER_START, LEAD_ANCHOR } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -259,16 +260,35 @@ export function Hero() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.26, ease: EASE }}
-              className="mt-9 flex flex-col gap-3 sm:flex-row"
+              className="mt-9"
             >
-              <ButtonLink href={LEAD_ANCHOR} size="xl" className="group">
-                Order stamp paper
-                <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />
-              </ButtonLink>
-              <ButtonLink href="/#stamp-paper" variant="secondary" size="xl">
+              {/*
+                Both halves of the business, side by side. The hero sold stamp
+                paper and nothing else, so the drafter — the thing the rest of
+                the page is about — was four sections down the scroll before it
+                was named. Denominations moves under the buttons: it is an
+                anchor to a section of this same page, which is not the same
+                order of decision as the two above it.
+              */}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <ButtonLink href={LEAD_ANCHOR} size="xl" className="group">
+                  Order stamp paper
+                  <ArrowRight className="size-[18px] transition-transform duration-300 group-hover:translate-x-1" />
+                </ButtonLink>
+                <ButtonLink href={BUILDER_START} variant="secondary" size="xl" className="group">
+                  <FileSignature className="size-[18px] text-brand-600" />
+                  Create agreement
+                  <ArrowRight className="size-[18px] text-navy-400 transition-transform duration-300 group-hover:translate-x-1" />
+                </ButtonLink>
+              </div>
+
+              <Link
+                href="/#stamp-paper"
+                className="mt-4 inline-flex items-center gap-2 text-[14.5px] font-semibold text-navy-600 transition-colors hover:text-navy-950"
+              >
                 <PlayCircle className="size-[18px] text-navy-400" />
-                See denominations
-              </ButtonLink>
+                See denominations and prices
+              </Link>
             </motion.div>
 
             {/* proof points */}
