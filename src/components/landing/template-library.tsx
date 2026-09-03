@@ -35,6 +35,7 @@ import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
 import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
 import { Stagger, StaggerItem } from "@/components/ui/motion";
+import { TemplateThumb } from "./template-thumb";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -88,30 +89,37 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
   return (
     <Link
       href={`/create/${template.id}`}
-      className="group relative flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lift"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lift"
     >
-      <div className="flex items-start justify-between gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-navy-950 text-white transition-colors duration-300 group-hover:bg-brand-600">
-          <Icon className="size-4.5" />
+      <div className="relative border-b border-line">
+        <TemplateThumb template={template} className="block h-auto w-full" />
+        <span className="absolute top-3 left-3 grid size-8 place-items-center rounded-lg bg-navy-950/85 text-white backdrop-blur-sm transition-colors duration-300 group-hover:bg-brand-600">
+          <Icon className="size-4" />
         </span>
-        {template.popular ? <Badge tone="dark">Popular</Badge> : null}
+        {template.popular ? (
+          <span className="absolute top-3 right-3">
+            <Badge tone="dark">Popular</Badge>
+          </span>
+        ) : null}
       </div>
 
-      <h3 className="mt-4 font-display text-[15.5px] leading-snug font-bold text-navy-950">
-        {template.name}
-      </h3>
-      <p className="mt-1.5 flex-1 text-[13px] leading-[1.65] text-navy-500">
-        {template.description}
-      </p>
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="font-display text-[15.5px] leading-snug font-bold text-navy-950">
+          {template.name}
+        </h3>
+        <p className="mt-1.5 flex-1 text-[13px] leading-[1.65] text-navy-500">
+          {template.description}
+        </p>
 
-      <div className="mt-4 flex items-center justify-between gap-2">
-        <span className="rounded-full border border-line bg-canvas px-2.5 py-1 text-[11.5px] font-medium text-navy-600">
-          {template.term}
-        </span>
-        <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-700">
-          Draft this
-          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </span>
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <span className="rounded-full border border-line bg-canvas px-2.5 py-1 text-[11.5px] font-medium text-navy-600">
+            {template.term}
+          </span>
+          <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-700">
+            Draft this
+            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </span>
+        </div>
       </div>
     </Link>
   );
@@ -148,7 +156,7 @@ export function TemplateLibrary({ heading = true }: { heading?: boolean } = {}) 
                 <span aria-hidden="true" className="h-px flex-1 bg-line" />
               </div>
 
-              <Stagger className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" amount={0.05}>
+              <Stagger className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" amount={0.05}>
                 {templates.map((template) => (
                   <StaggerItem key={template.id} className="h-full">
                     <TemplateCard template={template} />

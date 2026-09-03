@@ -2,14 +2,20 @@ import type { Metadata } from "next";
 import { ArrowRight, LayoutGrid } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { TemplateLibrary } from "@/components/landing/template-library";
-import { TamilTemplates } from "@/components/landing/tamil-templates";
 import { ButtonLink } from "@/components/ui/button";
 import { BUILDER_START, SITE } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
 import { TAMIL_TEMPLATE_IDS } from "@/lib/tamil-templates";
 
-const title = `${TEMPLATES.length + TAMIL_TEMPLATE_IDS.length} Agreement Templates in English and Tamil — Tamil Nadu`;
-const description = `Browse ${TEMPLATES.length} English templates across residential, commercial, lease, leave-and-licence and sale, plus ${TAMIL_TEMPLATE_IDS.length} Tamil deeds ready to print — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection.`;
+/**
+ * The Tamil deeds are inside TEMPLATES, not alongside it, so the total is the
+ * length of the one list. Adding the two together billed the sixteen Tamil
+ * deeds twice and advertised seventy-one documents where there are fifty-five.
+ */
+const ENGLISH_COUNT = TEMPLATES.length - TAMIL_TEMPLATE_IDS.length;
+
+const title = `${TEMPLATES.length} Agreement and Deed Templates in English and Tamil — Tamil Nadu`;
+const description = `Browse ${ENGLISH_COUNT} English templates across residential, commercial, lease, leave-and-licence, sale, business contracts, deeds and affidavits, plus ${TAMIL_TEMPLATE_IDS.length} Tamil deeds — rent, lease, loan, mortgage, sale, indemnity, affidavit and no-objection.`;
 
 export const metadata: Metadata = {
   title,
@@ -27,18 +33,16 @@ export default function TemplatesPage() {
         eyebrow="Template library"
         icon={LayoutGrid}
         crumbs={CRUMBS}
-        title={`${TEMPLATES.length} English templates and ${TAMIL_TEMPLATE_IDS.length} Tamil deeds`}
-        body="Every template here is a Tamil Nadu compliant draft. Pick the situation that matches yours and the right clauses come with it — you are never starting from a blank page or a generic download."
+        title={`${ENGLISH_COUNT} English templates and ${TAMIL_TEMPLATE_IDS.length} Tamil deeds`}
+        body="Every document here is a Tamil Nadu compliant draft — lettings, leases, sale deeds, business contracts, affidavits and the office’s own Tamil deeds. Pick the one that matches your situation and the right clauses come with it."
       >
         <ButtonLink href={BUILDER_START} size="lg" className="group">
-          Start drafting
+          Create agreement
           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
         </ButtonLink>
       </PageHero>
 
       <TemplateLibrary heading={false} />
-
-      <TamilTemplates />
 
       <BreadcrumbSchema crumbs={CRUMBS} baseUrl={SITE.url} />
     </>

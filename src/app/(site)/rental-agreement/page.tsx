@@ -4,7 +4,7 @@ import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { DistrictIndex } from "@/components/site/district-index";
 import { ButtonLink } from "@/components/ui/button";
 import { DISTRICTS } from "@/lib/districts";
-import { LEAD_ANCHOR, SITE } from "@/lib/site";
+import { BUILDER_START, SITE } from "@/lib/site";
 
 const title = "Rental Agreement in Tamil Nadu — All 38 Districts";
 const description =
@@ -30,12 +30,12 @@ export default function RentalAgreementIndex() {
         body={`We draft, e-stamp and e-sign rental agreements in all ${DISTRICTS.length} districts of the state. Each district page carries its own Sub-Registrar Offices, the towns we deliver to, and the delivery promise that applies there.`}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
-            Start my agreement
+          <ButtonLink href={BUILDER_START} size="lg" className="group">
+            Create agreement
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
           </ButtonLink>
-          <ButtonLink href="/stamp-paper" variant="secondary" size="lg">
-            Order stamp paper only
+          <ButtonLink href="/templates" variant="secondary" size="lg">
+            See all templates
           </ButtonLink>
         </div>
       </PageHero>

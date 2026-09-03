@@ -69,18 +69,17 @@ export const SITE = {
  * ("Delivery") was a homepage anchor sitting among page links, so choosing it
  * from any other page threw you back to the homepage.
  */
+/**
+ * The header.
+ *
+ * "Agreements" was a six-item dropdown, which made the templates a hover away
+ * from being found and gave the one link people actually want — the whole
+ * catalogue — equal billing with four service pages. It is a plain link to the
+ * catalogue now: the menu opened, and closed, on the way to somewhere the click
+ * could have gone directly.
+ */
 export const NAV_LINKS = [
-  {
-    label: "Agreements",
-    items: [
-      { title: "Residential Rental", href: "/services/residential-rental-agreement", desc: "Flats, houses and villas let to families or working professionals." },
-      { title: "Commercial Rental", href: "/services/commercial-rental-agreement", desc: "Offices, shops and warehouses with GST and trade-licence clauses." },
-      { title: "Lease Deed", href: "/services/lease-agreement", desc: "Long-term leases of 12 months and above, registered at the SRO." },
-      { title: "Leave & Licence", href: "/services/leave-and-license", desc: "Licence to occupy without creating a tenancy interest." },
-      { title: "All 24 templates", href: "/templates", desc: "Every situation we have a ready draft for, by instrument." },
-      { title: "Rental agreement by district", href: "/rental-agreement", desc: "Stamp duty, SRO jurisdiction and timelines for all 38 districts." },
-    ],
-  },
+  { label: "Agreements", href: "/templates" },
   { label: "Stamp paper", href: "/stamp-paper" },
   { label: "Certificates", href: "/certificates" },
   { label: "Pricing", href: "/pricing" },

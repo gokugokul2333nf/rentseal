@@ -13,6 +13,7 @@ import { Reveal } from "@/components/ui/motion";
 import { ButtonLink } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { AGREEMENT_TYPES, BUILDER_START, LEAD_ANCHOR, SITE } from "@/lib/site";
+import { TEMPLATES } from "@/lib/templates";
 import { DISTRICTS } from "@/lib/districts";
 
 export const metadata: Metadata = {
@@ -66,7 +67,7 @@ const SECTIONS = [
         label: `Draft a ${t.name}`,
         href: `/create/${t.id}`,
       })),
-      { label: "All 24 templates", href: "/templates" },
+      { label: `All ${TEMPLATES.length} templates`, href: "/templates" },
     ],
   },
   {
