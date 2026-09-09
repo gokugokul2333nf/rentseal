@@ -19,8 +19,20 @@ import { AFFIDAVIT_TEMPLATE_IDS } from "./affidavit-templates";
  * checkbox.
  */
 
-/** The agreement plan add-on, in rupees. Bundled into Premium. */
-export const NOTARY_FEE = 700;
+/**
+ * The notary's fee, in rupees. Bundled into Premium.
+ *
+ * ₹350 is the office's own quoted rate — "notary signature in stamp paper
+ * including 2 green sheets, ₹350, only for signature". It was ₹700 here, which
+ * was double what the same office charges a walk-in for the same act, and it
+ * fell hardest on exactly the documents that cannot decline it: the eleven
+ * affidavits, where attestation is compulsory, and the Tamil deeds, which are
+ * mostly one-off instruments carrying it too.
+ *
+ * Attestation on plain paper is ₹100 at the counter, but a deed drafted here is
+ * executed on stamp paper, so ₹350 is the rate that applies.
+ */
+export const NOTARY_FEE = 350;
 
 /**
  * The deeds that cannot be delivered unsworn.

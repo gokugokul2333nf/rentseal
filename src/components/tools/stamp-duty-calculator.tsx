@@ -166,7 +166,7 @@ export function StampDutyCalculator() {
             ) : null}
             {plan !== "premium" ? (
               <Toggle
-                label="Add notary attestation — ₹700"
+                label="Add notary attestation — ₹350"
                 desc="A notary public attests the signatures on the agreement."
                 checked={lawyerReview}
                 onChange={setLawyerReview}

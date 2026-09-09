@@ -22,10 +22,18 @@ export const TN_REGISTRATION_RATE = 0.01; // 1% of chargeable value
 export const REGISTRATION_MANDATORY_FROM_MONTHS = 12;
 export const GST_RATE = 0.18;
 
+/**
+ * Premium's `lawyer: 0` is the point, not an oversight.
+ *
+ * The plan card prices Premium at ₹1,499 and lists notary attestation as
+ * included. It was also adding ₹700 to the quote, so the plan that advertised
+ * attestation as part of the price was the one that charged separately for it —
+ * ₹2,595 all in against an advertised ₹1,499. Included means included.
+ */
 export const PLAN_FEES: Record<PlanId, { platform: number; lawyer: number }> = {
   basic: { platform: 349, lawyer: 0 },
   standard: { platform: 799, lawyer: 0 },
-  premium: { platform: 1499, lawyer: 700 },
+  premium: { platform: 1499, lawyer: 0 },
 };
 
 export interface StampDutyInput {

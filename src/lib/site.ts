@@ -295,7 +295,7 @@ export const PLANS: Array<{
       { label: "Cloud storage, unlimited", included: true },
       { label: "e-Stamp paper procured for you", included: true, hint: "Duty charged at government rate, no markup" },
       { label: "Aadhaar e-Sign for both parties", included: true },
-      { label: "Notary attestation", included: false, hint: "Add for ₹700" },
+      { label: "Notary attestation", included: false, hint: "Add for ₹350" },
       { label: "WhatsApp delivery", included: true },
       { label: "Doorstep delivery of stamped copy", included: false },
     ],
