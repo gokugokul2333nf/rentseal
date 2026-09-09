@@ -8,6 +8,7 @@ import {
   FileCheck2,
   Lock,
   Phone,
+  Copy,
   Receipt,
   Scale,
 } from "lucide-react";
@@ -27,6 +28,8 @@ import {
 import { DENOMINATIONS } from "@/lib/stamp-paper";
 import { TEMPLATES } from "@/lib/templates";
 import { BACKDATE_FEE_PER_MONTH, backdateLabel } from "@/lib/backdating";
+import { COPY_PAGE_FEE, printedCopyUnitPrice } from "@/lib/copies";
+import { Stepper } from "@/components/ui/stepper";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
@@ -159,6 +162,8 @@ function SendBlock({
     templateId: draft.templateId,
     stampPaperValue: draft.options.stampPaperValue,
     documentPages: draft.options.documentPages,
+    extraPrintedCopies: draft.options.extraPrintedCopies,
+    softCopy: draft.options.softCopy,
   });
   const split = splitGovernmentAndService(breakdown);
 
@@ -322,6 +327,110 @@ function SendBlock({
         </div>
 
         {/*
+          Extra copies.
+
+          Everyone asks — the landlord keeps one, the tenant keeps one, the bank
+          wants one. It used to be quoted on the phone, after the customer had
+          already agreed to an estimate that did not include it, which is the
+          worst moment to introduce a number.
+        */}
+        <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <div className="flex items-center gap-2 border-b border-line bg-navy-50 px-5 py-3">
+            <Copy className="size-4 text-navy-500" />
+            <h3 className="text-[13px] font-bold text-navy-950">
+              Do you need extra copies?
+            </h3>
+          </div>
+
+          <div className="divide-y divide-line">
+            {/* Printed */}
+            <div className="flex flex-wrap items-start justify-between gap-4 px-5 py-4">
+              <div className="min-w-[15rem] flex-1">
+                <p className="text-[14px] font-semibold text-navy-900">
+                  Printed &amp; stamped copies
+                </p>
+                <p className="mt-0.5 text-[12.5px] leading-relaxed text-navy-500">
+                  Each one is executed again on its own stamp paper, so each carries the
+                  sheet a second time plus {inr(COPY_PAGE_FEE)} a page for printing.
+                  {draft.options.stampPaperValue > 0 ? (
+                    <>
+                      {" "}
+                      On {inr(draft.options.stampPaperValue)} paper over{" "}
+                      {draft.options.documentPages} page
+                      {draft.options.documentPages === 1 ? "" : "s"}, that is{" "}
+                      <span className="font-semibold text-navy-800">
+                        {inr(
+                          printedCopyUnitPrice(
+                            draft.options.documentPages,
+                            draft.options.stampPaperValue,
+                          ),
+                        )}{" "}
+                        a copy
+                      </span>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      You have chosen an e-Stamp, which has no sheet to buy again, so a
+                      printed copy is the {inr(COPY_PAGE_FEE)} a page alone —{" "}
+                      <span className="font-semibold text-navy-800">
+                        {inr(
+                          printedCopyUnitPrice(
+                            draft.options.documentPages,
+                            draft.options.stampPaperValue,
+                          ),
+                        )}{" "}
+                        a copy
+                      </span>
+                      .
+                    </>
+                  )}
+                </p>
+              </div>
+              <Stepper
+                value={draft.options.extraPrintedCopies}
+                onChange={(n) => update({ options: { extraPrintedCopies: n } })}
+                min={0}
+                max={20}
+                suffix={draft.options.extraPrintedCopies === 1 ? "copy" : "copies"}
+                className="w-[10.5rem] shrink-0"
+              />
+            </div>
+
+            {/* Soft */}
+            <label className="flex cursor-pointer flex-wrap items-start justify-between gap-4 px-5 py-4">
+              <span className="flex min-w-[15rem] flex-1 items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={draft.options.softCopy}
+                  onChange={(e) => update({ options: { softCopy: e.target.checked } })}
+                  className="mt-0.5 size-4 shrink-0 accent-[#2563eb]"
+                />
+                <span>
+                  <span className="text-[14px] font-semibold text-navy-900">
+                    Scanned soft copy
+                  </span>
+                  <span className="mt-0.5 block text-[12.5px] leading-relaxed text-navy-500">
+                    A PDF of the executed deed, emailed to you. {inr(COPY_PAGE_FEE)} a page,
+                    charged once however many people you forward it to.
+                  </span>
+                </span>
+              </span>
+              <span className="tnum shrink-0 text-[14px] font-semibold text-navy-950">
+                {inr(COPY_PAGE_FEE * draft.options.documentPages)}
+              </span>
+            </label>
+          </div>
+
+          <p className="border-t border-line bg-canvas px-5 py-3 text-[12px] leading-relaxed text-navy-500">
+            The copy you are drafting is already included — this is for anyone else who needs
+            one. Both are counted by the {draft.options.documentPages} sheet
+            {draft.options.documentPages === 1 ? "" : "s"} set above.
+          </p>
+        </div>
+
+        {/*
           The date on the paper.
 
           It sits here rather than in the marketing pages on purpose — the
@@ -392,6 +501,20 @@ function SendBlock({
                     label: "Notary attestation",
                     value: breakdown.lawyerFee,
                     hint: `${draft.options.documentPages} sheet${draft.options.documentPages === 1 ? "" : "s"}${notaryRequired ? " · required" : ""}`,
+                  }
+                : null,
+              breakdown.printedCopiesFee > 0
+                ? {
+                    label: `Extra printed cop${draft.options.extraPrintedCopies === 1 ? "y" : "ies"}`,
+                    value: breakdown.printedCopiesFee,
+                    hint: `${draft.options.extraPrintedCopies} × ${inr(printedCopyUnitPrice(draft.options.documentPages, draft.options.stampPaperValue))} · sheet plus printing`,
+                  }
+                : null,
+              breakdown.softCopyFee > 0
+                ? {
+                    label: "Scanned soft copy",
+                    value: breakdown.softCopyFee,
+                    hint: `${draft.options.documentPages} page${draft.options.documentPages === 1 ? "" : "s"} · ${inr(COPY_PAGE_FEE)} a page`,
                   }
                 : null,
               breakdown.backdatingFee > 0

@@ -186,6 +186,8 @@ function CostRail() {
         lawyerReview: draft.options.lawyerReview,
         notaryRequired: isNotaryMandatory(draft.templateId),
         stampPaperDate: draft.options.stampPaperDate,
+        extraPrintedCopies: draft.options.extraPrintedCopies,
+        softCopy: draft.options.softCopy,
         templateId: draft.templateId,
         stampPaperValue: draft.options.stampPaperValue,
         documentPages: draft.options.documentPages,
@@ -223,6 +225,20 @@ function CostRail() {
                   label: "Notary attestation",
                   value: breakdown.lawyerFee,
                   hint: isNotaryMandatory(draft.templateId) ? "Notary public · required" : "Notary public",
+                }
+              : null,
+            breakdown.printedCopiesFee + breakdown.softCopyFee > 0
+              ? {
+                  label: "Extra copies",
+                  value: breakdown.printedCopiesFee + breakdown.softCopyFee,
+                  hint: [
+                    draft.options.extraPrintedCopies
+                      ? `${draft.options.extraPrintedCopies} printed`
+                      : "",
+                    draft.options.softCopy ? "soft copy" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" · "),
                 }
               : null,
             breakdown.backdatingFee > 0

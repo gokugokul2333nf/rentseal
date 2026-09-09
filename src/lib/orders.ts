@@ -122,6 +122,11 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     stampPaperDate: draft.options.stampPaperDate,
     backdatingMonths: breakdown.backdatingMonths ? String(breakdown.backdatingMonths) : "",
     backdatingFee: String(breakdown.backdatingFee),
+    // The counter prints and stamps these, so it needs the count, not just a fee.
+    extraPrintedCopies: String(draft.options.extraPrintedCopies || ""),
+    printedCopiesFee: String(breakdown.printedCopiesFee),
+    softCopy: draft.options.softCopy ? "yes" : "no",
+    softCopyFee: String(breakdown.softCopyFee),
     lawyerReview: notaryRequired
       ? "yes — required (affidavit)"
       : draft.options.lawyerReview

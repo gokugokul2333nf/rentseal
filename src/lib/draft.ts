@@ -140,6 +140,8 @@ export function createDraft(
       registrationRequired: dflt.registrationRequired,
       lawyerReview: false,
       stampPaperDate: "",
+      extraPrintedCopies: 0,
+      softCopy: false,
       stampPaperValue: 100,
       documentPages: 4,
       witnessRequired: true,

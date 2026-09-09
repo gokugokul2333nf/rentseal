@@ -3,6 +3,7 @@ import { notaryFeeForPages } from "./notary";
 import { BACKDATE_FEE_PER_MONTH as BACKDATE_PER_MONTH, backdateFee, backdateMonths } from "./backdating";
 import { templatePrice } from "./template-prices";
 import { stampPaperPrice } from "./stamp-paper";
+import { COPY_PAGE_FEE, printedCopiesFee, softCopyFee } from "./copies";
 import type { TemplateId } from "./agreement-templates";
 
 /**
@@ -68,6 +69,10 @@ export interface StampDutyInput {
   stampPaperValue?: number;
   /** Sheets the deed runs to, for the notary's per-sheet charge. */
   documentPages?: number;
+  /** Extra printed copies wanted, each on its own stamp paper. */
+  extraPrintedCopies?: number;
+  /** A scanned copy of the executed deed. */
+  softCopy?: boolean;
   /**
    * The date wanted on the paper, yyyy-mm-dd. A past date is sourced from older
    * stock and charged by the month. Quoted in the builder only.
@@ -87,6 +92,8 @@ export function calculateStampDuty({
   templateId,
   stampPaperValue = 0,
   documentPages = 4,
+  extraPrintedCopies = 0,
+  softCopy = false,
 }: StampDutyInput): StampDutyBreakdown {
   const rent = Math.max(0, Number(monthlyRent) || 0);
   const deposit = Math.max(0, Number(securityDeposit) || 0);
@@ -123,12 +130,19 @@ export function calculateStampDuty({
         ? notaryFeeForPages(documentPages)
         : 0;
 
+  // Extra copies. A printed one is a second execution and carries the sheet
+  // again; a soft one is a scan, charged once however many people get it.
+  const copiesFee = printedCopiesFee(extraPrintedCopies, documentPages, stampPaperValue);
+  const scanFee = softCopyFee(softCopy, documentPages);
+
   const backdatingMonths = backdateMonths(stampPaperDate);
   const backdatingFee = backdateFee(stampPaperDate);
 
   // GST applies to our service fees only — never to a government levy. Sourcing
   // older-dated stock is our service, so it is inside the GST base.
-  const gst = Math.round((platformFee + lawyerFee + backdatingFee) * GST_RATE);
+  const gst = Math.round(
+    (platformFee + lawyerFee + backdatingFee + copiesFee + scanFee) * GST_RATE,
+  );
 
   const total =
     stampDuty +
@@ -137,6 +151,8 @@ export function calculateStampDuty({
     stampPaperFee +
     lawyerFee +
     backdatingFee +
+    copiesFee +
+    scanFee +
     gst;
 
   const notes: string[] = [];
@@ -164,6 +180,16 @@ export function calculateStampDuty({
       `The paper is dated ${backdatingMonths} calendar month${backdatingMonths === 1 ? "" : "s"} back, sourced from older stock at ₹${BACKDATE_PER_MONTH} a month. A date inside the current month carries no such charge. We confirm on the call that the date you asked for is actually available before anything is charged.`,
     );
   }
+  if (extraPrintedCopies > 0) {
+    notes.push(
+      `${extraPrintedCopies} extra printed cop${extraPrintedCopies === 1 ? "y" : "ies"} — each is executed on its own stamp paper, so each carries the sheet again plus ₹${COPY_PAGE_FEE} a page for printing.`,
+    );
+  }
+  if (softCopy) {
+    notes.push(
+      `A scanned copy is ₹${COPY_PAGE_FEE} a page, charged once however many people you forward it to.`,
+    );
+  }
   notes.push("GST at 18% applies to our service fee only, never to government charges.");
 
   return {
@@ -177,6 +203,10 @@ export function calculateStampDuty({
     stampPaperFee,
     documentFee,
     lawyerFee,
+    paperFaceValue:
+      (paper?.faceValue ?? 0) * (1 + Math.max(0, Math.floor(Number(extraPrintedCopies) || 0))),
+    printedCopiesFee: copiesFee,
+    softCopyFee: scanFee,
     backdatingFee,
     backdatingMonths,
     gst,
@@ -187,8 +217,16 @@ export function calculateStampDuty({
 
 /** Government portion vs our portion — used to prove we don't mark up state fees. */
 export function splitGovernmentAndService(b: StampDutyBreakdown) {
-  const government = b.stampDuty + b.registrationFee;
-  const service =
-    b.platformFee + b.stampPaperFee + b.lawyerFee + b.backdatingFee + b.gst;
-  return { government, service, total: government + service };
+  /*
+    The sheet is both. ₹120 buys ₹100 of stamp paper and ₹20 of us fetching it,
+    and every extra printed copy buys another sheet at the same split. Counting
+    the whole ₹120 as ours overstates what we take; counting it as the state's
+    understates it.
+
+    Deriving the service half from the total rather than adding the fees up also
+    keeps the two halves summing to the figure printed directly above them — the
+    old sum quietly dropped the copies and the scan.
+  */
+  const government = b.stampDuty + b.registrationFee + b.paperFaceValue;
+  return { government, service: b.total - government, total: b.total };
 }

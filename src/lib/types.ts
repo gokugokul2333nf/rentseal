@@ -146,6 +146,15 @@ export interface AgreementOptions {
    * The notary signs each one, and the first four are inside the base fee.
    */
   documentPages: number;
+  /**
+   * Extra printed copies of the finished deed, beyond the one being executed.
+   *
+   * Each is a second execution on its own stamp paper, so each carries the
+   * stamp charge again plus the per-page printing — see copies.ts.
+   */
+  extraPrintedCopies: number;
+  /** A scanned copy of the executed deed, charged once by the page. */
+  softCopy: boolean;
   witnessRequired: boolean;
   customClauses: string[];
   /**
@@ -223,8 +232,18 @@ export interface StampDutyBreakdown {
   lawyerFee: number;
   /** The chosen sheet, at the shelf price. Zero on an e-Stamp. */
   stampPaperFee: number;
+  /**
+   * Face value of every physical sheet in the order — the one being executed
+   * plus one for each extra printed copy. This part of the shelf price is the
+   * state's, not ours, and the government/service split says so.
+   */
+  paperFaceValue: number;
   /** Drafting fee for this particular document. */
   documentFee: number;
+  /** Extra printed copies — stamped sheet plus printing, apiece. */
+  printedCopiesFee: number;
+  /** A scanned copy, charged once by the page. */
+  softCopyFee: number;
   /** Older-dated paper, at ₹50 a month. Zero unless a past date was asked for. */
   backdatingFee: number;
   /** How many months old, so the quote can say what the fee is for. */
