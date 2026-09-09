@@ -119,18 +119,15 @@ const organizationSchema = {
     containedInPlace: { "@type": "State", name: "Tamil Nadu" },
   })),
   knowsLanguage: ["en-IN", "ta-IN"],
+  // Sunday is simply absent. In schema.org an unlisted day is a closed one, and
+  // that is what puts "Closed" against Sunday in a Google listing rather than
+  // leaving someone to guess.
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
       opens: SITE.hours.weekday.opens,
       closes: SITE.hours.weekday.closes,
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Sunday"],
-      opens: SITE.hours.sunday.opens,
-      closes: SITE.hours.sunday.closes,
     },
   ],
 };

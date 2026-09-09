@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact Us — Talk to a Person in Tamil or English",
   description:
-    "Phone, WhatsApp, email or the form. Tamil and English, Monday to Saturday 9.30am to 9.30pm and Sunday evenings 6 to 9.30.",
+    "Phone, WhatsApp, email or the form. Tamil and English, Monday to Saturday 9.30am to 5pm. Closed Sundays.",
   alternates: { canonical: "/contact" },
 };
 
@@ -22,7 +22,7 @@ export default function ContactPage() {
         icon={MessageCircle}
         crumbs={CRUMBS}
         title="Ask us before you pay, not after"
-        body="We would rather spend ten minutes talking you out of something you don't need than process a refund next week. Tamil and English, six full days and Sunday evenings."
+        body="We would rather spend ten minutes talking you out of something you don't need than process a refund next week. Tamil and English, Monday to Saturday."
       />
 
       <section className="section">
@@ -59,7 +59,7 @@ export default function ContactPage() {
                       <span>
                         <span className="block text-[14px] font-semibold">{SITE.phone}</span>
                         <span className="block text-[12px] text-white/45">
-                          Tamil and English, Mon–Sat 9.30–9.30
+                          Tamil and English, {SITE.hours.short}
                         </span>
                       </span>
                     </a>
@@ -85,9 +85,8 @@ export default function ContactPage() {
                   </h2>
                   <dl className="mt-4 space-y-2.5 text-[13.5px]">
                     {[
-                      ["Monday – Saturday", "8:00 am – 10:00 pm"],
-                      ["Sunday", "9:00 am – 7:00 pm"],
-                      ["Government holidays", "WhatsApp only"],
+                      ["Monday – Saturday", "9:30 am – 5:00 pm"],
+                      ["Sunday", "Closed"],
                     ].map(([day, hours]) => (
                       <div key={day} className="flex items-center justify-between">
                         <dt className="text-navy-500">{day}</dt>

@@ -39,11 +39,21 @@ export const SITE = {
   cin: "",
   gstin: "",
   udyam: "UDYAM-TN-24-0060126",
-  /** Sunday is a short evening shift, so the two are listed separately. */
+  /**
+   * The counter's hours, and the only place they are written down.
+   *
+   * They used to be stated three different ways — 9.30 to 9.30 here, 8 to 10
+   * on the contact page, and "open seven days" in the stats band, with a Sunday
+   * evening shift in two of them. A visitor who rang at eight on a Sunday
+   * because the site said so got no answer, which is worse than not publishing
+   * hours at all. Everything now reads from here.
+   */
   hours: {
-    weekday: { label: "Monday to Saturday", opens: "09:30", closes: "21:30" },
-    sunday: { label: "Sunday", opens: "18:00", closes: "21:30" },
-    summary: "Mon–Sat 9.30am–9.30pm · Sun 6–9.30pm",
+    weekday: { label: "Monday to Saturday", opens: "09:30", closes: "17:00" },
+    /** Closed. Sunday is a holiday, not a short shift. */
+    sunday: null,
+    summary: "Mon–Sat 9.30am–5pm · Sunday closed",
+    short: "Mon–Sat 9.30–5",
   },
   /**
    * Profile URLs. Each empty string hides that icon in the footer — better a
@@ -344,7 +354,7 @@ export const STATS = [
   { value: "11 months", label: "Standard term", sub: "below compulsory registration" },
   // Counter animates the leading number, so keep it one that counts sensibly —
   // "8am – 10pm" rendered as "0am – 10pm" mid-animation.
-  { value: "7 days", label: "Open a week", sub: "Mon–Sat 9.30–9.30, Sun evening" },
+  { value: "6 days", label: "Open every week", sub: "Mon–Sat 9.30am–5pm, closed Sunday" },
 ] as const;
 
 export const HOW_IT_WORKS = [
@@ -509,7 +519,7 @@ export const FAQS = [
   {
     category: "Support",
     q: "Can I speak to someone in Tamil?",
-    a: "Yes. We work in Tamil and English, Monday to Saturday from 9.30am to 9.30pm and on Sunday evenings from 6pm to 9.30pm, on phone and WhatsApp.",
+    a: "Yes. We work in Tamil and English, Monday to Saturday from 9.30am to 5pm, on phone and WhatsApp. We are closed on Sundays — leave a WhatsApp message and we will pick it up first thing Monday.",
   },
 ] as const;
 

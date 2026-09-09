@@ -118,7 +118,7 @@ const PAGES: SearchDoc[] = [
     title: "Contact and support",
     href: "/contact",
     kind: "Page",
-    description: "Phone, WhatsApp and email in Tamil and English, six days plus Sunday evenings.",
+    description: "Phone, WhatsApp and email in Tamil and English, Monday to Saturday 9.30am to 5pm.",
     keywords: ["contact", "phone", "call", "whatsapp", "email", "support", "help", "tamil"],
   },
   {
