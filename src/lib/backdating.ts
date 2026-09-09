@@ -1,10 +1,10 @@
 /**
  * Paper carrying an earlier issue date, and what it costs.
  *
- * The office charges ₹50 for every month between the date the customer wants
- * on the sheet and today, and treats any past date at all as a month — asking
- * for yesterday costs the same ₹50 as asking for a month ago. Part months round
- * up, because the charge is per month of age and there is no half sheet.
+ * The office charges ₹50 for each calendar month the customer goes back. A date
+ * in the current month — including yesterday and the first of the month — is
+ * charged as usual, with nothing added. Last month is ₹50, the month before
+ * ₹100, and so on.
  *
  * This is builder-only by deliberate decision. Nothing here is rendered on a
  * public page, indexed, or put in a schema: the office's position is that
@@ -17,33 +17,27 @@
 /** Rupees, per month of age, as quoted by the office. */
 export const BACKDATE_FEE_PER_MONTH = 50;
 
-/** ISO yyyy-mm-dd for a Date, in local time rather than UTC. */
-function isoDay(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
 /**
- * How many months old the requested date is, for charging.
+ * How many calendar months back the requested date is, for charging.
  *
- * Zero for today or any future date — there is nothing to source. Otherwise the
- * completed calendar months, rounded up whenever a part month is left over, and
- * never less than one. So yesterday is one month, exactly two months ago is
- * two, and two months and a day is three.
+ * The month is the unit, not the day. Anything inside the current month — today,
+ * yesterday, the first of the month, or a date still to come — is zero, and the
+ * fee is the usual one. Step into last month and it is one, the month before
+ * that is two, and so on.
+ *
+ * This replaces an earlier reading in which any past date at all counted as a
+ * month, so yesterday cost ₹50. The office has since been explicit that the
+ * current month is charged as usual, which is the rule here.
  */
 export function backdateMonths(wanted: string, today = new Date()): number {
   if (!wanted) return 0;
   const target = new Date(`${wanted}T00:00:00`);
   if (Number.isNaN(target.getTime())) return 0;
 
-  const todayISO = isoDay(today);
-  if (wanted >= todayISO) return 0;
-
-  let months =
+  const months =
     (today.getFullYear() - target.getFullYear()) * 12 +
     (today.getMonth() - target.getMonth());
-  // A day left over past the whole months is another month on the bill.
-  if (today.getDate() > target.getDate()) months += 1;
-  return Math.max(1, months);
+  return Math.max(0, months);
 }
 
 /** What the older date adds to the quote. */
@@ -51,7 +45,7 @@ export function backdateFee(wanted: string, today = new Date()): number {
   return backdateMonths(wanted, today) * BACKDATE_FEE_PER_MONTH;
 }
 
-/** "3 months older — ₹150" and the like, for the quote line. */
+/** "3 months back — ₹150" and the like, for the quote line. */
 export function backdateLabel(months: number): string {
-  return `${months} month${months === 1 ? "" : "s"} older`;
+  return `${months} month${months === 1 ? "" : "s"} back`;
 }

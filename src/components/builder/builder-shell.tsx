@@ -229,7 +229,7 @@ function CostRail() {
               ? {
                   label: "Older-dated paper",
                   value: breakdown.backdatingFee,
-                  hint: `${breakdown.backdatingMonths} month${breakdown.backdatingMonths === 1 ? "" : "s"} older`,
+                  hint: `${breakdown.backdatingMonths} month${breakdown.backdatingMonths === 1 ? "" : "s"} back`,
                 }
               : null,
             { label: "GST", value: breakdown.gst, hint: "18% on our fee" },

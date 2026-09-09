@@ -161,7 +161,7 @@ export function calculateStampDuty({
   }
   if (backdatingMonths > 0) {
     notes.push(
-      `The paper is dated ${backdatingMonths} month${backdatingMonths === 1 ? "" : "s"} back, sourced from older stock at ₹${BACKDATE_PER_MONTH} a month. We confirm on the call that the date you asked for is actually available before anything is charged.`,
+      `The paper is dated ${backdatingMonths} calendar month${backdatingMonths === 1 ? "" : "s"} back, sourced from older stock at ₹${BACKDATE_PER_MONTH} a month. A date inside the current month carries no such charge. We confirm on the call that the date you asked for is actually available before anything is charged.`,
     );
   }
   notes.push("GST at 18% applies to our service fee only, never to government charges.");

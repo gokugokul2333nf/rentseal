@@ -235,15 +235,19 @@ export function Hero() {
               transition={{ duration: 0.75, delay: 0.08, ease: EASE }}
               className="mt-6 text-[clamp(2.2rem,5.6vw,3.7rem)] leading-[1.06] font-bold tracking-[-0.035em] text-navy-950"
             >
-              Stamp paper and rental
-              <br className="hidden sm:block" /> agreements,{" "}
               {/*
-                Was a gradient-filled word with an animated hand-drawn underline
-                swash beneath it. Both are decoration that every generated hero
-                reaches for. The emphasis now comes from the typeface itself.
+                The office's own line, and it earns the h1 because it answers
+                the question the page is actually asked: is this a download, or
+                does something arrive? Physical, and at your door.
+
+                "delivered" was a gradient-filled word with an animated
+                hand-drawn underline beneath it. Both are decoration every
+                generated hero reaches for; the emphasis comes from the typeface.
               */}
+              Physical stamp paper and agreements,
+              <br className="hidden sm:block" />{" "}
               <em className="italic font-normal text-brand-800">
-                delivered
+                delivered to your doorstep
               </em>
             </motion.h1>
 
@@ -253,10 +257,10 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
               className="mt-7 max-w-xl text-[17.5px] leading-[1.65] text-navy-600"
             >
-              Licensed non-judicial stamp paper and e-Stamp certificates from ₹120 a sheet,
-              brought to your door anywhere in Tamil Nadu — same day in Chennai. And when you
-              need the agreement written too, we draft, stamp and get it signed without you
-              visiting a single office.
+              Real, licensed non-judicial stamp paper from ₹120 a sheet, carried to your
+              address anywhere in Tamil Nadu — same day in Chennai. And when the agreement
+              needs writing too, we draft it from ₹300, print it on the paper, get it
+              attested and bring both to you, without you visiting a single office.
             </motion.p>
 
             <motion.div

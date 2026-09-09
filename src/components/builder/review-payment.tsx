@@ -335,7 +335,9 @@ function SendBlock({
             help={
               breakdown.backdatingMonths > 0
                 ? `Sourced from older stock — ${backdateLabel(breakdown.backdatingMonths)}, at ${inr(BACKDATE_FEE_PER_MONTH)} a month. We confirm the date is actually available on the call before anything is charged.`
-                : "Leave blank and the paper carries the day it is issued."
+                : draft.options.stampPaperDate
+                  ? "Inside this month, so nothing is added — the fee is the usual one."
+                  : `Leave blank and the paper carries the day it is issued. Any date this month is charged as usual; each month further back adds ${inr(BACKDATE_FEE_PER_MONTH)}.`
             }
           >
             {(id) => (
