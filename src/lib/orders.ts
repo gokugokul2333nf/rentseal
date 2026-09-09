@@ -1,4 +1,5 @@
 import { calculateStampDuty } from "./stamp-duty";
+import { isNotaryMandatory } from "./notary";
 import { propertyAddress, agreementTitle } from "./clauses";
 import { AGREEMENT_TYPES } from "./site";
 import { TEMPLATES } from "./templates";
@@ -34,6 +35,9 @@ const joinTruthy = (...parts: Array<string | undefined | null>) =>
 
 /** A drafted agreement, flattened for the order sheet. */
 export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
+  // An affidavit is sworn or it is nothing, so the counter must not read the
+  // notary column as a customer preference it can skip.
+  const notaryRequired = isNotaryMandatory(draft.templateId);
   const breakdown = calculateStampDuty({
     monthlyRent: parseFloat(draft.terms.monthlyRent || "0"),
     securityDeposit: parseFloat(draft.terms.securityDeposit || "0"),
@@ -41,6 +45,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     plan: draft.plan,
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
+    notaryRequired,
   });
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type);
   // Which of the twenty-four was drawn. "Commercial Rental Agreement" does not
@@ -103,7 +108,12 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     platformFee: String(breakdown.platformFee),
     gst: String(breakdown.gst),
     registrationRequired: draft.options.registrationRequired ? "yes" : "no",
-    lawyerReview: draft.options.lawyerReview ? "yes" : "no",
+    notaryFee: String(breakdown.lawyerFee),
+    lawyerReview: notaryRequired
+      ? "yes — required (affidavit)"
+      : draft.options.lawyerReview
+        ? "yes"
+        : "no",
   };
 }
 

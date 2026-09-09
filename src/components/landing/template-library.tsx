@@ -35,6 +35,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
+import { isNotaryMandatory } from "@/lib/notary";
 import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
 import { TemplateThumb } from "./template-thumb";
@@ -114,8 +115,23 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-2">
-          <span className="rounded-full border border-line bg-canvas px-2.5 py-1 text-[11.5px] font-medium text-navy-600">
-            {template.term}
+          <span className="flex flex-wrap items-center gap-1.5">
+            <span className="rounded-full border border-line bg-canvas px-2.5 py-1 text-[11.5px] font-medium text-navy-600">
+              {template.term}
+            </span>
+            {/*
+              Said on the card rather than at checkout. An affidavit carries a
+              notary fee whatever the plan, and finding that out on the last
+              screen is the kind of surprise that loses the order.
+            */}
+            {isNotaryMandatory(template.id) ? (
+              <span
+                title="An affidavit has to be sworn before a notary, so attestation is included."
+                className="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11.5px] font-semibold text-brand-700"
+              >
+                Notary included
+              </span>
+            ) : null}
           </span>
           <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-700">
             Draft this

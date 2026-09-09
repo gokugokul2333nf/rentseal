@@ -3,13 +3,14 @@ import { ArrowRight, Stamp } from "lucide-react";
 import { BreadcrumbSchema, PageHero } from "@/components/site/page-hero";
 import { DistrictIndex } from "@/components/site/district-index";
 import { StampPaperHow } from "@/components/site/stamp-paper-how";
+import { StampPaperRates } from "@/components/site/stamp-paper-rates";
 import { ButtonLink } from "@/components/ui/button";
 import { DISTRICTS } from "@/lib/districts";
 import { LEAD_ANCHOR, SITE } from "@/lib/site";
 
 const title = "Government Authorised Stamp Paper — Tamil Nadu";
 const description =
-  "Genuine, government authorised stamp paper delivered to your door anywhere in Tamil Nadu. ₹20 to ₹500 and e-Stamps for any value, at face value, same day in Chennai.";
+  "Genuine, government authorised stamp paper delivered anywhere in Tamil Nadu. ₹100 paper for ₹120, ₹500 for ₹550, ₹1,000 for ₹1,100 and ₹5,000 for ₹5,500. Printing, notary attestation and back-dated paper available.";
 
 export const metadata: Metadata = {
   title,
@@ -28,7 +29,7 @@ export default function StampPaperIndex() {
         icon={Stamp}
         crumbs={crumbs}
         title="Government authorised stamp paper, delivered to your doorstep"
-        body="Fill in the details online and receive genuine, government authorised stamp paper delivered to your door — legally valid, at exactly the printed value, with a flat delivery charge stated before you confirm. Same day in the Chennai metro, next working day in the major cities, two to three days everywhere else."
+        body="Fill in the details online and receive genuine, government authorised stamp paper at your door — the face value plus a stated procurement charge, with delivery quoted before you confirm. Same day in Chennai by Porter, ₹100 next day, and ₹100 to ₹200 anywhere else in Tamil Nadu. We can print your draft on it and get it attested too."
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
@@ -40,6 +41,8 @@ export default function StampPaperIndex() {
           </ButtonLink>
         </div>
       </PageHero>
+
+      <StampPaperRates />
 
       <StampPaperHow />
 

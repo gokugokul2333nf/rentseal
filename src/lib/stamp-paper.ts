@@ -1,15 +1,33 @@
 /**
- * Stamp paper catalogue and delivery model.
+ * Stamp paper catalogue, counter services and delivery model.
  *
  * Tamil Nadu supplies non-judicial stamp paper through licensed vendors and
- * e-Stamp certificates through the authorised channel. We procure both at face
- * value and charge only for the errand — the denominations below are the ones
- * ordinary transactions actually call for.
+ * e-Stamp certificates through the authorised channel. We procure both and
+ * charge for the errand — the denominations below are the ones ordinary
+ * transactions actually call for.
+ *
+ * Two conventions, both borrowed from certificates.ts and both there for the
+ * same reason:
+ *
+ *   - `price: null` means the office has not quoted a rate. Anything null
+ *     renders "Price on request" rather than a guess. A made-up figure on a
+ *     price list is a figure someone will be held to at the counter.
+ *   - Every price here is the amount payable for the sheet, blank and
+ *     unprinted, before delivery. Face value and price are separate fields on
+ *     purpose: the difference between them is our procurement charge, and the
+ *     UI shows both rather than implying the state charges ₹120 for a ₹100
+ *     sheet.
  */
 
 export interface Denomination {
+  /** Face value printed on the sheet. 0 for a variable-value e-Stamp. */
   value: number;
   label: string;
+  /**
+   * Rupees payable for one blank sheet, delivery excluded. Null where the
+   * office has not quoted a rate for that denomination.
+   */
+  price: number | null;
   popular?: boolean;
   uses: string[];
   note?: string;
@@ -19,16 +37,19 @@ export const DENOMINATIONS: Denomination[] = [
   {
     value: 20,
     label: "₹20",
+    price: null,
     uses: ["Affidavits", "Declarations", "Undertakings", "Name change"],
   },
   {
     value: 50,
     label: "₹50",
+    price: null,
     uses: ["Indemnity bonds", "Guarantee letters", "Sworn statements", "Gap certificates"],
   },
   {
     value: 100,
     label: "₹100",
+    price: 120,
     popular: true,
     uses: ["Rental agreements", "Power of attorney", "No-objection certificates", "General agreements"],
     note: "The denomination most 11-month rental agreements in Tamil Nadu are executed on.",
@@ -36,18 +57,200 @@ export const DENOMINATIONS: Denomination[] = [
   {
     value: 200,
     label: "₹200",
+    price: null,
     uses: ["Partnership deeds", "Loan agreements", "Job contracts", "Franchise agreements"],
   },
   {
     value: 500,
     label: "₹500",
+    price: 550,
     uses: ["Commercial agreements", "Sale agreements", "Higher-value bonds", "Settlement deeds"],
+  },
+  {
+    value: 1000,
+    label: "₹1,000",
+    price: 1100,
+    uses: ["Lease deeds", "Development agreements", "Higher-value settlements", "Corporate guarantees"],
+  },
+  {
+    value: 5000,
+    label: "₹5,000",
+    price: 5500,
+    uses: ["Property instruments", "Mortgage deeds", "Large commercial leases", "High-value bonds"],
   },
   {
     value: 0,
     label: "Any value",
+    price: null,
     uses: ["Lease deeds", "Sale deeds", "Mortgage deeds", "Development agreements"],
-    note: "Issued as an e-Stamp certificate for any amount from ₹1 upward, against the exact duty payable.",
+    note: "Issued as an e-Stamp certificate for any amount from ₹1 upward, against the exact duty payable. You pay the duty itself plus our charge, confirmed before you order.",
+  },
+];
+
+/** The quoted denominations, in the order they are sold. */
+export const PRICED_DENOMINATIONS = DENOMINATIONS.filter(
+  (d): d is Denomination & { price: number } => d.price !== null,
+);
+
+/** What one blank sheet costs, and what of that is the state's. */
+export function stampPaperPrice(value: number) {
+  const d = DENOMINATIONS.find((x) => x.value === value);
+  if (!d || d.price === null) return null;
+  return { faceValue: d.value, price: d.price, ourCharge: d.price - d.value };
+}
+
+/* ══════════════════ Sheets, stamps and labels sold alongside ══════════════ */
+
+export interface StampAddOn {
+  id: string;
+  name: string;
+  /** Rupees for one, delivery excluded. */
+  price: number;
+  /** What it is for, in one line. */
+  blurb: string;
+  /** Face value where the item carries one — the court fee labels do. */
+  faceValue?: number;
+}
+
+/**
+ * The counter items that go with a deed rather than instead of one.
+ *
+ * Green sheets are the continuation paper a deed runs onto once the stamp paper
+ * is full; the revenue stamp is the one-rupee-class stamp a receipt is signed
+ * across; court fee labels are what a petition carries. All sold singly.
+ */
+export const STAMP_ADD_ONS: StampAddOn[] = [
+  {
+    id: "green-sheet-a4",
+    name: "Green sheet — A4",
+    price: 3,
+    blurb: "Continuation paper for a deed that runs past the stamp paper. Priced per sheet.",
+  },
+  {
+    id: "green-sheet-legal",
+    name: "Green sheet — legal size",
+    price: 4,
+    blurb: "The longer sheet, for deeds typed to legal width. Priced per sheet.",
+  },
+  {
+    id: "revenue-stamp",
+    name: "Revenue stamp",
+    price: 2,
+    blurb: "Affixed to receipts and acknowledgements, signed across. Priced per stamp.",
+  },
+  {
+    id: "court-fee-10",
+    name: "Court fee label — ₹10",
+    price: 15,
+    faceValue: 10,
+    blurb: "For petitions, vakalats and applications that carry a ₹10 court fee.",
+  },
+  {
+    id: "court-fee-20",
+    name: "Court fee label — ₹20",
+    price: 25,
+    faceValue: 20,
+    blurb: "For filings where the prescribed court fee is ₹20.",
+  },
+];
+
+/* ═════════════════════ What the counter does with the paper ═══════════════ */
+
+export interface CounterService {
+  id: string;
+  name: string;
+  /** Rupees. Null where it is quoted on the job. */
+  price: number | null;
+  blurb: string;
+  /** Worth calling out on the page rather than leaving in a list. */
+  highlight?: boolean;
+}
+
+export const COUNTER_SERVICES: CounterService[] = [
+  {
+    id: "old-date-stamp-paper",
+    name: "Back-dated stamp paper",
+    price: null,
+    highlight: true,
+    blurb:
+      "Stamp paper carrying an earlier issue date is available, subject to what the vendor holds on the day. Tell us the date you need and we will confirm availability before you pay.",
+  },
+  {
+    id: "print-on-stamp-paper",
+    name: "Printing on the stamp paper",
+    price: null,
+    blurb:
+      "Upload your own draft and we print it onto the stamp paper before it is delivered. Send it as a PDF or a Word file — the layout is set to leave the margins the sub-registrar expects.",
+  },
+  {
+    id: "print-xerox",
+    name: "Printouts and photocopies",
+    price: null,
+    blurb: "Black-and-white and colour printing, and photocopying, at the counter. Charged by the page.",
+  },
+  {
+    id: "notary-on-stamp-paper",
+    name: "Notary signature on stamp paper",
+    price: 350,
+    blurb:
+      "A notary public attests the document, and two green sheets are included. This is the attestation charge only — the stamp paper itself is priced above.",
+  },
+  {
+    id: "notary-white-sheet",
+    name: "Notary signature on white paper",
+    price: 100,
+    blurb: "Attestation of a document typed on plain paper rather than stamp paper.",
+  },
+];
+
+/* ═══════════════════════════════ Delivery ═════════════════════════════════ */
+
+/**
+ * Shipping, as the office quotes it.
+ *
+ * Two speeds within Chennai and two across the rest of Tamil Nadu. Same-day
+ * inside the city goes by Porter and is billed at whatever Porter charges for
+ * that run — we do not add to it, and we do not pretend to know it in advance.
+ */
+export interface ShippingOption {
+  id: string;
+  from: string;
+  to: string;
+  eta: string;
+  /** Rupees. Null where the charge is passed through at cost. */
+  charge: number | null;
+  note?: string;
+}
+
+export const SHIPPING_OPTIONS: ShippingOption[] = [
+  {
+    id: "chennai-porter",
+    from: "Chennai",
+    to: "Chennai",
+    eta: "Same day",
+    charge: null,
+    note: "Sent by Porter and charged at Porter's own fare for the run, passed on at cost.",
+  },
+  {
+    id: "chennai-next-day",
+    from: "Chennai",
+    to: "Chennai",
+    eta: "Next day",
+    charge: 100,
+  },
+  {
+    id: "tn-express",
+    from: "Chennai",
+    to: "Anywhere in Tamil Nadu",
+    eta: "Express",
+    charge: 200,
+  },
+  {
+    id: "tn-standard",
+    from: "Chennai",
+    to: "Anywhere in Tamil Nadu",
+    eta: "2 – 3 days",
+    charge: 100,
   },
 ];
 
@@ -65,9 +268,9 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
     id: "metro",
     name: "Chennai metro",
     districts: ["Chennai", "Chengalpattu", "Kancheepuram", "Tiruvallur"],
-    eta: "Same day",
-    charge: 99,
-    cutOff: "Order before 2 pm",
+    eta: "Next day",
+    charge: 100,
+    cutOff: "Same day by Porter, charged at cost",
   },
   {
     id: "tier-2",
@@ -84,15 +287,15 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
       "Tirunelveli",
       "Thoothukudi",
     ],
-    eta: "Next working day",
-    charge: 149,
+    eta: "Express",
+    charge: 200,
   },
   {
     id: "state",
     name: "Every other district",
     districts: ["All remaining districts of Tamil Nadu"],
     eta: "2 – 3 working days",
-    charge: 149,
+    charge: 100,
   },
 ];
 
@@ -117,7 +320,7 @@ export const STAMP_USE_CASES: StampUseCase[] = [
   {
     title: "Affidavits & declarations",
     denomination: "₹20",
-    body: "Name change, date of birth correction, address proof, single-status affidavits and the sworn statements colleges and passport offices ask for.",
+    body: "Name change, date of birth correction, address proof, single-status affidavits and the sworn statements colleges and passport offices ask for. All of them have to be sworn before a notary to count.",
   },
   {
     title: "Indemnity & surety bonds",
@@ -131,8 +334,8 @@ export const STAMP_USE_CASES: StampUseCase[] = [
   },
   {
     title: "Property instruments",
-    denomination: "Exact duty, e-Stamp",
-    body: "Sale agreements, mortgage deeds, gift and settlement deeds, development agreements — where duty runs into thousands and only an e-Stamp certificate will do.",
+    denomination: "₹1,000 – ₹5,000, or exact duty",
+    body: "Sale agreements, mortgage deeds, gift and settlement deeds, development agreements — where duty runs into thousands and often only an e-Stamp certificate will do.",
   },
   {
     title: "Power of attorney",
@@ -145,5 +348,5 @@ export const STAMP_USE_CASES: StampUseCase[] = [
 export function deliveryCharge(zoneId: string, stampValue: number, sheets = 1) {
   if (stampValue >= DELIVERY_RULES.freeAbove) return 0;
   if (sheets >= DELIVERY_RULES.bulkFreeFrom) return 0;
-  return DELIVERY_ZONES.find((z) => z.id === zoneId)?.charge ?? 149;
+  return DELIVERY_ZONES.find((z) => z.id === zoneId)?.charge ?? 100;
 }

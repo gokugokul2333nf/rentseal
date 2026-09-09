@@ -9,12 +9,14 @@ import {
   Lock,
   Phone,
   Receipt,
+  Scale,
 } from "lucide-react";
 import { useAgreement } from "@/lib/agreement-store";
 import { PLANS, SITE } from "@/lib/site";
 import { agreementRow } from "@/lib/orders";
 import { checkPincode } from "@/lib/pincode";
 import { calculateStampDuty, splitGovernmentAndService } from "@/lib/stamp-duty";
+import { NOTARY_FEE, NOTARY_MANDATORY_REASON, isNotaryMandatory } from "@/lib/notary";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { Field, Textarea } from "@/components/ui/field";
@@ -132,6 +134,8 @@ function SendBlock({
 }) {
   const { draft, setPlan, update } = useAgreement();
 
+  const notaryRequired = isNotaryMandatory(draft.templateId);
+
   const breakdown = calculateStampDuty({
     monthlyRent: parseFloat(draft.terms.monthlyRent || "0"),
     securityDeposit: parseFloat(draft.terms.securityDeposit || "0"),
@@ -139,6 +143,7 @@ function SendBlock({
     plan: draft.plan,
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
+    notaryRequired,
   });
   const split = splitGovernmentAndService(breakdown);
 
@@ -206,7 +211,31 @@ function SendBlock({
             })}
           </div>
 
-          {draft.plan !== "premium" ? (
+          {notaryRequired ? (
+            /*
+              An affidavit is not an affidavit until it is sworn, so there is
+              nothing here to decide. It is stated, priced and locked rather
+              than offered as a checkbox someone can untick and then be told
+              about on the phone.
+            */
+            <div className="mt-3 flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50/60 p-4">
+              <Scale className="mt-0.5 size-4 shrink-0 text-brand-700" />
+              <div className="flex-1">
+                <p className="flex flex-wrap items-center gap-2 text-[14px] font-semibold text-brand-900">
+                  Notary attestation included
+                  <Badge tone="brand">Required</Badge>
+                </p>
+                <p className="mt-0.5 text-[12.5px] leading-relaxed text-navy-600">
+                  {NOTARY_MANDATORY_REASON}
+                </p>
+                <p className="mt-1.5 text-[12.5px] text-navy-500">
+                  {draft.plan === "premium"
+                    ? "Your Premium plan already covers it."
+                    : `Charged at ${inr(NOTARY_FEE)}, shown in the quote below.`}
+                </p>
+              </div>
+            </div>
+          ) : draft.plan !== "premium" ? (
             <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-line bg-white p-4">
               <input
                 type="checkbox"
@@ -220,7 +249,7 @@ function SendBlock({
                 </span>
                 <span className="mt-0.5 block text-[12.5px] text-navy-500">
                   A notary public attests the signatures on your agreement once both
-                  parties have signed.
+                  parties have signed. Optional on this document — it is valid without it.
                 </span>
               </span>
             </label>
@@ -243,7 +272,11 @@ function SendBlock({
                 : null,
               { label: "Platform fee", value: breakdown.platformFee, hint: "LP Stamp Paper" },
               breakdown.lawyerFee > 0
-                ? { label: "Notary attestation", value: breakdown.lawyerFee, hint: "Notary public" }
+                ? {
+                    label: "Notary attestation",
+                    value: breakdown.lawyerFee,
+                    hint: notaryRequired ? "Notary public · required" : "Notary public",
+                  }
                 : null,
               { label: "GST", value: breakdown.gst, hint: "18% on our fee" },
             ]

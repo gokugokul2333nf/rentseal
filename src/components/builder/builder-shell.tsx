@@ -21,6 +21,7 @@ import {
 import { useAgreement } from "@/lib/agreement-store";
 import { clauseStats, specFor } from "@/lib/clauses";
 import { calculateStampDuty } from "@/lib/stamp-duty";
+import { isNotaryMandatory } from "@/lib/notary";
 import { AGREEMENT_TYPES } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -183,6 +184,7 @@ function CostRail() {
         plan: draft.plan,
         registerAnyway: draft.options.registrationRequired,
         lawyerReview: draft.options.lawyerReview,
+        notaryRequired: isNotaryMandatory(draft.templateId),
       }),
     [draft],
   );
@@ -203,7 +205,11 @@ function CostRail() {
               : null,
             { label: "Platform fee", value: breakdown.platformFee, hint: "LP Stamp Paper" },
             breakdown.lawyerFee > 0
-              ? { label: "Notary attestation", value: breakdown.lawyerFee, hint: "Notary public" }
+              ? {
+                  label: "Notary attestation",
+                  value: breakdown.lawyerFee,
+                  hint: isNotaryMandatory(draft.templateId) ? "Notary public · required" : "Notary public",
+                }
               : null,
             { label: "GST", value: breakdown.gst, hint: "18% on our fee" },
           ]
@@ -673,6 +679,7 @@ function SummaryRailMobile() {
     plan: draft.plan,
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
+    notaryRequired: isNotaryMandatory(draft.templateId),
   });
   return (
     <div className="flex items-center justify-between">

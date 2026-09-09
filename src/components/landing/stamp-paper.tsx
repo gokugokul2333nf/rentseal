@@ -33,7 +33,7 @@ export function StampPaper() {
           eyebrow="Stamp paper, delivered"
           icon={Stamp}
           title="Licensed stamp paper at your door, anywhere in Tamil Nadu"
-          body="No hunting for a vendor who has shut for lunch, no queue at the treasury. Tell us the denomination and the address — we procure it at face value and a rider brings it to you."
+          body="No hunting for a vendor who has shut for lunch, no queue at the treasury. Tell us the denomination and the address — we fetch the paper and a rider brings it to you, with the face value and our charge shown separately."
         />
 
         <div className="mt-11 grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
@@ -46,12 +46,12 @@ export function StampPaper() {
                     Choose your denomination
                   </h3>
                   <p className="mt-1.5 text-[13.5px] text-navy-500">
-                    Non-judicial stamp paper and e-Stamp certificates, all at face value.
+                    Non-judicial stamp paper from ₹120, and e-Stamp certificates for any value.
                   </p>
                 </div>
                 <Badge tone="emerald" className="hidden shrink-0 sm:inline-flex">
                   <BadgeIndianRupee className="size-3" />
-                  No markup
+                  Priced up front
                 </Badge>
               </div>
 
@@ -91,11 +91,15 @@ export function StampPaper() {
                       </span>
                       <span
                         className={cn(
-                          "mt-1 block text-[11.5px] leading-snug",
+                          "tnum mt-1 block text-[11.5px] leading-snug",
                           isActive ? "text-white/70" : "text-navy-400",
                         )}
                       >
-                        {d.value === 0 ? "e-Stamp certificate" : "Stamp paper"}
+                        {d.price === null
+                          ? d.value === 0
+                            ? "e-Stamp certificate"
+                            : "Price on request"
+                          : `${inr(d.price)} a sheet`}
                       </span>
                     </button>
                   );
@@ -149,8 +153,8 @@ export function StampPaper() {
                   Delivered across all 38 districts
                 </h3>
                 <p className="mt-2 text-[14px] leading-relaxed text-white/60">
-                  Same-day inside Chennai, next day in the major cities, and two to three
-                  working days everywhere else in Tamil Nadu.
+                  Same day inside Chennai by Porter at cost, ₹100 next day, and ₹100 to ₹200
+                  everywhere else in Tamil Nadu depending on how fast you need it.
                 </p>
 
                 <ul className="mt-6 space-y-3">
@@ -202,8 +206,8 @@ export function StampPaper() {
                   },
                   {
                     icon: Bike,
-                    title: "Face value only",
-                    body: "You pay the printed value plus a flat delivery fee. We never inflate the denomination.",
+                    title: "Priced before you order",
+                    body: "The face value and our charge are shown separately, and delivery is quoted on the call. Nothing appears at the door.",
                   },
                 ].map((item) => (
                   <div key={item.title} className="rounded-2xl border border-line bg-canvas p-5">

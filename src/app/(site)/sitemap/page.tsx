@@ -47,10 +47,10 @@ const JOURNEYS = [
     tone: "emerald" as const,
     kicker: "Path 2",
     title: "I just need stamp paper",
-    lead: "Licensed non-judicial paper and e-Stamp certificates at face value, brought to your address. No agreement drafting involved, and nothing charged until we have spoken.",
+    lead: "Licensed non-judicial paper and e-Stamp certificates brought to your address — ₹100 paper for ₹120, up to ₹5,000, with printing and notary attestation available. Nothing charged until we have spoken.",
     steps: [
       { label: "See denominations and delivery charges", href: "/stamp-paper", note: "₹20 to ₹500 sheets, or an e-Stamp for any value." },
-      { label: "Check the timeline for your district", href: "/stamp-paper", note: "Same day in the Chennai metro, 2–3 days statewide." },
+      { label: "Check the rate card and your district", href: "/stamp-paper", note: "Same day in Chennai by Porter, 2–3 days statewide." },
       { label: "Tell us what you need", href: LEAD_ANCHOR, note: "We call back with a firm quote before anything is charged." },
     ],
     cta: { label: "Order stamp paper", href: LEAD_ANCHOR },

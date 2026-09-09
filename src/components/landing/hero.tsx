@@ -24,7 +24,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const PROOF_POINTS = [
   { icon: Truck, label: "Same-day delivery in Chennai" },
   { icon: MapPin, label: "All 38 districts covered" },
-  { icon: Stamp, label: "Face value, no markup" },
+  { icon: Stamp, label: "₹100 paper for ₹120" },
   { icon: FileSignature, label: "Agreements in 10 minutes" },
 ];
 
@@ -253,7 +253,7 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.18, ease: EASE }}
               className="mt-7 max-w-xl text-[17.5px] leading-[1.65] text-navy-600"
             >
-              Licensed non-judicial stamp paper and e-Stamp certificates at face value,
+              Licensed non-judicial stamp paper and e-Stamp certificates from ₹120 a sheet,
               brought to your door anywhere in Tamil Nadu — same day in Chennai. And when you
               need the agreement written too, we draft, stamp and get it signed without you
               visiting a single office.

@@ -17,6 +17,6 @@ export default async function Image({ params }: { params: Promise<{ district: st
   return ogImage({
     eyebrow: `${district.name} district`,
     title: `Stamp paper in ${district.name}`,
-    facts: [zone.eta, "At face value, no markup", `₹20 – ₹500 + e-Stamp`],
+    facts: [zone.eta, "₹100 paper for ₹120", `₹20 – ₹5,000 + e-Stamp`],
   });
 }

@@ -39,7 +39,7 @@ export async function generateMetadata({
 
   const zone = ZONE_META[district.zone];
   const title = `Stamp Paper in ${district.name} — ${zone.shortEta}`;
-  const description = `Non-judicial stamp paper and e-Stamps in ${district.name} district at face value, delivered ${zone.eta.toLowerCase()}. ₹20 to ₹500, and any value on e-Stamp.`;
+  const description = `Non-judicial stamp paper and e-Stamps delivered across ${district.name} district, ${zone.eta.toLowerCase()}. ₹100 paper for ₹120, ₹500 for ₹550, ₹1,000 for ₹1,100, ₹5,000 for ₹5,500, and any value on e-Stamp.`;
 
   return {
     title,
@@ -83,7 +83,7 @@ export default async function StampPaperDistrictPage({
         icon={Stamp}
         crumbs={crumbs}
         title={`Stamp paper in ${district.name}, delivered to your door`}
-        body={`Licensed non-judicial stamp paper and e-Stamp certificates at face value, anywhere in ${district.name} district. ${zone.eta} delivery${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}. No queue at the vendor, no markup on the denomination.`}
+        body={`Licensed non-judicial stamp paper and e-Stamp certificates anywhere in ${district.name} district — the face value plus a stated procurement charge, never a figure you find out at the door. ${zone.eta} delivery${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}, and no queue at the vendor's counter.`}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <ButtonLink href={LEAD_ANCHOR} size="lg" className="group">
@@ -99,7 +99,7 @@ export default async function StampPaperDistrictPage({
           </ButtonLink>
         </div>
         <p className="mt-4 text-[13.5px] text-navy-500">
-          {zone.eta} delivery · Face value, no markup · Free above ₹2,000 of stamp value
+          {zone.eta} delivery · ₹100 paper for ₹120 · Free above ₹2,000 of stamp value
         </p>
       </PageHero>
 
@@ -166,8 +166,8 @@ export default async function StampPaperDistrictPage({
           <SectionHeading
             eyebrow={`In stock for ${district.name}`}
             icon={Stamp}
-            title="Every denomination, at exactly the printed value"
-            body="You pay the face value on the sheet and a flat delivery charge stated before you confirm. We never mark up the paper itself."
+            title="Every denomination, priced before you order"
+            body="Each sheet is the face value printed on it plus our charge for fetching it, and both figures are shown. Delivery is quoted separately before you confirm, and government stamp duty on an e-Stamp passes through at cost."
           />
 
           <Stagger className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" amount={0.08}>
@@ -175,9 +175,16 @@ export default async function StampPaperDistrictPage({
               <StaggerItem key={d.label}>
                 <div className="flex h-full flex-col rounded-2xl border border-line bg-canvas/60 p-6">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="font-display text-[24px] font-bold tracking-tight text-navy-950">
-                      {d.label}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="font-display text-[24px] font-bold tracking-tight text-navy-950">
+                        {d.label}
+                      </p>
+                      <p className="tnum mt-0.5 text-[12.5px] font-semibold text-brand-700">
+                        {d.price === null
+                          ? "Price on request"
+                          : `${inr(d.price)} a sheet · ${inr(d.price - d.value)} ours`}
+                      </p>
+                    </div>
                     {d.popular ? (
                       <span className="shrink-0 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold tracking-wide text-white uppercase">
                         Most used

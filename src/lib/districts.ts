@@ -809,22 +809,22 @@ export const ZONE_META: Record<
 > = {
   metro: {
     label: "Chennai metro",
-    eta: "Same day",
-    shortEta: "Same-Day Delivery",
-    charge: 99,
-    cutOff: "Order before 2 pm",
+    eta: "Next day",
+    shortEta: "Next-Day Delivery",
+    charge: 100,
+    cutOff: "Same day by Porter, charged at cost",
   },
   major: {
     label: "Major cities",
-    eta: "Next working day",
-    shortEta: "Next-Day Delivery",
-    charge: 149,
+    eta: "Express",
+    shortEta: "Express Delivery",
+    charge: 200,
   },
   state: {
     label: "Statewide",
     eta: "2 – 3 working days",
     shortEta: "2–3 Day Delivery",
-    charge: 149,
+    charge: 100,
   },
 };
 

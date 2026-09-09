@@ -23,7 +23,7 @@ export const SITE = {
   legalName: "LP Enterprises",
   tagline: "Licensed stamp paper and notarised agreements across Tamil Nadu",
   description:
-    "Licensed non-judicial stamp paper and e-Stamps at face value, delivered anywhere in Tamil Nadu — same day in Chennai. Agreements, deeds and affidavits drafted too.",
+    "Licensed non-judicial stamp paper and e-Stamps from ₹120, delivered anywhere in Tamil Nadu — same day in Chennai. Agreements, deeds and affidavits drafted too.",
   url: "https://lpstamppaper.com",
   /** Landline. Dialled as 044 within India; the tel: link strips the spaces. */
   phone: "044 4006 8402",
@@ -366,8 +366,8 @@ export const HOW_IT_WORKS = [
 ] as const;
 
 export const FEATURES = [
-  { icon: "Truck", title: "Delivered to your door", body: "Same day inside Chennai, next working day in the major cities, two to three days everywhere else in Tamil Nadu. Free above ₹2,000 of stamp value." },
-  { icon: "Stamp", title: "Every denomination in stock", body: "₹20, ₹50, ₹100, ₹200 and ₹500 non-judicial paper, plus e-Stamp certificates for any value from ₹1 upward." },
+  { icon: "Truck", title: "Delivered to your door", body: "Same day inside Chennai by Porter at cost, ₹100 next day, ₹200 express anywhere in Tamil Nadu and ₹100 in two to three days. Free above ₹2,000 of stamp value." },
+  { icon: "Stamp", title: "Every denomination in stock", body: "₹20 to ₹5,000 non-judicial paper — ₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — plus e-Stamp certificates for any value from ₹1 upward." },
   { icon: "ShieldCheck", title: "Licensed and verifiable", body: "Procured through authorised vendors and the state e-Stamp channel. Every sheet carries a certificate number you can check yourself." },
   { icon: "Wand2", title: "Clauses that write themselves", body: "Say the flat is furnished and an inventory clause appears. Allow pets and the pet clause writes itself. No legal drafting required." },
   { icon: "PenTool", title: "Aadhaar e-Sign", body: "Both parties sign with an OTP on their own phone. Legally valid under Section 3A of the Information Technology Act, 2000." },
@@ -385,17 +385,27 @@ export const FAQS = [
   {
     category: "Stamp paper",
     q: "Which stamp paper denominations do you supply?",
-    a: "Non-judicial stamp paper in ₹20, ₹50, ₹100, ₹200 and ₹500, which covers almost every ordinary transaction. Where the duty payable is a specific figure — a lease deed, a sale agreement, a mortgage — we issue an e-Stamp certificate for that exact amount instead, from ₹1 upward with no practical ceiling.",
+    a: "Non-judicial stamp paper from ₹20 up to ₹5,000, which covers almost every ordinary transaction. Where the duty payable is a specific figure — a lease deed, a sale agreement, a mortgage — we issue an e-Stamp certificate for that exact amount instead, from ₹1 upward with no practical ceiling.",
   },
   {
     category: "Stamp paper",
-    q: "Do you charge more than the face value printed on the paper?",
-    a: "No. You pay exactly the denomination printed on the sheet, plus a flat delivery charge that is stated before you confirm — ₹99 within the Chennai metro and ₹149 elsewhere in Tamil Nadu. Delivery is free on any order above ₹2,000 of stamp value, and free everywhere on ten sheets or more.",
+    q: "What does a sheet of stamp paper actually cost?",
+    a: "The face value plus a procurement charge, and we print both so you can see the difference. ₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — that is for a blank, unprinted sheet. Delivery is charged separately and stated before you confirm: ₹100 next day in Chennai, ₹200 express anywhere in Tamil Nadu, ₹100 for two to three days, and same day in Chennai by Porter at Porter's own fare. Delivery is free on any order above ₹2,000 of stamp value and free everywhere on ten sheets or more. Government stamp duty on an e-Stamp is a separate thing and passes through at cost with nothing added.",
   },
   {
     category: "Stamp paper",
     q: "Which denomination do I need for a rental agreement?",
     a: "In practice most 11-month residential agreements in Tamil Nadu are executed on ₹100 stamp paper. Strictly, duty under Article 35 is 1% of the total rent across the term plus the deposit, and for a 12-month-or-longer agreement that has to be paid in full through an e-Stamp. Tell us the rent, deposit and duration and we will tell you which applies to you before you order.",
+  },
+  {
+    category: "Stamp paper",
+    q: "Can you print my draft on the stamp paper?",
+    a: "Yes. Upload your draft as a PDF or a Word file and we print it onto the paper before it goes out, with the margins a sub-registrar expects left clear. Black-and-white and colour printing and photocopying are available at the counter, charged by the page. If you want it attested as well, a notary signature on stamp paper is ₹350 including two green sheets, or ₹100 on plain paper — that is the attestation alone, the paper is priced separately.",
+  },
+  {
+    category: "Stamp paper",
+    q: "Can I get stamp paper with an earlier date on it?",
+    a: "Back-dated stamp paper is available, subject to what the vendor is holding on the day. Tell us the date you need when you order and we will confirm whether we can get it before you pay anything, rather than take the order and tell you later.",
   },
   {
     category: "Stamp paper",
@@ -410,7 +420,7 @@ export const FAQS = [
   {
     category: "Delivery",
     q: "Where in Tamil Nadu do you deliver?",
-    a: "All 38 districts. Chennai, Chengalpattu, Kancheepuram and Tiruvallur get same-day delivery on orders placed before 2pm. Coimbatore, Madurai, Trichy, Salem, Tiruppur, Erode, Vellore, Hosur, Tirunelveli and Thoothukudi get next working day. Everywhere else in the state is two to three working days.",
+    a: "All 38 districts. Inside Chennai it is ₹100 for next day, or same day by Porter charged at Porter's own fare. Anywhere else in Tamil Nadu is ₹200 for express delivery or ₹100 for two to three working days — Coimbatore, Madurai, Trichy, Salem, Tiruppur, Erode, Vellore, Hosur, Tirunelveli and Thoothukudi are the quickest of them.",
   },
   {
     category: "Delivery",
@@ -436,6 +446,11 @@ export const FAQS = [
     category: "Legal validity",
     q: "What happens if my agreement is for 12 months or longer?",
     a: "We flag it the moment you set the term, add the registration clause, compute the registration fee alongside the stamp duty, and book your Sub-Registrar appointment. Both parties still have to appear in person before the Sub-Registrar for a registered instrument — that is a statutory requirement no online service can remove.",
+  },
+  {
+    category: "Legal validity",
+    q: "Do I have to have my affidavit notarised?",
+    a: "Yes, and we do not offer it any other way. An affidavit is a sworn statement — until a notary public administers the oath and attests it, it is an unsigned-under-oath piece of paper, and the court, registrar, passport office, bank or college that asked for it will hand it straight back. So attestation is built into the price of every affidavit rather than offered as an extra. On a rental agreement, a lease, a sale or a licence it is genuinely optional: those are valid once executed and e-stamped, and notarisation only adds further proof of who signed. There it stays a tick box.",
   },
   {
     category: "Stamp duty",
@@ -503,7 +518,7 @@ export const FAQS = [
  */
 export const TRUST_SIGNALS = [
   "Stamp duty paid in full to the Government of Tamil Nadu",
-  "No markup on any government charge",
+  "No markup on stamp duty or any other government charge",
   "Certificate numbers printed on your invoice to verify yourself",
   "Aadhaar e-Sign under Section 3A, IT Act 2000",
   "Signatures attested by a notary public",

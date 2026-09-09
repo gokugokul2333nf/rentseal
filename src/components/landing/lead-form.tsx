@@ -29,9 +29,9 @@ import { cn } from "@/lib/utils";
 
 const ASSURANCES = [
   { icon: Clock3, text: "We call back within 30 minutes during working hours" },
-  { icon: PackageCheck, text: "Same-day delivery in Chennai, next day in major cities" },
+  { icon: PackageCheck, text: "Same-day delivery in Chennai, ₹200 express across Tamil Nadu" },
   { icon: BadgeCheck, text: "A real person, in Tamil or English — never a bot" },
-  { icon: ShieldCheck, text: "Face value on the stamp, a firm quote on everything else" },
+  { icon: ShieldCheck, text: "Face value and our charge shown separately, both before you pay" },
   { icon: Lock, text: "Your number is used to help you, never sold or spammed" },
 ];
 
@@ -176,8 +176,8 @@ export function LeadForm() {
             <Reveal delay={0.12}>
               <p className="mt-5 max-w-lg text-[17px] leading-[1.7] text-white/60">
                 Stamp paper, an agreement, or both. Leave your number and one of our team will
-                call back with a firm quote — face value on the stamp, delivery charge stated
-                up front, nothing hidden. Chennai orders placed before 2pm go out the same day.
+                call back with a firm quote — the face value, our charge and the delivery all
+                stated up front, nothing hidden. Chennai orders placed before 2pm go out the same day.
               </p>
             </Reveal>
 

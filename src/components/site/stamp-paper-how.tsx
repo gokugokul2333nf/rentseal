@@ -49,7 +49,7 @@ const REASONS = [
   {
     icon: Truck,
     title: "Delivered across Tamil Nadu",
-    body: "Same day inside the Chennai metro, next working day in the major cities, two to three days everywhere else in the state.",
+    body: "Same day inside Chennai by Porter at cost, ₹100 next day, ₹200 express anywhere in Tamil Nadu, and ₹100 in two to three working days.",
   },
   {
     icon: Lock,

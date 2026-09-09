@@ -214,7 +214,8 @@ function buildIndex(): SearchDoc[] {
       title: `${d.label} stamp paper`,
       href: "/stamp-paper",
       kind: "Stamp paper",
-      description: d.uses.join(" · "),
+      description:
+        d.price === null ? d.uses.join(" · ") : `${d.price} rupees a sheet · ${d.uses.join(" · ")}`,
       keywords: [
         d.label,
         `${d.value}`,

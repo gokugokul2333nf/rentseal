@@ -1,4 +1,5 @@
 import type { PlanId, StampDutyBreakdown } from "./types";
+import { NOTARY_FEE } from "./notary";
 
 /**
  * Tamil Nadu stamp duty & registration charges for lease/rental instruments.
@@ -35,6 +36,12 @@ export interface StampDutyInput {
   registerAnyway?: boolean;
   /** Premium includes notary attestation; other plans can add it on. */
   lawyerReview?: boolean;
+  /**
+   * The instrument cannot be delivered unsworn — an affidavit. The fee is
+   * charged whatever the plan and whatever the checkbox says, because there is
+   * no version of the document that does without it.
+   */
+  notaryRequired?: boolean;
 }
 
 export function calculateStampDuty({
@@ -44,6 +51,7 @@ export function calculateStampDuty({
   plan = "standard",
   registerAnyway = false,
   lawyerReview = false,
+  notaryRequired = false,
 }: StampDutyInput): StampDutyBreakdown {
   const rent = Math.max(0, Number(monthlyRent) || 0);
   const deposit = Math.max(0, Number(securityDeposit) || 0);
@@ -62,8 +70,10 @@ export function calculateStampDuty({
 
   const fees = PLAN_FEES[plan];
   const platformFee = fees.platform;
-  // Premium bundles notary attestation; other plans pay the add-on only if they opt in.
-  const lawyerFee = plan === "premium" ? fees.lawyer : lawyerReview ? 700 : 0;
+  // Premium bundles notary attestation; other plans pay the add-on if they opt
+  // in, or if the instrument is one that is void without it.
+  const lawyerFee =
+    plan === "premium" ? fees.lawyer : lawyerReview || notaryRequired ? NOTARY_FEE : 0;
 
   // GST applies to our service fees only — never to a government levy.
   const gst = Math.round((platformFee + lawyerFee) * GST_RATE);
@@ -83,6 +93,11 @@ export function calculateStampDuty({
   } else {
     notes.push(
       "An 11-month term does not require registration. Your agreement is e-stamped and legally valid as evidence.",
+    );
+  }
+  if (notaryRequired) {
+    notes.push(
+      "Notary attestation is included because an affidavit has to be sworn — it is not an optional extra on this document.",
     );
   }
   notes.push("GST at 18% applies to our service fee only, never to government charges.");
