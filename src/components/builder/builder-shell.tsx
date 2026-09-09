@@ -22,6 +22,7 @@ import { useAgreement } from "@/lib/agreement-store";
 import { clauseStats, specFor } from "@/lib/clauses";
 import { calculateStampDuty } from "@/lib/stamp-duty";
 import { isNotaryMandatory } from "@/lib/notary";
+import { stampPaperDateOf } from "@/lib/backdating";
 import { AGREEMENT_TYPES } from "@/lib/site";
 import { TEMPLATES } from "@/lib/templates";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -185,7 +186,7 @@ function CostRail() {
         registerAnyway: draft.options.registrationRequired,
         lawyerReview: draft.options.lawyerReview,
         notaryRequired: isNotaryMandatory(draft.templateId),
-        stampPaperDate: draft.options.stampPaperDate,
+        stampPaperDate: stampPaperDateOf(draft),
         extraPrintedCopies: draft.options.extraPrintedCopies,
         softCopy: draft.options.softCopy,
         templateId: draft.templateId,
@@ -717,7 +718,7 @@ function SummaryRailMobile() {
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired: isNotaryMandatory(draft.templateId),
-    stampPaperDate: draft.options.stampPaperDate,
+    stampPaperDate: stampPaperDateOf(draft),
     templateId: draft.templateId,
     stampPaperValue: draft.options.stampPaperValue,
     documentPages: draft.options.documentPages,

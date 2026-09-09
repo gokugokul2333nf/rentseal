@@ -1,3 +1,7 @@
+import type { AgreementDraft } from "./types";
+import { TEMPLATE_SPECS } from "./agreement-templates";
+import { collectsExecutionDate } from "./template-fields";
+
 /**
  * Paper carrying an earlier issue date, and what it costs.
  *
@@ -13,6 +17,23 @@
  * asked for. Keeping the rule in one file rather than inline in a component is
  * what makes that boundary checkable later.
  */
+
+/**
+ * The date the sheet should carry, for a given draft.
+ *
+ * Most deeds are asked their date up front — every letting is, and any verbatim
+ * deed whose wording carries the date tokens. For those the stamp paper simply
+ * takes the date already given, because the date printed on the sheet and the
+ * date inside the deed are the same date and asking twice invites them to
+ * differ. Only a deed that was never asked gets its own field on the review
+ * step.
+ */
+export function stampPaperDateOf(draft: AgreementDraft): string {
+  const spec = TEMPLATE_SPECS[draft.templateId];
+  return spec && collectsExecutionDate(spec)
+    ? draft.terms.executionDate
+    : draft.options.stampPaperDate;
+}
 
 /** Rupees, per month of age, as quoted by the office. */
 export const BACKDATE_FEE_PER_MONTH = 50;

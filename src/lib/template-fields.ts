@@ -151,3 +151,20 @@ export function fieldsForTemplate(spec: TemplateSpec): TemplateField[] {
 export function hasSecondParty(spec: TemplateSpec): boolean {
   return fieldsForTemplate(spec).some((f) => f.party === "B");
 }
+
+/**
+ * Whether the builder has already asked this deed for its date.
+ *
+ * A letting runs through the fixed Terms step, which always asks "Signed on".
+ * A verbatim deed is asked only if its wording carries the date tokens — a
+ * no-objection certificate does, a memorandum of deposit of title deeds does
+ * not.
+ *
+ * Where it has been asked, the stamp paper takes that date and the review step
+ * does not ask a second time. Two date fields on one form are two dates that
+ * can disagree, and the one on the sheet has to match the one in the deed.
+ */
+export function collectsExecutionDate(spec: TemplateSpec): boolean {
+  if (!spec.body?.length) return true;
+  return fieldsForTemplate(spec).some((f) => f.path === "terms.executionDate");
+}

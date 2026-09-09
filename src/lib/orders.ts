@@ -1,5 +1,6 @@
 import { calculateStampDuty } from "./stamp-duty";
 import { isNotaryMandatory } from "./notary";
+import { stampPaperDateOf } from "./backdating";
 import { propertyAddress, agreementTitle } from "./clauses";
 import { AGREEMENT_TYPES } from "./site";
 import { TEMPLATES } from "./templates";
@@ -46,7 +47,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
-    stampPaperDate: draft.options.stampPaperDate,
+    stampPaperDate: stampPaperDateOf(draft),
     templateId: draft.templateId,
     stampPaperValue: draft.options.stampPaperValue,
     documentPages: draft.options.documentPages,
@@ -119,7 +120,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     notaryFee: String(breakdown.lawyerFee),
     // The counter has to source this sheet, so it needs the date and the months
     // spelt out rather than inferred from the fee.
-    stampPaperDate: draft.options.stampPaperDate,
+    stampPaperDate: stampPaperDateOf(draft),
     backdatingMonths: breakdown.backdatingMonths ? String(breakdown.backdatingMonths) : "",
     backdatingFee: String(breakdown.backdatingFee),
     // The counter prints and stamps these, so it needs the count, not just a fee.

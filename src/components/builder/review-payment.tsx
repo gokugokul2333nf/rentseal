@@ -27,7 +27,9 @@ import {
 } from "@/lib/notary";
 import { DENOMINATIONS } from "@/lib/stamp-paper";
 import { TEMPLATES } from "@/lib/templates";
-import { BACKDATE_FEE_PER_MONTH, backdateLabel } from "@/lib/backdating";
+import { BACKDATE_FEE_PER_MONTH, backdateLabel, stampPaperDateOf } from "@/lib/backdating";
+import { TEMPLATE_SPECS } from "@/lib/agreement-templates";
+import { collectsExecutionDate } from "@/lib/template-fields";
 import { COPY_PAGE_FEE, printedCopyUnitPrice } from "@/lib/copies";
 import { Stepper } from "@/components/ui/stepper";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -148,6 +150,10 @@ function SendBlock({
   const { draft, setPlan, update } = useAgreement();
 
   const notaryRequired = isNotaryMandatory(draft.templateId);
+  // Most deeds have already given their date; only the rest are asked again.
+  const spec = TEMPLATE_SPECS[draft.templateId];
+  const dateAlreadyAsked = spec ? collectsExecutionDate(spec) : true;
+  const stampDate = stampPaperDateOf(draft);
   const tpl = TEMPLATES.find((t) => t.id === draft.templateId);
 
   const breakdown = calculateStampDuty({
@@ -158,7 +164,7 @@ function SendBlock({
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
-    stampPaperDate: draft.options.stampPaperDate,
+    stampPaperDate: stampPaperDateOf(draft),
     templateId: draft.templateId,
     stampPaperValue: draft.options.stampPaperValue,
     documentPages: draft.options.documentPages,
@@ -433,32 +439,56 @@ function SendBlock({
         {/*
           The date on the paper.
 
-          It sits here rather than in the marketing pages on purpose — the
-          office's position is that offering older-dated paper publicly is not
-          lawful, so it is asked during drafting and nowhere else.
+          Asked here only when it has not been asked already. Every letting and
+          most verbatim deeds give their date up front, and the sheet takes that
+          one — the date on the paper and the date in the deed have to match, so
+          there is no second field for them to disagree in.
+
+          It also stays off the marketing pages entirely, because the office's
+          position is that offering older-dated paper publicly is not lawful.
         */}
-        <div className="rounded-2xl border border-line bg-white p-5">
-          <Field
-            label="Date to be printed on the stamp paper"
-            hint="Optional"
-            help={
-              breakdown.backdatingMonths > 0
-                ? `Sourced from older stock — ${backdateLabel(breakdown.backdatingMonths)}, at ${inr(BACKDATE_FEE_PER_MONTH)} a month. We confirm the date is actually available on the call before anything is charged.`
-                : draft.options.stampPaperDate
-                  ? "Inside this month, so nothing is added — the fee is the usual one."
-                  : `Leave blank and the paper carries the day it is issued. Any date this month is charged as usual; each month further back adds ${inr(BACKDATE_FEE_PER_MONTH)}.`
-            }
-          >
-            {(id) => (
-              <Input
-                id={id}
-                type="date"
-                value={draft.options.stampPaperDate}
-                onChange={(e) => update({ options: { stampPaperDate: e.target.value } })}
-              />
-            )}
-          </Field>
-        </div>
+        {dateAlreadyAsked ? (
+          stampDate ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-5 py-4">
+              <p className="text-[13.5px] text-navy-600">
+                The paper will be dated{" "}
+                <span className="font-semibold text-navy-950">{formatDate(stampDate)}</span>, the
+                date of the agreement you entered.{" "}
+                <span className="text-navy-400">Change it on the Terms step.</span>
+              </p>
+              {breakdown.backdatingMonths > 0 ? (
+                <Badge tone="amber">
+                  {backdateLabel(breakdown.backdatingMonths)} · {inr(breakdown.backdatingFee)}
+                </Badge>
+              ) : (
+                <Badge tone="emerald">No date charge</Badge>
+              )}
+            </div>
+          ) : null
+        ) : (
+          <div className="rounded-2xl border border-line bg-white p-5">
+            <Field
+              label="Date to be printed on the stamp paper"
+              hint="Optional"
+              help={
+                breakdown.backdatingMonths > 0
+                  ? `Sourced from older stock — ${backdateLabel(breakdown.backdatingMonths)}, at ${inr(BACKDATE_FEE_PER_MONTH)} a month. We confirm the date is actually available on the call before anything is charged.`
+                  : draft.options.stampPaperDate
+                    ? "Inside this month, so nothing is added — the fee is the usual one."
+                    : `Leave blank and the paper carries the day it is issued. Any date this month is charged as usual; each month further back adds ${inr(BACKDATE_FEE_PER_MONTH)}.`
+              }
+            >
+              {(id) => (
+                <Input
+                  id={id}
+                  type="date"
+                  value={draft.options.stampPaperDate}
+                  onChange={(e) => update({ options: { stampPaperDate: e.target.value } })}
+                />
+              )}
+            </Field>
+          </div>
+        )}
 
         {/* Quote */}
         <div className="overflow-hidden rounded-2xl border border-line bg-white">
