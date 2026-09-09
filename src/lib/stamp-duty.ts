@@ -138,11 +138,27 @@ export function calculateStampDuty({
   const backdatingMonths = backdateMonths(stampPaperDate);
   const backdatingFee = backdateFee(stampPaperDate);
 
-  // GST applies to our service fees only — never to a government levy. Sourcing
-  // older-dated stock is our service, so it is inside the GST base.
-  const gst = Math.round(
-    (platformFee + lawyerFee + backdatingFee + copiesFee + scanFee) * GST_RATE,
-  );
+  /*
+    GST applies to our service fees only, never to a government levy — which is
+    what the site tells the customer, so it has to be what the arithmetic does.
+
+    Two things used to break that, in opposite directions. The sheet was left
+    out of the base entirely, so our margin on it — ₹20 of a ₹120 sheet — went
+    untaxed. Meanwhile an extra printed copy carries a whole sheet inside its
+    fee, and that fee was taxed in full, so the face value of a copy's paper was
+    taxed while the face value of the original's was not. The same rupee of
+    stamp paper, taxed or not depending on which line it sat in.
+
+    The rule now is the one we print: everything we charge for is in the base,
+    and every rupee that belongs to the state — duty, registration fee, and the
+    face value of every sheet, the original and each copy — is out of it.
+  */
+  const paperFaceValue =
+    (paper?.faceValue ?? 0) * (1 + Math.max(0, Math.floor(Number(extraPrintedCopies) || 0)));
+
+  const ourCharges =
+    platformFee + stampPaperFee + lawyerFee + backdatingFee + copiesFee + scanFee;
+  const gst = Math.round(Math.max(0, ourCharges - paperFaceValue) * GST_RATE);
 
   const total =
     stampDuty +
@@ -190,7 +206,9 @@ export function calculateStampDuty({
       `A scanned copy is ₹${COPY_PAGE_FEE} a page, charged once however many people you forward it to.`,
     );
   }
-  notes.push("GST at 18% applies to our service fee only, never to government charges.");
+  notes.push(
+    "GST at 18% applies to our service fee only. Stamp duty, the registration fee and the face value printed on every sheet are the state's and carry no GST.",
+  );
 
   return {
     totalRentOverTerm,
@@ -203,8 +221,7 @@ export function calculateStampDuty({
     stampPaperFee,
     documentFee,
     lawyerFee,
-    paperFaceValue:
-      (paper?.faceValue ?? 0) * (1 + Math.max(0, Math.floor(Number(extraPrintedCopies) || 0))),
+    paperFaceValue,
     printedCopiesFee: copiesFee,
     softCopyFee: scanFee,
     backdatingFee,

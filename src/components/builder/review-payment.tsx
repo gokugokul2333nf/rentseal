@@ -399,6 +399,7 @@ function SendBlock({
                 onChange={(n) => update({ options: { extraPrintedCopies: n } })}
                 min={0}
                 max={20}
+                label="Extra printed copies"
                 suffix={draft.options.extraPrintedCopies === 1 ? "copy" : "copies"}
                 className="w-[10.5rem] shrink-0"
               />

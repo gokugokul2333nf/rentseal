@@ -22,6 +22,7 @@ export function Stepper({
   min = 0,
   max = 20,
   suffix,
+  label,
   className,
 }: {
   id?: string;
@@ -31,6 +32,14 @@ export function Stepper({
   max?: number;
   /** Read out beside the number — "copies", "sheets". */
   suffix?: string;
+  /**
+   * Accessible name for the number itself.
+   *
+   * The suffix beside it is a truncated visual label, and where the control
+   * sits next to a paragraph rather than inside a Field there is nothing else
+   * tying a name to the input — a screen reader reached an unnamed spinbutton.
+   */
+  label?: string;
   className?: string;
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, Math.floor(n) || 0));
@@ -55,6 +64,7 @@ export function Stepper({
         <input
           id={id}
           type="number"
+          aria-label={label}
           inputMode="numeric"
           min={min}
           max={max}
