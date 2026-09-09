@@ -9,9 +9,14 @@
  * Two conventions, both borrowed from certificates.ts and both there for the
  * same reason:
  *
- *   - `price: null` means the office has not quoted a rate. Anything null
- *     renders "Price on request" rather than a guess. A made-up figure on a
- *     price list is a figure someone will be held to at the counter.
+ *   - Physical paper is stocked in ₹100, ₹500, ₹1,000 and ₹5,000 and nothing
+ *     else. Listing ₹20, ₹50 or ₹200 as "price on request" was still an offer
+ *     to supply them, and the office cannot, so they are gone rather than
+ *     unpriced. Duty below ₹100 goes on a ₹100 sheet; anything needing an
+ *     exact figure goes on an e-Stamp.
+ *   - `price: null` survives for the e-Stamp alone, whose value is whatever
+ *     the instrument attracts. It renders "Price on request" rather than a
+ *     guess — a made-up figure on a price list is one someone is held to.
  *   - Every price here is the amount payable for the sheet, blank and
  *     unprinted, before delivery. Face value and price are separate fields on
  *     purpose: the difference between them is our procurement charge, and the
@@ -35,36 +40,24 @@ export interface Denomination {
 
 export const DENOMINATIONS: Denomination[] = [
   {
-    value: 20,
-    label: "₹20",
-    price: null,
-    uses: ["Affidavits", "Declarations", "Undertakings", "Name change"],
-  },
-  {
-    value: 50,
-    label: "₹50",
-    price: null,
-    uses: ["Indemnity bonds", "Guarantee letters", "Sworn statements", "Gap certificates"],
-  },
-  {
     value: 100,
     label: "₹100",
     price: 120,
     popular: true,
-    uses: ["Rental agreements", "Power of attorney", "No-objection certificates", "General agreements"],
-    note: "The denomination most 11-month rental agreements in Tamil Nadu are executed on.",
-  },
-  {
-    value: 200,
-    label: "₹200",
-    price: null,
-    uses: ["Partnership deeds", "Loan agreements", "Job contracts", "Franchise agreements"],
+    uses: [
+      "Rental agreements",
+      "Affidavits and declarations",
+      "Indemnity bonds",
+      "Power of attorney",
+      "No-objection certificates",
+    ],
+    note: "The denomination most 11-month rental agreements in Tamil Nadu are executed on, and the smallest sheet we stock — affidavits and bonds that used to go on ₹20 or ₹50 paper are executed on this.",
   },
   {
     value: 500,
     label: "₹500",
     price: 550,
-    uses: ["Commercial agreements", "Sale agreements", "Higher-value bonds", "Settlement deeds"],
+    uses: ["Commercial agreements", "Partnership deeds", "Sale agreements", "Settlement deeds"],
   },
   {
     value: 1000,
@@ -156,25 +149,23 @@ export const STAMP_ADD_ONS: StampAddOn[] = [
 
 /* ═════════════════════ What the counter does with the paper ═══════════════ */
 
+/**
+ * What the counter does with the paper once it has it.
+ *
+ * Nothing here advertises the issue date of a sheet. Paper carrying an earlier
+ * date is a question the office answers on the confirming call, against what
+ * the vendor is actually holding — a public page offering it is an
+ * advertisement to antedate an instrument, which is not the same thing at all.
+ */
 export interface CounterService {
   id: string;
   name: string;
   /** Rupees. Null where it is quoted on the job. */
   price: number | null;
   blurb: string;
-  /** Worth calling out on the page rather than leaving in a list. */
-  highlight?: boolean;
 }
 
 export const COUNTER_SERVICES: CounterService[] = [
-  {
-    id: "old-date-stamp-paper",
-    name: "Back-dated stamp paper",
-    price: null,
-    highlight: true,
-    blurb:
-      "Stamp paper carrying an earlier issue date is available, subject to what the vendor holds on the day. Tell us the date you need and we will confirm availability before you pay.",
-  },
   {
     id: "print-on-stamp-paper",
     name: "Printing on the stamp paper",
@@ -319,17 +310,17 @@ export const STAMP_USE_CASES: StampUseCase[] = [
   },
   {
     title: "Affidavits & declarations",
-    denomination: "₹20",
+    denomination: "₹100",
     body: "Name change, date of birth correction, address proof, single-status affidavits and the sworn statements colleges and passport offices ask for. All of them have to be sworn before a notary to count.",
   },
   {
     title: "Indemnity & surety bonds",
-    denomination: "₹50 – ₹100",
+    denomination: "₹100",
     body: "Employment bonds, gap certificates, loss-of-document indemnities, and the guarantee letters banks and employers commonly require.",
   },
   {
     title: "Business & partnership deeds",
-    denomination: "₹200 – ₹500",
+    denomination: "₹500",
     body: "Partnership deeds, LLP agreements, vendor contracts, franchise agreements and commercial leases where a higher denomination is prescribed.",
   },
   {

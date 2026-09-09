@@ -20,11 +20,12 @@ import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { Reveal } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { StampSheet } from "@/components/ui/stamp-sheet";
 import { cn, inr } from "@/lib/utils";
 
 export function StampPaper() {
   const [selected, setSelected] = useState(100);
-  const active = DENOMINATIONS.find((d) => d.value === selected) ?? DENOMINATIONS[2];
+  const active = DENOMINATIONS.find((d) => d.value === selected) ?? DENOMINATIONS[0];
 
   return (
     <section id="stamp-paper" className="section scroll-mt-20 bg-white">
@@ -46,7 +47,8 @@ export function StampPaper() {
                     Choose your denomination
                   </h3>
                   <p className="mt-1.5 text-[13.5px] text-navy-500">
-                    Non-judicial stamp paper from ₹120, and e-Stamp certificates for any value.
+                    Four physical denominations from ₹120, and e-Stamp certificates for any
+                    value. The paper is delivered; the e-Stamp is emailed.
                   </p>
                 </div>
                 <Badge tone="emerald" className="hidden shrink-0 sm:inline-flex">
@@ -81,9 +83,17 @@ export function StampPaper() {
                           Most used
                         </span>
                       ) : null}
+                      <StampSheet
+                        value={d.value}
+                        label={d.label}
+                        className={cn(
+                          "mb-2.5 rounded-[3px] shadow-sm ring-1",
+                          isActive ? "ring-white/40" : "ring-navy-950/10",
+                        )}
+                      />
                       <span
                         className={cn(
-                          "block font-display text-[22px] font-bold tracking-tight",
+                          "block font-display text-[20px] font-bold tracking-tight",
                           isActive ? "text-white" : "text-navy-950",
                         )}
                       >
@@ -91,15 +101,15 @@ export function StampPaper() {
                       </span>
                       <span
                         className={cn(
-                          "tnum mt-1 block text-[11.5px] leading-snug",
+                          "tnum mt-0.5 block text-[11.5px] leading-snug",
                           isActive ? "text-white/70" : "text-navy-400",
                         )}
                       >
-                        {d.price === null
-                          ? d.value === 0
-                            ? "e-Stamp certificate"
-                            : "Price on request"
-                          : `${inr(d.price)} a sheet`}
+                        {d.value === 0
+                          ? "Emailed, any value"
+                          : d.price === null
+                            ? "Price on request"
+                            : `${inr(d.price)} a sheet`}
                       </span>
                     </button>
                   );

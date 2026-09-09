@@ -13,6 +13,7 @@ import {
   MessageCircle,
   PackageCheck,
   Phone,
+  Scale,
   ShieldCheck,
   Stamp,
 } from "lucide-react";
@@ -35,12 +36,27 @@ const ASSURANCES = [
   { icon: Lock, text: "Your number is used to help you, never sold or spammed" },
 ];
 
-type Need = "stamp-paper" | "agreement" | "both";
+type Need = "stamp-paper" | "agreement" | "affidavit" | "both";
 
-// Labels stay short — three across inside a ~520px card leaves no room for prose.
+/** What the counter needs to know about attestation before it quotes. */
+type NotaryChoice = "none" | "stamp-paper" | "white-sheet" | "advise";
+
+const NOTARY_CHOICES: Array<{ value: NotaryChoice; label: string; hint: string }> = [
+  { value: "none", label: "Not needed", hint: "Just the paper" },
+  { value: "stamp-paper", label: "On the stamp paper", hint: "₹350, two green sheets included" },
+  { value: "white-sheet", label: "On plain paper", hint: "₹100" },
+  { value: "advise", label: "Not sure", hint: "Advise me on the call" },
+];
+
+// Labels stay short — four across inside a ~520px card leaves no room for prose.
+// Affidavit is its own choice rather than a kind of agreement: it is sworn, not
+// negotiated, it always carries the notary fee, and the counter quotes it
+// differently. Burying it under "Agreement" was sending sworn work down a path
+// that never mentions attestation.
 const NEEDS: Array<{ value: Need; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { value: "stamp-paper", label: "Stamp paper", icon: Stamp },
   { value: "agreement", label: "Agreement", icon: FileText },
+  { value: "affidavit", label: "Affidavit", icon: Scale },
   { value: "both", label: "Both", icon: PackageCheck },
 ];
 
@@ -56,7 +72,15 @@ export function LeadForm() {
   const [drafting, setDrafting] = useState<AgreementType | null>(null);
   const [draftType, setDraftType] = useState<AgreementType>("residential");
   const [wantsCallback, setWantsCallback] = useState(false);
+  // Both asked for by the counter. Attestation because half the walk-ins want
+  // the notary's signature and were having to say so in the free-text box, and
+  // the date because the office needs to know when the paper is wanted for
+  // before it promises a delivery slot.
+  const [notary, setNotary] = useState<NotaryChoice>("none");
+  const [stampDate, setStampDate] = useState("");
   const showDrafter = (need === "agreement" || need === "both") && !wantsCallback;
+  /** Stamp paper is being bought, so the paper questions apply. */
+  const buyingPaper = need === "stamp-paper" || need === "affidavit" || need === "both";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +106,8 @@ export function LeadForm() {
             email: value("email"),
             city: value("city"),
             denomination: value("denomination"),
+            notary: buyingPaper ? notary : "",
+            stampDate: buyingPaper ? stampDate : "",
             agreementType: value("agreementType"),
             message: value("message"),
           }),
@@ -306,7 +332,7 @@ export function LeadForm() {
                     <div
                       role="radiogroup"
                       aria-label="What do you need"
-                      className="grid grid-cols-3 gap-2"
+                      className="grid grid-cols-2 gap-2 sm:grid-cols-4"
                     >
                       {NEEDS.map((option) => {
                         const isActive = option.value === need;
@@ -319,6 +345,9 @@ export function LeadForm() {
                             onClick={() => {
                               setNeed(option.value);
                               setWantsCallback(false);
+                              // An affidavit is sworn by definition, so the
+                              // attestation question cannot start at "no".
+                              setNotary(option.value === "affidavit" ? "stamp-paper" : "none");
                             }}
                             className={cn(
                               "flex flex-col items-center gap-2 rounded-xl border px-2 py-3.5 transition-all duration-200",
@@ -461,13 +490,28 @@ export function LeadForm() {
                   ) : (
                     <>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {need === "stamp-paper" ? (
-                      <Field label="Denomination needed" required>
+                    {buyingPaper ? (
+                      <Field
+                        label="Denomination needed"
+                        required
+                        help={
+                          need === "affidavit"
+                            ? "₹100 is the smallest sheet we carry, and it is what most affidavits are sworn on."
+                            : undefined
+                        }
+                      >
                         {(id) => (
-                          <Select id={id} name="denomination" defaultValue="100" required>
+                          <Select
+                            id={id}
+                            name="denomination"
+                            defaultValue="100"
+                            required
+                          >
                             {DENOMINATIONS.map((d) => (
                               <option key={d.label} value={d.value || "custom"}>
-                                {d.value ? `${d.label} stamp paper` : "Any value — e-Stamp"}
+                                {d.value
+                                  ? `${d.label} stamp paper — delivered`
+                                  : "Any value — e-Stamp, emailed"}
                               </option>
                             ))}
                             <option value="not-sure">I&apos;m not sure — advise me</option>
@@ -504,6 +548,53 @@ export function LeadForm() {
                       )}
                     </Field>
                   </div>
+
+                  {buyingPaper ? (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Field
+                        label="Notary signature"
+                        required={need === "affidavit"}
+                        help={
+                          need === "affidavit"
+                            ? "An affidavit has to be sworn before a notary to count, so pick where the signature goes."
+                            : undefined
+                        }
+                      >
+                        {(id) => (
+                          <Select
+                            id={id}
+                            value={notary}
+                            onChange={(e) => setNotary(e.target.value as NotaryChoice)}
+                          >
+                            {NOTARY_CHOICES.filter(
+                              // Nothing to decline on an affidavit — it is sworn or it
+                              // is not an affidavit.
+                              (c) => !(need === "affidavit" && c.value === "none"),
+                            ).map((c) => (
+                              <option key={c.value} value={c.value}>
+                                {c.label} — {c.hint}
+                              </option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+
+                      <Field
+                        label="Date wanted on the paper"
+                        hint="Optional"
+                        help="Leave blank and we will use the day it is issued."
+                      >
+                        {(id) => (
+                          <Input
+                            id={id}
+                            type="date"
+                            value={stampDate}
+                            onChange={(e) => setStampDate(e.target.value)}
+                          />
+                        )}
+                      </Field>
+                    </div>
+                  ) : null}
 
                   <Field label="Anything we should know?" hint="Optional">
                     {(id) => (

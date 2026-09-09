@@ -9,6 +9,6 @@ export default function Image() {
   return ogImage({
     eyebrow: "District-wise delivery",
     title: "Stamp paper delivered across Tamil Nadu",
-    facts: [`All ${DISTRICTS.length} districts`, "₹20 – ₹5,000 + e-Stamp", "₹100 paper for ₹120"],
+    facts: [`All ${DISTRICTS.length} districts`, "₹100 – ₹5,000 + e-Stamp", "₹100 paper for ₹120"],
   });
 }

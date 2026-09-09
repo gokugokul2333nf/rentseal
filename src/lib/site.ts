@@ -112,10 +112,10 @@ export const FOOTER_LINKS = [
   {
     heading: "Stamp paper",
     links: [
-      { label: "₹20 stamp paper", href: "/#stamp-paper" },
-      { label: "₹50 stamp paper", href: "/#stamp-paper" },
       { label: "₹100 stamp paper", href: "/#stamp-paper" },
       { label: "₹500 stamp paper", href: "/#stamp-paper" },
+      { label: "₹1,000 stamp paper", href: "/#stamp-paper" },
+      { label: "₹5,000 stamp paper", href: "/#stamp-paper" },
       { label: "e-Stamp — any value", href: "/#stamp-paper" },
       { label: "Stamp paper by district", href: "/stamp-paper" },
       { label: "Bulk orders for firms", href: LEAD_ANCHOR },
@@ -367,7 +367,7 @@ export const HOW_IT_WORKS = [
 
 export const FEATURES = [
   { icon: "Truck", title: "Delivered to your door", body: "Same day inside Chennai by Porter at cost, ₹100 next day, ₹200 express anywhere in Tamil Nadu and ₹100 in two to three days. Free above ₹2,000 of stamp value." },
-  { icon: "Stamp", title: "Every denomination in stock", body: "₹20 to ₹5,000 non-judicial paper — ₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — plus e-Stamp certificates for any value from ₹1 upward." },
+  { icon: "Stamp", title: "Four denominations, always in stock", body: "₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — the four we carry. Anything needing an exact figure goes on an e-Stamp certificate for any value from ₹1 upward." },
   { icon: "ShieldCheck", title: "Licensed and verifiable", body: "Procured through authorised vendors and the state e-Stamp channel. Every sheet carries a certificate number you can check yourself." },
   { icon: "Wand2", title: "Clauses that write themselves", body: "Say the flat is furnished and an inventory clause appears. Allow pets and the pet clause writes itself. No legal drafting required." },
   { icon: "PenTool", title: "Aadhaar e-Sign", body: "Both parties sign with an OTP on their own phone. Legally valid under Section 3A of the Information Technology Act, 2000." },
@@ -385,7 +385,7 @@ export const FAQS = [
   {
     category: "Stamp paper",
     q: "Which stamp paper denominations do you supply?",
-    a: "Non-judicial stamp paper from ₹20 up to ₹5,000, which covers almost every ordinary transaction. Where the duty payable is a specific figure — a lease deed, a sale agreement, a mortgage — we issue an e-Stamp certificate for that exact amount instead, from ₹1 upward with no practical ceiling.",
+    a: "Physical non-judicial paper in four denominations — ₹100, ₹500, ₹1,000 and ₹5,000 — which covers almost every ordinary transaction. ₹100 is the smallest sheet we carry, so an affidavit or a bond that would once have gone on ₹20 or ₹50 paper is executed on ₹100. Where the duty payable is a specific figure — a lease deed, a sale agreement, a mortgage — we issue an e-Stamp certificate for that exact amount instead, from ₹1 upward with no practical ceiling.",
   },
   {
     category: "Stamp paper",
@@ -401,11 +401,6 @@ export const FAQS = [
     category: "Stamp paper",
     q: "Can you print my draft on the stamp paper?",
     a: "Yes. Upload your draft as a PDF or a Word file and we print it onto the paper before it goes out, with the margins a sub-registrar expects left clear. Black-and-white and colour printing and photocopying are available at the counter, charged by the page. If you want it attested as well, a notary signature on stamp paper is ₹350 including two green sheets, or ₹100 on plain paper — that is the attestation alone, the paper is priced separately.",
-  },
-  {
-    category: "Stamp paper",
-    q: "Can I get stamp paper with an earlier date on it?",
-    a: "Back-dated stamp paper is available, subject to what the vendor is holding on the day. Tell us the date you need when you order and we will confirm whether we can get it before you pay anything, rather than take the order and tell you later.",
   },
   {
     category: "Stamp paper",

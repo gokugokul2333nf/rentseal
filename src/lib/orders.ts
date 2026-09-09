@@ -125,6 +125,10 @@ export function enquiryRow(fields: {
   email: string;
   city: string;
   denomination?: string;
+  /** Which attestation, if any, the counter should quote for. */
+  notary?: string;
+  /** The date the customer wants the paper for. Blank if they did not say. */
+  stampDate?: string;
   agreementType?: string;
   message?: string;
 }): SheetRow {
@@ -139,6 +143,8 @@ export function enquiryRow(fields: {
     summary: joinTruthy(
       fields.need,
       fields.denomination ? `denomination ${fields.denomination}` : "",
+      fields.notary && fields.notary !== "none" ? `notary ${fields.notary}` : "",
+      fields.stampDate ? `dated ${fields.stampDate}` : "",
       fields.agreementType ?? "",
     ),
     notes: fields.message ?? "",
@@ -148,6 +154,8 @@ export function enquiryRow(fields: {
     clausesChanged: "",
     need: fields.need,
     denomination: fields.denomination ?? "",
+    notary: fields.notary ?? "",
+    stampDate: fields.stampDate ?? "",
     agreementType: fields.agreementType ?? "",
   };
 }

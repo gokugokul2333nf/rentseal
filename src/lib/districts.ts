@@ -61,7 +61,7 @@ export const DISTRICTS: District[] = [
     economy:
       "The state's cement and limestone belt, with quarries and plants clustered around Ariyalur and Jayankondam town.",
     demand:
-      "Most agreements here are staff quarters taken by cement and quarry companies, and shop leases along the Ariyalur–Jayankondam road. Stamp paper demand runs to ₹20 affidavits and ₹100 rental paper.",
+      "Most agreements here are staff quarters taken by cement and quarry companies, and shop leases along the Ariyalur–Jayankondam road. Stamp paper demand runs to ₹100 rental and affidavit paper.",
   },
   {
     name: "Chengalpattu",
@@ -165,7 +165,7 @@ export const DISTRICTS: District[] = [
     economy:
       "Mango and granite country, with the Hogenakkal belt and a growing spread of agri-processing units.",
     demand:
-      "Agricultural land leases, godown rentals for mango and granite traders, and the ₹20 affidavits that go with revenue and patta work.",
+      "Agricultural land leases, godown rentals for mango and granite traders, and the affidavits that go with revenue and patta work.",
   },
   {
     name: "Dindigul",
@@ -910,7 +910,7 @@ export function stampPaperFaqs(d: District): Faq[] {
     },
     {
       q: `Which denomination do I need?`,
-      a: `Most 11-month rental agreements in Tamil Nadu are executed on ₹100 paper, affidavits and declarations on ₹20, and indemnity or surety bonds on ₹50 to ₹100. Where the duty payable is a specific figure — a lease deed, sale agreement or mortgage — only an e-Stamp certificate for that exact amount will do. Tell us what you are executing and we will tell you which applies before you order.`,
+      a: `Most 11-month rental agreements in Tamil Nadu are executed on ₹100 paper, and so are affidavits, declarations and indemnity bonds — ₹100 is the smallest sheet we carry. Partnership and commercial deeds go on ₹500, and we stock ₹1,000 and ₹5,000 above that. Where the duty payable is a specific figure — a lease deed, sale agreement or mortgage — only an e-Stamp certificate for that exact amount will do. Tell us what you are executing and we will tell you which applies before you order.`,
     },
     {
       q: `Is the stamp paper you deliver in ${d.name} genuine?`,

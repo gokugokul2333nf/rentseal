@@ -362,7 +362,7 @@ export default async function StampPaperDistrictPage({
             description: `Non-judicial stamp paper and e-Stamp certificate supply and delivery across ${district.name} district, Tamil Nadu.`,
             url: `${SITE.url}/stamp-paper/${district.slug}`,
             telephone: SITE.phone,
-            priceRange: "₹20 – ₹500",
+            priceRange: "₹120 – ₹5,500",
             areaServed: {
               "@type": "AdministrativeArea",
               name: `${district.name} district`,

@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  CalendarClock,
   CheckCircle2,
   IndianRupee,
   Printer,
@@ -12,6 +11,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/ui/motion";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
+import { StampSheet } from "@/components/ui/stamp-sheet";
 import {
   COUNTER_SERVICES,
   DELIVERY_RULES,
@@ -37,9 +37,6 @@ import { inr } from "@/lib/utils";
  *     a number on.
  */
 
-const oldDate = COUNTER_SERVICES.find((s) => s.highlight);
-const otherServices = COUNTER_SERVICES.filter((s) => !s.highlight);
-
 export function StampPaperRates() {
   return (
     <section id="rates" className="section scroll-mt-20 border-t border-line bg-white">
@@ -48,34 +45,12 @@ export function StampPaperRates() {
           eyebrow="Rate card"
           icon={IndianRupee}
           title="What a sheet costs, before anything is printed on it"
-          body="These are the prices for blank, unprinted stamp paper. The face value is what the government charges for the sheet; the difference is what we charge to fetch it and get it to you. Delivery is separate and is listed further down."
+          body="These are the prices for blank, unprinted stamp paper in the four denominations we carry. The face value is what the government charges for the sheet; the difference is what we charge to fetch it and get it to you. An e-Stamp is not a sheet at all — it is a certificate that arrives by email. Delivery is separate and listed further down."
         />
-
-        {/* ── Old-date paper: the thing people ring up to ask about ── */}
-        {oldDate ? (
-          <Reveal>
-            <div className="mt-10 flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:flex-row sm:items-start">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-700">
-                <CalendarClock className="size-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="flex flex-wrap items-center gap-2.5">
-                  <span className="font-display text-[17px] font-bold text-amber-950">
-                    {oldDate.name}
-                  </span>
-                  <Badge tone="amber">Available</Badge>
-                </p>
-                <p className="mt-1.5 text-[13.5px] leading-relaxed text-amber-900">
-                  {oldDate.blurb}
-                </p>
-              </div>
-            </div>
-          </Reveal>
-        ) : null}
 
         {/* ── Denominations ── */}
         <Reveal>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-line bg-white shadow-soft">
+          <div className="mt-10 overflow-hidden rounded-2xl border border-line bg-white shadow-soft">
             <div className="flex items-center gap-2 border-b border-line bg-navy-50 px-5 py-3.5">
               <Stamp className="size-4 text-navy-500" />
               <h3 className="text-[13px] font-bold text-navy-950">
@@ -95,13 +70,24 @@ export function StampPaperRates() {
                   {DENOMINATIONS.map((d) => (
                     <tr key={d.label} className="align-top">
                       <th scope="row" className="px-5 py-3.5 font-normal">
-                        <span className="tnum flex flex-wrap items-center gap-2 font-display text-[16px] font-bold text-navy-950">
-                          {d.label}
-                          {d.popular ? <Badge tone="dark">Most used</Badge> : null}
-                        </span>
-                        <span className="mt-0.5 block text-[11.5px] text-navy-400">
-                          {d.value === 0 ? "e-Stamp certificate" : "Non-judicial paper"}
-                        </span>
+                        <div className="flex items-start gap-3">
+                          <StampSheet
+                            value={d.value}
+                            label={d.label}
+                            className="w-16 shrink-0 rounded-[3px] ring-1 ring-navy-950/10"
+                          />
+                          <div className="min-w-0">
+                            <span className="tnum flex flex-wrap items-center gap-2 font-display text-[16px] font-bold text-navy-950">
+                              {d.label}
+                              {d.popular ? <Badge tone="dark">Most used</Badge> : null}
+                            </span>
+                            <span className="mt-0.5 block text-[11.5px] text-navy-400">
+                              {d.value === 0
+                                ? "e-Stamp certificate · emailed"
+                                : "Non-judicial paper · delivered"}
+                            </span>
+                          </div>
+                        </div>
                       </th>
                       <td className="px-5 py-3.5 text-[13px] leading-relaxed text-navy-500">
                         {d.uses.slice(0, 3).join(", ")}
@@ -128,9 +114,10 @@ export function StampPaperRates() {
               </table>
             </div>
             <p className="border-t border-line bg-canvas px-5 py-3.5 text-[12.5px] leading-relaxed text-navy-500">
-              Denominations shown as &ldquo;on request&rdquo; are stocked but not on a
-              standing rate — ring us and we will quote before you order. On an e-Stamp the
-              government duty itself passes through at cost, whatever the figure comes to.
+              Those four are the physical denominations we carry — ₹100 is the smallest
+              sheet, so an affidavit or a bond that would once have gone on ₹20 or ₹50 paper is
+              executed on ₹100. Anything needing an exact figure goes on an e-Stamp instead,
+              where the government duty passes through at cost whatever it comes to.
             </p>
           </div>
         </Reveal>
@@ -169,7 +156,7 @@ export function StampPaperRates() {
 
         {/* ── Printing, notary and the rest of the counter ── */}
         <Stagger className="mt-6 grid gap-4 sm:grid-cols-2" amount={0.1}>
-          {otherServices.map((service) => (
+          {COUNTER_SERVICES.map((service) => (
             <StaggerItem key={service.id}>
               <div className="flex h-full flex-col rounded-2xl border border-line bg-canvas p-5">
                 <div className="flex items-start justify-between gap-4">

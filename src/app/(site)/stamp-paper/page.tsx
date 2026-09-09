@@ -10,7 +10,7 @@ import { LEAD_ANCHOR, SITE } from "@/lib/site";
 
 const title = "Government Authorised Stamp Paper — Tamil Nadu";
 const description =
-  "Genuine, government authorised stamp paper delivered anywhere in Tamil Nadu. ₹100 paper for ₹120, ₹500 for ₹550, ₹1,000 for ₹1,100 and ₹5,000 for ₹5,500. Printing, notary attestation and back-dated paper available.";
+  "Genuine, government authorised stamp paper delivered anywhere in Tamil Nadu. ₹100 paper for ₹120, ₹500 for ₹550, ₹1,000 for ₹1,100 and ₹5,000 for ₹5,500. Printing and notary attestation available.";
 
 export const metadata: Metadata = {
   title,
