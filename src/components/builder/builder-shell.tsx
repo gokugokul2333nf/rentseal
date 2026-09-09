@@ -185,6 +185,7 @@ function CostRail() {
         registerAnyway: draft.options.registrationRequired,
         lawyerReview: draft.options.lawyerReview,
         notaryRequired: isNotaryMandatory(draft.templateId),
+        stampPaperDate: draft.options.stampPaperDate,
       }),
     [draft],
   );
@@ -209,6 +210,13 @@ function CostRail() {
                   label: "Notary attestation",
                   value: breakdown.lawyerFee,
                   hint: isNotaryMandatory(draft.templateId) ? "Notary public · required" : "Notary public",
+                }
+              : null,
+            breakdown.backdatingFee > 0
+              ? {
+                  label: "Older-dated paper",
+                  value: breakdown.backdatingFee,
+                  hint: `${breakdown.backdatingMonths} month${breakdown.backdatingMonths === 1 ? "" : "s"} older`,
                 }
               : null,
             { label: "GST", value: breakdown.gst, hint: "18% on our fee" },
@@ -680,6 +688,7 @@ function SummaryRailMobile() {
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired: isNotaryMandatory(draft.templateId),
+    stampPaperDate: draft.options.stampPaperDate,
   });
   return (
     <div className="flex items-center justify-between">

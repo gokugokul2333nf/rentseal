@@ -17,9 +17,10 @@ import { agreementRow } from "@/lib/orders";
 import { checkPincode } from "@/lib/pincode";
 import { calculateStampDuty, splitGovernmentAndService } from "@/lib/stamp-duty";
 import { NOTARY_FEE, NOTARY_MANDATORY_REASON, isNotaryMandatory } from "@/lib/notary";
+import { BACKDATE_FEE_PER_MONTH, backdateLabel } from "@/lib/backdating";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
-import { Field, Textarea } from "@/components/ui/field";
+import { Field, Input, Textarea } from "@/components/ui/field";
 import { AgreementDocument } from "./agreement-document";
 import { StepIntro } from "./steps";
 import { cn, formatDate, inr } from "@/lib/utils";
@@ -144,6 +145,7 @@ function SendBlock({
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
+    stampPaperDate: draft.options.stampPaperDate,
   });
   const split = splitGovernmentAndService(breakdown);
 
@@ -256,6 +258,34 @@ function SendBlock({
           ) : null}
         </div>
 
+        {/*
+          The date on the paper.
+
+          It sits here rather than in the marketing pages on purpose — the
+          office's position is that offering older-dated paper publicly is not
+          lawful, so it is asked during drafting and nowhere else.
+        */}
+        <div className="rounded-2xl border border-line bg-white p-5">
+          <Field
+            label="Date to be printed on the stamp paper"
+            hint="Optional"
+            help={
+              breakdown.backdatingMonths > 0
+                ? `Sourced from older stock — ${backdateLabel(breakdown.backdatingMonths)}, at ${inr(BACKDATE_FEE_PER_MONTH)} a month. We confirm the date is actually available on the call before anything is charged.`
+                : "Leave blank and the paper carries the day it is issued."
+            }
+          >
+            {(id) => (
+              <Input
+                id={id}
+                type="date"
+                value={draft.options.stampPaperDate}
+                onChange={(e) => update({ options: { stampPaperDate: e.target.value } })}
+              />
+            )}
+          </Field>
+        </div>
+
         {/* Quote */}
         <div className="overflow-hidden rounded-2xl border border-line bg-white">
           <div className="flex items-center gap-2 border-b border-line bg-navy-50 px-5 py-3">
@@ -276,6 +306,13 @@ function SendBlock({
                     label: "Notary attestation",
                     value: breakdown.lawyerFee,
                     hint: notaryRequired ? "Notary public · required" : "Notary public",
+                  }
+                : null,
+              breakdown.backdatingFee > 0
+                ? {
+                    label: "Older-dated paper",
+                    value: breakdown.backdatingFee,
+                    hint: `${backdateLabel(breakdown.backdatingMonths)} · ${inr(BACKDATE_FEE_PER_MONTH)} a month`,
                   }
                 : null,
               { label: "GST", value: breakdown.gst, hint: "18% on our fee" },

@@ -128,6 +128,14 @@ export interface AgreementOptions {
   noLiquorOrIllegalUse: boolean;
   registrationRequired: boolean;
   lawyerReview: boolean;
+  /**
+   * The date the customer wants printed on the stamp paper, yyyy-mm-dd.
+   *
+   * Blank means the day it is issued, which is the ordinary case. An earlier
+   * date is sourced from older stock and charged by the month — see
+   * backdating.ts, and note that it is quoted during drafting only.
+   */
+  stampPaperDate: string;
   witnessRequired: boolean;
   customClauses: string[];
   /**
@@ -203,6 +211,10 @@ export interface StampDutyBreakdown {
   registrationRequired: boolean;
   platformFee: number;
   lawyerFee: number;
+  /** Older-dated paper, at ₹50 a month. Zero unless a past date was asked for. */
+  backdatingFee: number;
+  /** How many months old, so the quote can say what the fee is for. */
+  backdatingMonths: number;
   gst: number;
   total: number;
   notes: string[];

@@ -46,6 +46,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     registerAnyway: draft.options.registrationRequired,
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
+    stampPaperDate: draft.options.stampPaperDate,
   });
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type);
   // Which of the twenty-four was drawn. "Commercial Rental Agreement" does not
@@ -109,6 +110,11 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     gst: String(breakdown.gst),
     registrationRequired: draft.options.registrationRequired ? "yes" : "no",
     notaryFee: String(breakdown.lawyerFee),
+    // The counter has to source this sheet, so it needs the date and the months
+    // spelt out rather than inferred from the fee.
+    stampPaperDate: draft.options.stampPaperDate,
+    backdatingMonths: breakdown.backdatingMonths ? String(breakdown.backdatingMonths) : "",
+    backdatingFee: String(breakdown.backdatingFee),
     lawyerReview: notaryRequired
       ? "yes — required (affidavit)"
       : draft.options.lawyerReview

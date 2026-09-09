@@ -1,5 +1,6 @@
 import type { PlanId, StampDutyBreakdown } from "./types";
 import { NOTARY_FEE } from "./notary";
+import { BACKDATE_FEE_PER_MONTH as BACKDATE_PER_MONTH, backdateFee, backdateMonths } from "./backdating";
 
 /**
  * Tamil Nadu stamp duty & registration charges for lease/rental instruments.
@@ -42,6 +43,11 @@ export interface StampDutyInput {
    * no version of the document that does without it.
    */
   notaryRequired?: boolean;
+  /**
+   * The date wanted on the paper, yyyy-mm-dd. A past date is sourced from older
+   * stock and charged by the month. Quoted in the builder only.
+   */
+  stampPaperDate?: string;
 }
 
 export function calculateStampDuty({
@@ -52,6 +58,7 @@ export function calculateStampDuty({
   registerAnyway = false,
   lawyerReview = false,
   notaryRequired = false,
+  stampPaperDate = "",
 }: StampDutyInput): StampDutyBreakdown {
   const rent = Math.max(0, Number(monthlyRent) || 0);
   const deposit = Math.max(0, Number(securityDeposit) || 0);
@@ -75,10 +82,15 @@ export function calculateStampDuty({
   const lawyerFee =
     plan === "premium" ? fees.lawyer : lawyerReview || notaryRequired ? NOTARY_FEE : 0;
 
-  // GST applies to our service fees only — never to a government levy.
-  const gst = Math.round((platformFee + lawyerFee) * GST_RATE);
+  const backdatingMonths = backdateMonths(stampPaperDate);
+  const backdatingFee = backdateFee(stampPaperDate);
 
-  const total = stampDuty + registrationFee + platformFee + lawyerFee + gst;
+  // GST applies to our service fees only — never to a government levy. Sourcing
+  // older-dated stock is our service, so it is inside the GST base.
+  const gst = Math.round((platformFee + lawyerFee + backdatingFee) * GST_RATE);
+
+  const total =
+    stampDuty + registrationFee + platformFee + lawyerFee + backdatingFee + gst;
 
   const notes: string[] = [];
   notes.push(
@@ -100,6 +112,11 @@ export function calculateStampDuty({
       "Notary attestation is included because an affidavit has to be sworn — it is not an optional extra on this document.",
     );
   }
+  if (backdatingMonths > 0) {
+    notes.push(
+      `The paper is dated ${backdatingMonths} month${backdatingMonths === 1 ? "" : "s"} back, sourced from older stock at ₹${BACKDATE_PER_MONTH} a month. We confirm on the call that the date you asked for is actually available before anything is charged.`,
+    );
+  }
   notes.push("GST at 18% applies to our service fee only, never to government charges.");
 
   return {
@@ -111,6 +128,8 @@ export function calculateStampDuty({
     registrationRequired,
     platformFee,
     lawyerFee,
+    backdatingFee,
+    backdatingMonths,
     gst,
     total,
     notes,
@@ -120,6 +139,6 @@ export function calculateStampDuty({
 /** Government portion vs our portion — used to prove we don't mark up state fees. */
 export function splitGovernmentAndService(b: StampDutyBreakdown) {
   const government = b.stampDuty + b.registrationFee;
-  const service = b.platformFee + b.lawyerFee + b.gst;
+  const service = b.platformFee + b.lawyerFee + b.backdatingFee + b.gst;
   return { government, service, total: government + service };
 }

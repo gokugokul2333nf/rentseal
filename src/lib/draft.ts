@@ -139,6 +139,7 @@ export function createDraft(
       noLiquorOrIllegalUse: true,
       registrationRequired: dflt.registrationRequired,
       lawyerReview: false,
+      stampPaperDate: "",
       witnessRequired: true,
       customClauses: [],
       clauseEdits: {},
