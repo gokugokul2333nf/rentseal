@@ -902,7 +902,7 @@ export function stampPaperFaqs(d: District): Faq[] {
   return [
     {
       q: `How fast is stamp paper delivered in ${d.name}?`,
-      a: `${d.name} is in our ${zone.label.toLowerCase()} zone, so stamp paper reaches you ${zone.eta.toLowerCase()}${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}. Delivery is ₹${zone.charge}, and free once your order crosses ₹2,000 of stamp value or ten sheets. An e-Stamp certificate, where your instrument allows one, is emailed within minutes and costs nothing to deliver.`,
+      a: `${d.name} is in our ${zone.label.toLowerCase()} zone, so stamp paper reaches you ${zone.eta.toLowerCase()}${zone.cutOff ? ` — ${zone.cutOff.toLowerCase()}` : ""}. Delivery is ₹${zone.charge}, and free once the physical paper in your order crosses ₹2,000 or ten sheets. An e-Stamp certificate, where your instrument allows one, is emailed within minutes — nothing is delivered, so its value does not count towards that free-delivery threshold.`,
     },
     {
       q: `Do you charge more than the printed value in ${d.name}?`,

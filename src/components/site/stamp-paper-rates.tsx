@@ -216,9 +216,9 @@ export function StampPaperRates() {
             </ul>
             <div className="space-y-2 border-t border-white/10 bg-white/[0.05] px-5 py-4">
               {[
-                `Free on any order above ${inr(DELIVERY_RULES.freeAbove)} of stamp value`,
+                `Free above ${inr(DELIVERY_RULES.freeAbovePaperValue)} of physical paper`,
                 `Free everywhere on ${DELIVERY_RULES.bulkFreeFrom} sheets or more`,
-                "e-Stamp certificates are emailed — there is nothing to ship",
+                "An e-Stamp is emailed, so there is nothing to ship — and its value does not count towards the free-delivery threshold",
               ].map((line) => (
                 <p key={line} className="flex items-start gap-2 text-[12.5px] leading-relaxed text-white/70">
                   <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-400" />

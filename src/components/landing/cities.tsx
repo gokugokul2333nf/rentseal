@@ -63,8 +63,8 @@ export function Cities() {
               <PackageCheck className="mt-0.5 size-5 shrink-0 text-emerald-600" />
               <div>
                 <p className="text-[14.5px] font-bold text-emerald-900">
-                  Delivery is free above {inr(DELIVERY_RULES.freeAbove)} of stamp value, and on{" "}
-                  {DELIVERY_RULES.bulkFreeFrom} sheets or more
+                  Delivery is free above {inr(DELIVERY_RULES.freeAbovePaperValue)} of physical
+                  paper, and on {DELIVERY_RULES.bulkFreeFrom} sheets or more
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed text-emerald-800">
                   e-Stamp certificates are emailed within minutes — there is nothing to deliver

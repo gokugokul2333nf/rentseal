@@ -116,7 +116,7 @@ export default async function DistrictPage({
                 icon: Clock3,
                 label: "Delivery to " + district.name,
                 value: zone.eta,
-                sub: zone.cutOff ?? `${zone.label} zone, ₹${zone.charge} or free above ₹2,000`,
+                sub: zone.cutOff ?? `${zone.label} zone, ₹${zone.charge} or free above ₹2,000 of paper`,
               },
               {
                 icon: Landmark,

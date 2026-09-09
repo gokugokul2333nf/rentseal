@@ -99,7 +99,7 @@ export default async function StampPaperDistrictPage({
           </ButtonLink>
         </div>
         <p className="mt-4 text-[13.5px] text-navy-500">
-          {zone.eta} delivery · ₹100 paper for ₹120 · Free above ₹2,000 of stamp value
+          {zone.eta} delivery · ₹100 paper for ₹120 · Free above ₹2,000 of physical paper
         </p>
       </PageHero>
 
@@ -118,7 +118,7 @@ export default async function StampPaperDistrictPage({
                 icon: Truck,
                 label: "Delivery charge",
                 value: inr(zone.charge),
-                sub: `free above ${inr(DELIVERY_RULES.freeAbove)} of stamp value`,
+                sub: `free above ${inr(DELIVERY_RULES.freeAbovePaperValue)} of physical paper`,
               },
               {
                 icon: PackageCheck,

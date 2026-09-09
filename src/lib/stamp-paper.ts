@@ -291,7 +291,16 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
 ];
 
 export const DELIVERY_RULES = {
-  freeAbove: 2000,
+  /**
+   * Rupees of PHYSICAL paper face value above which delivery is waived.
+   *
+   * e-Stamp value is excluded, and the name says so because the mistake is easy
+   * and expensive: an e-Stamp is emailed, so there is no delivery to waive, and
+   * an e-Stamp for the duty on a property deed runs to tens of thousands. Let
+   * that count and a single certificate silently ships every sheet in the order
+   * for nothing.
+   */
+  freeAbovePaperValue: 2000,
   bulkFreeFrom: 10,
   digitalInstant: true,
 } as const;
@@ -335,9 +344,16 @@ export const STAMP_USE_CASES: StampUseCase[] = [
   },
 ];
 
-/** Delivery charge for a given zone and order value. */
-export function deliveryCharge(zoneId: string, stampValue: number, sheets = 1) {
-  if (stampValue >= DELIVERY_RULES.freeAbove) return 0;
+/**
+ * Delivery charge for a zone, given the physical paper in the order.
+ *
+ * `paperValue` is the face value of the sheets being delivered and nothing
+ * else. Do not pass the value of an e-Stamp: it is emailed, it is not part of
+ * what the rider carries, and it does not buy free delivery for whatever else
+ * is in the order.
+ */
+export function deliveryCharge(zoneId: string, paperValue: number, sheets = 1) {
+  if (paperValue >= DELIVERY_RULES.freeAbovePaperValue) return 0;
   if (sheets >= DELIVERY_RULES.bulkFreeFrom) return 0;
   return DELIVERY_ZONES.find((z) => z.id === zoneId)?.charge ?? 100;
 }

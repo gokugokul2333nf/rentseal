@@ -366,7 +366,7 @@ export const HOW_IT_WORKS = [
 ] as const;
 
 export const FEATURES = [
-  { icon: "Truck", title: "Delivered to your door", body: "Same day inside Chennai by Porter at cost, ₹100 next day, ₹200 express anywhere in Tamil Nadu and ₹100 in two to three days. Free above ₹2,000 of stamp value." },
+  { icon: "Truck", title: "Delivered to your door", body: "Same day inside Chennai by Porter at cost, ₹100 next day, ₹200 express anywhere in Tamil Nadu and ₹100 in two to three days. Free above ₹2,000 of physical paper." },
   { icon: "Stamp", title: "Four denominations, always in stock", body: "₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — the four we carry. Anything needing an exact figure goes on an e-Stamp certificate for any value from ₹1 upward." },
   { icon: "ShieldCheck", title: "Licensed and verifiable", body: "Procured through authorised vendors and the state e-Stamp channel. Every sheet carries a certificate number you can check yourself." },
   { icon: "Wand2", title: "Clauses that write themselves", body: "Say the flat is furnished and an inventory clause appears. Allow pets and the pet clause writes itself. No legal drafting required." },
@@ -390,7 +390,7 @@ export const FAQS = [
   {
     category: "Stamp paper",
     q: "What does a sheet of stamp paper actually cost?",
-    a: "The face value plus a procurement charge, and we print both so you can see the difference. ₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — that is for a blank, unprinted sheet. Delivery is charged separately and stated before you confirm: ₹100 next day in Chennai, ₹200 express anywhere in Tamil Nadu, ₹100 for two to three days, and same day in Chennai by Porter at Porter's own fare. Delivery is free on any order above ₹2,000 of stamp value and free everywhere on ten sheets or more. Government stamp duty on an e-Stamp is a separate thing and passes through at cost with nothing added.",
+    a: "The face value plus a procurement charge, and we print both so you can see the difference. ₹100 paper is ₹120, ₹500 is ₹550, ₹1,000 is ₹1,100 and ₹5,000 is ₹5,500 — that is for a blank, unprinted sheet. Delivery is charged separately and stated before you confirm: ₹100 next day in Chennai, ₹200 express anywhere in Tamil Nadu, ₹100 for two to three days, and same day in Chennai by Porter at Porter's own fare. Delivery is free above ₹2,000 of physical paper and free everywhere on ten sheets or more — an e-Stamp is emailed rather than delivered, so its value does not count towards that. Government stamp duty on an e-Stamp is a separate thing and passes through at cost with nothing added.",
   },
   {
     category: "Stamp paper",
