@@ -104,7 +104,7 @@ const organizationSchema = {
   description: SITE.description,
   telephone: SITE.phone,
   email: SITE.email,
-  priceRange: "₹349 – ₹1499",
+  priceRange: "₹300 – ₹5,500",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Prestige Polygon, 471 Anna Salai, Teynampet",

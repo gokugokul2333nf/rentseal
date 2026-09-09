@@ -15,12 +15,21 @@ import { useAgreement } from "@/lib/agreement-store";
 import { PLANS, SITE } from "@/lib/site";
 import { agreementRow } from "@/lib/orders";
 import { checkPincode } from "@/lib/pincode";
-import { calculateStampDuty, splitGovernmentAndService } from "@/lib/stamp-duty";
-import { NOTARY_FEE, NOTARY_MANDATORY_REASON, isNotaryMandatory } from "@/lib/notary";
+import { PLAN_FEES, calculateStampDuty, splitGovernmentAndService } from "@/lib/stamp-duty";
+import { templatePrice } from "@/lib/template-prices";
+import {
+  NOTARY_EXTRA_SHEET_FEE,
+  NOTARY_MANDATORY_REASON,
+  NOTARY_SHEETS_INCLUDED,
+  isNotaryMandatory,
+  notaryFeeForPages,
+} from "@/lib/notary";
+import { DENOMINATIONS } from "@/lib/stamp-paper";
+import { TEMPLATES } from "@/lib/templates";
 import { BACKDATE_FEE_PER_MONTH, backdateLabel } from "@/lib/backdating";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
-import { Field, Input, Textarea } from "@/components/ui/field";
+import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { AgreementDocument } from "./agreement-document";
 import { StepIntro } from "./steps";
 import { cn, formatDate, inr } from "@/lib/utils";
@@ -136,6 +145,7 @@ function SendBlock({
   const { draft, setPlan, update } = useAgreement();
 
   const notaryRequired = isNotaryMandatory(draft.templateId);
+  const tpl = TEMPLATES.find((t) => t.id === draft.templateId);
 
   const breakdown = calculateStampDuty({
     monthlyRent: parseFloat(draft.terms.monthlyRent || "0"),
@@ -146,6 +156,9 @@ function SendBlock({
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
     stampPaperDate: draft.options.stampPaperDate,
+    templateId: draft.templateId,
+    stampPaperValue: draft.options.stampPaperValue,
+    documentPages: draft.options.documentPages,
   });
   const split = splitGovernmentAndService(breakdown);
 
@@ -205,7 +218,9 @@ function SendBlock({
                     {plan.recommended ? <Badge tone="brand">Popular</Badge> : null}
                   </div>
                   <p className="tnum mt-1.5 text-[19px] font-bold text-navy-950">
-                    {inr(plan.price)}
+                    {inr(
+                      (tpl ? templatePrice(tpl.id) : 0) + PLAN_FEES[plan.id as PlanId].platform,
+                    )}
                   </p>
                   <p className="mt-1 text-[12px] leading-snug text-navy-500">{plan.delivery}</p>
                 </button>
@@ -233,7 +248,7 @@ function SendBlock({
                 <p className="mt-1.5 text-[12.5px] text-navy-500">
                   {draft.plan === "premium"
                     ? "Your Premium plan already covers it."
-                    : `Charged at ${inr(NOTARY_FEE)}, shown in the quote below.`}
+                    : `Charged at ${inr(notaryFeeForPages(draft.options.documentPages))}, shown in the quote below.`}
                 </p>
               </div>
             </div>
@@ -256,6 +271,54 @@ function SendBlock({
               </span>
             </label>
           ) : null}
+        </div>
+
+        {/* The sheet it is executed on, and how long it runs. */}
+        <div className="grid gap-4 rounded-2xl border border-line bg-white p-5 sm:grid-cols-2">
+          <Field
+            label="Stamp paper"
+            help="The sheet your deed is printed on. Added to the quote at the shelf price."
+          >
+            {(id) => (
+              <Select
+                id={id}
+                value={String(draft.options.stampPaperValue)}
+                onChange={(e) =>
+                  update({ options: { stampPaperValue: Number(e.target.value) } })
+                }
+              >
+                {DENOMINATIONS.map((d) => (
+                  <option key={d.label} value={d.value}>
+                    {d.value === 0
+                      ? "e-Stamp — duty only, emailed"
+                      : `${d.label} paper — ${inr(d.price ?? 0)}`}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+
+          <Field
+            label="Sheets the deed runs to"
+            help={
+              draft.plan === "premium" || breakdown.lawyerFee > 0
+                ? `The notary signs every sheet. The first ${NOTARY_SHEETS_INCLUDED} — the stamp paper and three green sheets — are in the fee; each one after is ${inr(NOTARY_EXTRA_SHEET_FEE)}.`
+                : "Only matters if you add notary attestation, which is charged per sheet."
+            }
+          >
+            {(id) => (
+              <Input
+                id={id}
+                type="number"
+                min={1}
+                max={50}
+                value={draft.options.documentPages}
+                onChange={(e) =>
+                  update({ options: { documentPages: Math.max(1, Number(e.target.value) || 1) } })
+                }
+              />
+            )}
+          </Field>
         </div>
 
         {/*
@@ -296,16 +359,37 @@ function SendBlock({
           </div>
           <dl className="divide-y divide-line">
             {[
+              {
+                label: "Drafting this document",
+                value: breakdown.documentFee,
+                hint: tpl?.name ?? "Document fee",
+              },
+              breakdown.stampPaperFee > 0
+                ? {
+                    label: "Stamp paper",
+                    value: breakdown.stampPaperFee,
+                    hint: `${inr(draft.options.stampPaperValue)} sheet · face value plus our charge`,
+                  }
+                : null,
               { label: "Stamp duty", value: breakdown.stampDuty, hint: "1% · Govt of TN" },
               breakdown.registrationRequired
                 ? { label: "Registration fee", value: breakdown.registrationFee, hint: "1% · Govt of TN" }
                 : null,
-              { label: "Platform fee", value: breakdown.platformFee, hint: "LP Stamp Paper" },
+              breakdown.platformFee - breakdown.documentFee > 0
+                ? {
+                    label: `${draft.plan === "premium" ? "Premium" : "Standard"} service`,
+                    value: breakdown.platformFee - breakdown.documentFee,
+                    hint:
+                      draft.plan === "premium"
+                        ? "e-Stamp, e-Sign, notary and doorstep delivery"
+                        : "e-Stamp and Aadhaar e-Sign",
+                  }
+                : null,
               breakdown.lawyerFee > 0
                 ? {
                     label: "Notary attestation",
                     value: breakdown.lawyerFee,
-                    hint: notaryRequired ? "Notary public · required" : "Notary public",
+                    hint: `${draft.options.documentPages} sheet${draft.options.documentPages === 1 ? "" : "s"}${notaryRequired ? " · required" : ""}`,
                   }
                 : null,
               breakdown.backdatingFee > 0

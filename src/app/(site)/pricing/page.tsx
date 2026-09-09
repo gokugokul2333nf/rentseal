@@ -7,9 +7,9 @@ import { Comparison } from "@/components/landing/comparison";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Pricing — Rental Agreements from ₹349",
+  title: "Pricing — Agreements and Deeds from ₹300",
   description:
-    "Three plans from ₹349. Government stamp duty passed through at cost with no markup, itemised separately on every invoice. GST applies to our fee alone.",
+    "Every deed priced individually, from ₹300, with the plan adding e-stamping, e-signing and delivery on top. Government stamp duty passed through at cost, itemised separately on every invoice. GST applies to our fee alone.",
   alternates: { canonical: "/pricing" },
 };
 

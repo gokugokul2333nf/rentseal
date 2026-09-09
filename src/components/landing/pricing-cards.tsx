@@ -86,6 +86,16 @@ export function PricingCards({
                     </p>
 
                     <div className="mt-6 flex items-baseline gap-1.5">
+                      {plan.from ? (
+                        <span
+                          className={cn(
+                            "text-[14px] font-semibold",
+                            featured ? "text-white/45" : "text-navy-400",
+                          )}
+                        >
+                          from
+                        </span>
+                      ) : null}
                       <span
                         className={cn(
                           "tnum font-display text-[42px] leading-none font-bold tracking-tight",

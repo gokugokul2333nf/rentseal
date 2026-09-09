@@ -61,8 +61,8 @@ const PAGES: SearchDoc[] = [
     title: "Pricing",
     href: "/pricing",
     kind: "Page",
-    description: "Basic ₹349, Standard ₹799 and Premium ₹1499 — what each plan includes.",
-    keywords: ["price", "cost", "plans", "fees", "charges", "how much", "349", "799", "1499"],
+    description: "Every deed priced individually from ₹300, on Basic, Standard or Premium — what each plan adds.",
+    keywords: ["price", "cost", "plans", "fees", "charges", "how much", "300", "350", "400"],
   },
   {
     id: "page-how",

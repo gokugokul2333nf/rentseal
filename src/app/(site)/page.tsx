@@ -35,9 +35,9 @@ const serviceSchema = {
         price: String(d.value),
         priceCurrency: "INR",
       })),
-      { "@type": "Offer", name: "Rental agreement — Basic", price: "349", priceCurrency: "INR" },
-      { "@type": "Offer", name: "Rental agreement — Standard", price: "799", priceCurrency: "INR" },
-      { "@type": "Offer", name: "Rental agreement — Premium", price: "1499", priceCurrency: "INR" },
+      { "@type": "Offer", name: "Rental agreement — Basic", price: "350", priceCurrency: "INR" },
+      { "@type": "Offer", name: "Rental agreement — Standard", price: "800", priceCurrency: "INR" },
+      { "@type": "Offer", name: "Rental agreement — Premium", price: "1500", priceCurrency: "INR" },
     ],
   },
 };

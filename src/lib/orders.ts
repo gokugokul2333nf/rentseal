@@ -47,6 +47,9 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     lawyerReview: draft.options.lawyerReview,
     notaryRequired,
     stampPaperDate: draft.options.stampPaperDate,
+    templateId: draft.templateId,
+    stampPaperValue: draft.options.stampPaperValue,
+    documentPages: draft.options.documentPages,
   });
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type);
   // Which of the twenty-four was drawn. "Commercial Rental Agreement" does not
@@ -106,6 +109,10 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     tenantEmail: draft.tenant.email,
     stampDuty: String(breakdown.stampDuty),
     registrationFee: String(breakdown.registrationFee),
+    documentFee: String(breakdown.documentFee),
+    stampPaperValue: String(draft.options.stampPaperValue),
+    stampPaperFee: String(breakdown.stampPaperFee),
+    documentPages: String(draft.options.documentPages),
     platformFee: String(breakdown.platformFee),
     gst: String(breakdown.gst),
     registrationRequired: draft.options.registrationRequired ? "yes" : "no",

@@ -136,6 +136,16 @@ export interface AgreementOptions {
    * backdating.ts, and note that it is quoted during drafting only.
    */
   stampPaperDate: string;
+  /**
+   * Face value of the physical sheet the deed is executed on. 0 means an
+   * e-Stamp, where duty is the computed figure rather than a shelf price.
+   */
+  stampPaperValue: number;
+  /**
+   * Sheets the finished deed runs to — the stamp paper plus its green sheets.
+   * The notary signs each one, and the first four are inside the base fee.
+   */
+  documentPages: number;
   witnessRequired: boolean;
   customClauses: string[];
   /**
@@ -211,6 +221,10 @@ export interface StampDutyBreakdown {
   registrationRequired: boolean;
   platformFee: number;
   lawyerFee: number;
+  /** The chosen sheet, at the shelf price. Zero on an e-Stamp. */
+  stampPaperFee: number;
+  /** Drafting fee for this particular document. */
+  documentFee: number;
   /** Older-dated paper, at ₹50 a month. Zero unless a past date was asked for. */
   backdatingFee: number;
   /** How many months old, so the quote can say what the fee is for. */

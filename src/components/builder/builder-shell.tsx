@@ -186,6 +186,9 @@ function CostRail() {
         lawyerReview: draft.options.lawyerReview,
         notaryRequired: isNotaryMandatory(draft.templateId),
         stampPaperDate: draft.options.stampPaperDate,
+        templateId: draft.templateId,
+        stampPaperValue: draft.options.stampPaperValue,
+        documentPages: draft.options.documentPages,
       }),
     [draft],
   );
@@ -200,11 +203,21 @@ function CostRail() {
         </div>
         <dl className="divide-y divide-line">
           {[
+            { label: "This document", value: breakdown.documentFee, hint: "Drafting fee" },
+            breakdown.stampPaperFee > 0
+              ? { label: "Stamp paper", value: breakdown.stampPaperFee, hint: `${inr(draft.options.stampPaperValue)} sheet` }
+              : null,
             { label: "Stamp duty", value: breakdown.stampDuty, hint: "1% · Govt of TN" },
             breakdown.registrationRequired
               ? { label: "Registration fee", value: breakdown.registrationFee, hint: "1% · Govt of TN" }
               : null,
-            { label: "Platform fee", value: breakdown.platformFee, hint: "LP Stamp Paper" },
+            breakdown.platformFee - breakdown.documentFee > 0
+              ? {
+                  label: "Service",
+                  value: breakdown.platformFee - breakdown.documentFee,
+                  hint: draft.plan === "premium" ? "Premium" : "Standard",
+                }
+              : null,
             breakdown.lawyerFee > 0
               ? {
                   label: "Notary attestation",
@@ -689,6 +702,9 @@ function SummaryRailMobile() {
     lawyerReview: draft.options.lawyerReview,
     notaryRequired: isNotaryMandatory(draft.templateId),
     stampPaperDate: draft.options.stampPaperDate,
+    templateId: draft.templateId,
+    stampPaperValue: draft.options.stampPaperValue,
+    documentPages: draft.options.documentPages,
   });
   return (
     <div className="flex items-center justify-between">

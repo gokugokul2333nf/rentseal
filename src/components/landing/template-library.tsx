@@ -3,7 +3,6 @@
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
   BedDouble,
   Bike,
   Briefcase,
@@ -36,6 +35,8 @@ import {
 } from "lucide-react";
 import { getTemplatesByCategory, TEMPLATES } from "@/lib/templates";
 import { isNotaryMandatory } from "@/lib/notary";
+import { templatePrice } from "@/lib/template-prices";
+import { inr } from "@/lib/utils";
 import type { AgreementTemplate } from "@/lib/templates";
 import { Badge } from "@/components/ui/card";
 import { TemplateThumb } from "./template-thumb";
@@ -133,9 +134,11 @@ function TemplateCard({ template }: { template: AgreementTemplate }) {
               </span>
             ) : null}
           </span>
-          <span className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-700">
-            Draft this
-            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+          <span className="tnum shrink-0 text-right">
+            <span className="block font-display text-[16px] font-bold text-navy-950">
+              {inr(templatePrice(template.id))}
+            </span>
+            <span className="block text-[10.5px] leading-tight text-navy-400">to draft</span>
           </span>
         </div>
       </div>

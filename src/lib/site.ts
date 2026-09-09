@@ -253,6 +253,8 @@ export const PLANS: Array<{
   id: PlanId;
   name: string;
   price: number;
+  /** The price is a floor — the cheapest document on this plan, not a flat fee. */
+  from?: boolean;
   tagline: string;
   delivery: string;
   recommended?: boolean;
@@ -262,7 +264,12 @@ export const PLANS: Array<{
   {
     id: "basic",
     name: "Basic",
-    price: 349,
+    // Every deed is priced individually now, so a plan can only quote a floor:
+    // the cheapest document plus whatever the plan adds. Showing a flat ₹349
+    // beside a quote that reads ₹800 is how a customer stops believing the
+    // pricing page.
+    price: 300,
+    from: true,
     tagline: "A clean, compliant draft you print and sign yourself.",
     delivery: "Instant download",
     cta: "Start with Basic",
@@ -282,7 +289,8 @@ export const PLANS: Array<{
   {
     id: "standard",
     name: "Standard",
-    price: 799,
+    price: 750,
+    from: true,
     tagline: "Everything digital — e-stamped, e-signed, delivered. Nobody visits an office.",
     delivery: "Same day, usually under 4 hours",
     recommended: true,
@@ -303,7 +311,8 @@ export const PLANS: Array<{
   {
     id: "premium",
     name: "Premium",
-    price: 1499,
+    price: 1450,
+    from: true,
     tagline: "Signatures attested by a notary, and a stamped copy reaches your door.",
     delivery: "Verified within 24 hours",
     cta: "Go Premium",

@@ -1,6 +1,9 @@
 import type { PlanId, StampDutyBreakdown } from "./types";
-import { NOTARY_FEE } from "./notary";
+import { notaryFeeForPages } from "./notary";
 import { BACKDATE_FEE_PER_MONTH as BACKDATE_PER_MONTH, backdateFee, backdateMonths } from "./backdating";
+import { templatePrice } from "./template-prices";
+import { stampPaperPrice } from "./stamp-paper";
+import type { TemplateId } from "./agreement-templates";
 
 /**
  * Tamil Nadu stamp duty & registration charges for lease/rental instruments.
@@ -23,17 +26,25 @@ export const REGISTRATION_MANDATORY_FROM_MONTHS = 12;
 export const GST_RATE = 0.18;
 
 /**
- * Premium's `lawyer: 0` is the point, not an oversight.
+ * What each plan adds on top of the document's own price.
  *
- * The plan card prices Premium at ₹1,499 and lists notary attestation as
- * included. It was also adding ₹700 to the quote, so the plan that advertised
- * attestation as part of the price was the one that charged separately for it —
- * ₹2,595 all in against an advertised ₹1,499. Included means included.
+ * Every deed is now priced individually — ₹300 for a Tamil loan bond, ₹800 for
+ * a detailed sale agreement — so the drafting fee comes from the template and
+ * the plan only prices the service wrapped around it. The uplifts are the gaps
+ * the three plans already stood at (₹349 / ₹799 / ₹1,499), kept exactly so the
+ * ladder between them is unchanged and nothing here is a figure nobody quoted.
+ *
+ * Basic is the document and nothing else, so it adds nothing.
+ *
+ * Premium's `lawyer: 0` is the point, not an oversight. Its card lists notary
+ * attestation as included and it was also adding the fee to the quote, so the
+ * one plan that sold attestation as part of the price was the one charging
+ * separately for it. Included means included.
  */
 export const PLAN_FEES: Record<PlanId, { platform: number; lawyer: number }> = {
-  basic: { platform: 349, lawyer: 0 },
-  standard: { platform: 799, lawyer: 0 },
-  premium: { platform: 1499, lawyer: 0 },
+  basic: { platform: 0, lawyer: 0 },
+  standard: { platform: 450, lawyer: 0 },
+  premium: { platform: 1150, lawyer: 0 },
 };
 
 export interface StampDutyInput {
@@ -51,6 +62,12 @@ export interface StampDutyInput {
    * no version of the document that does without it.
    */
   notaryRequired?: boolean;
+  /** Which of the sixty-two is being drawn. Sets the drafting fee. */
+  templateId?: TemplateId;
+  /** Face value of the physical sheet chosen. 0 for an e-Stamp. */
+  stampPaperValue?: number;
+  /** Sheets the deed runs to, for the notary's per-sheet charge. */
+  documentPages?: number;
   /**
    * The date wanted on the paper, yyyy-mm-dd. A past date is sourced from older
    * stock and charged by the month. Quoted in the builder only.
@@ -67,6 +84,9 @@ export function calculateStampDuty({
   lawyerReview = false,
   notaryRequired = false,
   stampPaperDate = "",
+  templateId,
+  stampPaperValue = 0,
+  documentPages = 4,
 }: StampDutyInput): StampDutyBreakdown {
   const rent = Math.max(0, Number(monthlyRent) || 0);
   const deposit = Math.max(0, Number(securityDeposit) || 0);
@@ -84,11 +104,24 @@ export function calculateStampDuty({
     : 0;
 
   const fees = PLAN_FEES[plan];
-  const platformFee = fees.platform;
-  // Premium bundles notary attestation; other plans pay the add-on if they opt
-  // in, or if the instrument is one that is void without it.
+  // The document's own price, plus whatever the plan wraps around it.
+  const documentFee = templateId ? templatePrice(templateId) : 0;
+  const platformFee = documentFee + fees.platform;
+
+  // The sheet the deed is executed on, at the shelf price. An e-Stamp has no
+  // shelf price — its cost is the duty, already counted above.
+  const paper = stampPaperPrice(stampPaperValue);
+  const stampPaperFee = paper?.price ?? 0;
+
+  // Premium bundles notary attestation; other plans pay for it if they opt in,
+  // or if the instrument is one that is void without it. The fee covers the
+  // first four sheets and charges for every one after them.
   const lawyerFee =
-    plan === "premium" ? fees.lawyer : lawyerReview || notaryRequired ? NOTARY_FEE : 0;
+    plan === "premium"
+      ? fees.lawyer
+      : lawyerReview || notaryRequired
+        ? notaryFeeForPages(documentPages)
+        : 0;
 
   const backdatingMonths = backdateMonths(stampPaperDate);
   const backdatingFee = backdateFee(stampPaperDate);
@@ -98,7 +131,13 @@ export function calculateStampDuty({
   const gst = Math.round((platformFee + lawyerFee + backdatingFee) * GST_RATE);
 
   const total =
-    stampDuty + registrationFee + platformFee + lawyerFee + backdatingFee + gst;
+    stampDuty +
+    registrationFee +
+    platformFee +
+    stampPaperFee +
+    lawyerFee +
+    backdatingFee +
+    gst;
 
   const notes: string[] = [];
   notes.push(
@@ -135,6 +174,8 @@ export function calculateStampDuty({
     registrationFee,
     registrationRequired,
     platformFee,
+    stampPaperFee,
+    documentFee,
     lawyerFee,
     backdatingFee,
     backdatingMonths,
@@ -147,6 +188,7 @@ export function calculateStampDuty({
 /** Government portion vs our portion — used to prove we don't mark up state fees. */
 export function splitGovernmentAndService(b: StampDutyBreakdown) {
   const government = b.stampDuty + b.registrationFee;
-  const service = b.platformFee + b.lawyerFee + b.backdatingFee + b.gst;
+  const service =
+    b.platformFee + b.stampPaperFee + b.lawyerFee + b.backdatingFee + b.gst;
   return { government, service, total: government + service };
 }

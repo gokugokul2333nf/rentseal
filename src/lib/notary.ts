@@ -20,19 +20,29 @@ import { AFFIDAVIT_TEMPLATE_IDS } from "./affidavit-templates";
  */
 
 /**
- * The notary's fee, in rupees. Bundled into Premium.
+ * The notary's fee, in rupees.
  *
- * ₹350 is the office's own quoted rate — "notary signature in stamp paper
- * including 2 green sheets, ₹350, only for signature". It was ₹700 here, which
- * was double what the same office charges a walk-in for the same act, and it
- * fell hardest on exactly the documents that cannot decline it: the eleven
- * affidavits, where attestation is compulsory, and the Tamil deeds, which are
- * mostly one-off instruments carrying it too.
+ * ₹350 buys the signature on the first page together with three green sheets —
+ * four sheets in all, which covers most deeds. A document running longer is
+ * ₹75 for every sheet past those four, because the notary signs each one.
  *
  * Attestation on plain paper is ₹100 at the counter, but a deed drafted here is
  * executed on stamp paper, so ₹350 is the rate that applies.
  */
 export const NOTARY_FEE = 350;
+
+/** Sheets the base fee covers: the stamp paper plus three green sheets. */
+export const NOTARY_SHEETS_INCLUDED = 4;
+
+/** Every sheet past the included four. */
+export const NOTARY_EXTRA_SHEET_FEE = 75;
+
+/** What attestation comes to for a document of a given length. */
+export function notaryFeeForPages(pages: number): number {
+  const sheets = Math.max(1, Math.floor(Number(pages) || NOTARY_SHEETS_INCLUDED));
+  const extra = Math.max(0, sheets - NOTARY_SHEETS_INCLUDED);
+  return NOTARY_FEE + extra * NOTARY_EXTRA_SHEET_FEE;
+}
 
 /**
  * The deeds that cannot be delivered unsworn.
