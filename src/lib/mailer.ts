@@ -3,10 +3,12 @@ import nodemailer from "nodemailer";
 /**
  * Outbound mail for the order desk.
  *
- * Every completed draft is emailed to the office with the agreement attached as
- * a PDF, so an operator can print it onto stamp paper and courier it. Nothing
- * is sent to the customer: the finished instrument is the thing being paid for,
- * and handing it over before the confirming call would give it away.
+ * Every lead is emailed — an enquiry from the short form and a completed draft
+ * alike — and a drafted agreement carries the deed as a PDF attachment, so an
+ * operator can print it onto stamp paper and courier it.
+ *
+ * Nothing is sent to the customer: the finished instrument is the thing being
+ * paid for, and handing it over before the confirming call would give it away.
  *
  * Set up: docs/order-email.md
  */
@@ -15,10 +17,22 @@ const HOST = process.env.SMTP_HOST;
 const PORT = Number(process.env.SMTP_PORT ?? 465);
 const USER = process.env.SMTP_USER;
 const PASS = process.env.SMTP_PASS;
-/** Where orders land. Falls back to the address on the site. */
-const TO = process.env.ORDER_EMAIL || process.env.SMTP_USER;
+/**
+ * Where orders land. One address or several, comma separated.
+ *
+ * The office needs every lead and so does whoever is watching the pipeline, and
+ * the two are not always the same person. Splitting on commas costs nothing and
+ * saves standing up a forwarding rule in Gmail that nobody remembers exists.
+ *
+ * Falls back to the sending account, so a half-configured mailer still lands
+ * somewhere a human reads rather than nowhere.
+ */
+const TO = (process.env.ORDER_EMAIL || process.env.SMTP_USER || "")
+  .split(",")
+  .map((address) => address.trim())
+  .filter(Boolean);
 
-export const mailConfigured = Boolean(HOST && USER && PASS && TO);
+export const mailConfigured = Boolean(HOST && USER && PASS && TO.length);
 
 let cached: nodemailer.Transporter | null = null;
 
@@ -56,7 +70,7 @@ export async function sendOrderMail(mail: OrderMail): Promise<boolean> {
   try {
     await transport().sendMail({
       from: `"Orders" <${USER}>`,
-      to: TO,
+      to: TO.join(", "),
       replyTo: USER,
       subject: mail.subject,
       text: mail.text,

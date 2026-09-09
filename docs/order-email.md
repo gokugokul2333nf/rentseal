@@ -1,8 +1,13 @@
 # Order email
 
-Every submission is emailed to the office. A completed agreement arrives with
-the deed attached as a PDF, ready to print onto stamp paper of the right value,
-get signed, and courier.
+Every lead is emailed — an enquiry from the short form and a completed draft
+alike. A drafted agreement arrives with the deed attached as a PDF, ready to
+print onto stamp paper of the right value, get signed, and courier.
+
+The mail and the order sheet are independent. A lead is safe if it reached
+either one, and the form only tells the customer to ring us if it reached
+neither — so mail keeps working when the sheet is down or unconfigured, and
+vice versa.
 
 **Nothing is sent to the customer.** The finished instrument is the thing being
 paid for, and emailing it before the confirming call would give it away — the
@@ -17,8 +22,12 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=lpscanxerox@gmail.com
 SMTP_PASS=<16-character app password>
-ORDER_EMAIL=lpscanxerox@gmail.com
+ORDER_EMAIL=lpscanxerox@gmail.com,gokulgokul077g@gmail.com
 ```
+
+`ORDER_EMAIL` takes a comma-separated list, so the office and whoever is
+watching the pipeline both get every lead without a Gmail forwarding rule that
+nobody remembers setting up. Whitespace around the commas is fine.
 
 ### Gmail needs an App Password, not the account password
 
