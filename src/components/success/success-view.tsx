@@ -5,12 +5,9 @@ import Link from "next/link";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
   BadgeCheck,
   Check,
-  Download,
   FileSignature,
-  LayoutDashboard,
   Loader2,
   Mail,
   MessageCircle,
@@ -19,7 +16,7 @@ import {
   Scale,
   Stamp,
 } from "lucide-react";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -148,13 +145,31 @@ That&apos;s it — we have your agreement.
             transition={{ duration: 0.6, delay: 0.35 }}
             className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"
           >
-            <Button size="lg" onClick={() => window.print()}>
-              <Download className="size-[18px]" />
-              Download PDF
-            </Button>
-            <ButtonLink href="/dashboard" variant="secondary" size="lg">
-              <LayoutDashboard className="size-[18px]" />
-              Go to dashboard
+            {/*
+              No download here, deliberately.
+
+              The finished instrument is the thing being paid for, and handing
+              over a copy before the confirming call gives it away — the same
+              reason printing and copying are off in the drafter, and the same
+              reason the deed is emailed to the office and not to the customer.
+              This used to be a "Download PDF" button that called window.print(),
+              which was both a policy hole and a lie about what it did: it opens
+              a print dialog for this page, not the agreement.
+
+              What someone actually wants at this point is to reach a person, so
+              that is what the buttons do.
+            */}
+            <ButtonLink href={`tel:${SITE.phone.replace(/\s/g, "")}`} size="lg">
+              <Phone className="size-[18px]" />
+              Call {SITE.phone}
+            </ButtonLink>
+            <ButtonLink
+              href={`https://wa.me/${SITE.whatsapp.replace(/\D/g, "")}`}
+              variant="secondary"
+              size="lg"
+            >
+              <MessageCircle className="size-[18px]" />
+              WhatsApp us
             </ButtonLink>
           </motion.div>
         </div>
@@ -263,14 +278,19 @@ That&apos;s it — we have your agreement.
                   One thing still needs you
                 </h3>
                 <p className="mt-2 text-[14px] leading-relaxed text-white/60">
-                  Both parties must complete the Aadhaar OTP to finalise the agreement. The link
-                  has gone to each phone number you entered. Until both sign, the document sits
-                  in your dashboard as awaiting signature.
+                  Both parties complete an Aadhaar OTP to finalise the agreement. We set that up
+                  on the confirming call and send the link to each number you entered — there is
+                  nothing to do until then.
                 </p>
-                <ButtonLink href="/dashboard" size="md" className="mt-5 group">
-                  Track signature status
-                  <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </ButtonLink>
+                {/*
+                  This pointed at /dashboard, which does not exist, so both
+                  buttons on this page were 404s. Telling someone to track their
+                  signature somewhere they cannot reach is worse than not
+                  offering it, so it says who to ask instead.
+                */}
+                <p className="mt-4 text-[13.5px] text-white/45">
+                  Quote {agreementId} if you ring us before we ring you.
+                </p>
               </div>
             </div>
           </div>
