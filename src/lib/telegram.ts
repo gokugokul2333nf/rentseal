@@ -32,6 +32,12 @@ const TIMEOUT_MS = 20_000;
 
 export interface TelegramNotice {
   text: string;
+  /**
+   * "HTML" to render Telegram's tag subset. Omitted, the text is sent literally.
+   * Telegram rejects the whole message on a malformed entity, so anything
+   * passed here must already be escaped — see orderTelegramHtml.
+   */
+  parseMode?: "HTML";
   document?: { filename: string; content: Buffer };
 }
 
@@ -51,21 +57,23 @@ export async function sendTelegramNotice(notice: TelegramNotice): Promise<boolea
 
   // Sent whole rather than split across messages: half an order arriving is
   // worse than a trimmed one, and the full record is in the email regardless.
-  const text =
-    notice.text.length > MAX_TEXT
-      ? `${notice.text.slice(0, MAX_TEXT - 40)}\n\n… trimmed — full details in the email.`
-      : notice.text;
+  // Trimming HTML mid-message could sever a tag and Telegram would reject the
+  // lot, so an over-long message drops to plain text rather than risking that.
+  const overLong = notice.text.length > MAX_TEXT;
+  const text = overLong
+    ? `${notice.text.replace(/<[^>]+>/g, "").slice(0, MAX_TEXT - 48)}\n\n… trimmed — full details in the email.`
+    : notice.text;
 
   const results = await Promise.all(
     CHATS.map(async (chat) => {
       try {
-        // No parse_mode on purpose. The order text contains rupee amounts,
-        // underscores and dots that MarkdownV2 would reject as unescaped
-        // entities, and a notification that fails to send over punctuation is
-        // not worth the bold headings.
+        // HTML rather than MarkdownV2. Telegram needs only & < > escaped for
+        // HTML, where MarkdownV2 also demands . - ( ) ! _ — and every rupee
+        // amount, reference and address in an order is full of those.
         const sent = await post(api("sendMessage"), {
           chat_id: chat,
           text,
+          parse_mode: overLong ? undefined : notice.parseMode,
           disable_web_page_preview: true,
         });
         if (!sent) return false;

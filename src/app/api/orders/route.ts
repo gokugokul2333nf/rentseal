@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { renderAgreementPdf } from "@/lib/agreement-pdf";
 import { sendOrderMail } from "@/lib/mailer";
 import { sendTelegramNotice } from "@/lib/telegram";
-import { orderEmailText, type OrderRow } from "@/lib/orders";
+import { orderEmailHtml, orderEmailText, orderTelegramHtml, type OrderRow } from "@/lib/orders";
 import type { AgreementDraft } from "@/lib/types";
 
 /**
@@ -111,14 +111,9 @@ async function notifyTelegram(
   pdf?: { filename: string; content: Buffer },
 ): Promise<boolean> {
   try {
-    const who = String(row.contactName ?? "Someone");
-    const phone = String(row.contactPhone ?? "");
-    const heading =
-      row.kind === "agreement"
-        ? `NEW AGREEMENT — ${who}, ${phone}`
-        : `NEW ENQUIRY — ${who}, ${phone}`;
     return await sendTelegramNotice({
-      text: `${heading}\n\n${orderEmailText(row)}`,
+      text: orderTelegramHtml(row),
+      parseMode: "HTML",
       document: pdf,
     });
   } catch (error) {
@@ -143,6 +138,7 @@ async function mailOrder(
           ? `Agreement ${ref} — ${who}, ${phone}`
           : `Enquiry — ${who}, ${phone}`,
       text: orderEmailText(row),
+      html: orderEmailHtml(row),
       attachment: pdf,
     });
   } catch (error) {

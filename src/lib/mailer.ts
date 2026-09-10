@@ -51,7 +51,10 @@ function transport() {
 
 export interface OrderMail {
   subject: string;
+  /** Plain-text fallback. Text-only clients and most spam filters read this. */
   text: string;
+  /** The version a person sees. Sent as multipart/alternative beside the text. */
+  html?: string;
   attachment?: { filename: string; content: Buffer };
 }
 
@@ -74,6 +77,7 @@ export async function sendOrderMail(mail: OrderMail): Promise<boolean> {
       replyTo: USER,
       subject: mail.subject,
       text: mail.text,
+      html: mail.html,
       attachments: mail.attachment
         ? [
             {
