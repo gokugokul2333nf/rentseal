@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "telegram:chat-id": "node scripts/telegram-chat-id.mjs",
     "dev": "next dev -p 3011",
     "build": "next build",
     "start": "next start",

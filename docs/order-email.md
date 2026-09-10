@@ -4,9 +4,11 @@ Every lead is emailed — an enquiry from the short form and a completed draft
 alike. A drafted agreement arrives with the deed attached as a PDF, ready to
 print onto stamp paper of the right value, get signed, and courier.
 
-Mail is the whole record. There was a Google Sheet alongside it, written
-through an Apps Script webhook; it has been removed. Because the mail is now
-the only copy, it carries every field the order has — the parties, the
+Mail is the record, and a Telegram bot carries the same lead as a nudge — see
+`docs/telegram-notifications.md`. A lead is safe if either caught it. There was
+a Google Sheet here once, written through an Apps Script webhook; it has been
+removed. Because the mail is the durable copy, it carries every field the order
+has — the parties, the
 property, the terms, which sheet to buy and what date to put on it, and each
 line of the quote — rather than a summary pointing at a spreadsheet.
 
@@ -60,14 +62,14 @@ attachment, because there is no drafted agreement yet.
 
 ## If mail fails
 
-The order **is** lost, so the request fails loudly rather than quietly. A failed
-send returns `502 {"ok":false,"error":"unreachable"}`, the form tells the
-customer to call or WhatsApp instead, and the reason is logged with a `[mail]`
-prefix.
+If Telegram is configured, the lead still arrives there and the request
+succeeds; the log carries `emailed but Telegram notification failed` or its
+opposite so you know a channel is down.
 
-This is the trade for having one record instead of two: nothing can go missing
-between them, but SMTP being down means the site cannot take an order. If
-`mailConfigured` is false — any of `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` or a
-recipient missing — **every submission fails**. Check the logs for
+If **both** fail, the request returns `502 {"ok":false,"error":"unreachable"}`
+and the form tells the customer to call or WhatsApp instead — better than
+thanking someone for an order nothing recorded.
+
+With neither configured, every submission fails. Check the logs for
 `SMTP is not configured` after any deploy that touches environment variables.
 

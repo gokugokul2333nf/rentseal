@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { renderAgreementPdf } from "@/lib/agreement-pdf";
 import { sendOrderMail } from "@/lib/mailer";
+import { sendTelegramNotice } from "@/lib/telegram";
 import { orderEmailText, type OrderRow } from "@/lib/orders";
 import type { AgreementDraft } from "@/lib/types";
 
@@ -9,11 +10,13 @@ import type { AgreementDraft } from "@/lib/types";
  * Nothing is charged online — an operator reads the mail, calls to confirm, and
  * takes payment on that call.
  *
- * Mail is the whole record. There was a Google Sheet alongside it, written
- * through an Apps Script webhook; it is gone, and with it the failure mode
- * where an unset webhook URL returned 503 before the mailer was ever reached.
- * Because the mail is now the only copy, it carries the entire row rather than
- * a six-line summary pointing at a spreadsheet — see orderEmailText.
+ * Two channels carry it. Mail is the record: the whole row, the deed as a PDF,
+ * something searchable months later. Telegram is the nudge — an operator does
+ * not watch an inbox, but a phone buzzes. A lead is safe if either caught it.
+ *
+ * There was a Google Sheet here once, written through an Apps Script webhook.
+ * It is gone, and with it the failure mode where an unset webhook URL returned
+ * 503 before the mailer was reached.
  *
  * A drafted agreement rides along with the deed attached as a PDF, so an
  * operator can print it onto stamp paper and courier it. Nothing goes to the
@@ -50,34 +53,97 @@ export async function POST(request: Request) {
     source: request.headers.get("referer") ?? "",
   } as unknown as OrderRow;
 
-  const sent = await mailOrder(row, draft);
-  if (!sent) {
-    // The only copy failed, so the form has to say so — telling someone their
-    // order is in when nothing recorded it is how a lead disappears silently.
+  /*
+    Two channels again, and deliberately unalike.
+
+    Mail is the record — the whole row, the PDF, something searchable months
+    later. Telegram is the nudge: an operator does not watch an inbox, but a
+    phone buzzes. They also fail for different reasons, which is the point. When
+    the sheet was removed mail became the only copy, so SMTP being down took the
+    order form with it; a bot on a different network and a different credential
+    puts that redundancy back.
+
+    A lead is safe if either caught it. It fails only when neither did.
+  */
+  const pdf = await agreementPdf(row, draft);
+  const [emailed, notified] = await Promise.all([
+    mailOrder(row, pdf),
+    notifyTelegram(row, pdf),
+  ]);
+
+  if (!emailed && !notified) {
+    // Telling someone their order is in when nothing recorded it is how a lead
+    // disappears silently.
     return NextResponse.json({ ok: false, error: "unreachable" }, { status: 502 });
   }
-  return NextResponse.json({ ok: true, emailed: true });
+  if (!emailed) console.error("[orders] notified on Telegram but NOT emailed — no durable record");
+  if (!notified) console.error("[orders] emailed but Telegram notification failed");
+  return NextResponse.json({ ok: true, emailed, notified });
+}
+
+/**
+ * The deed as a PDF, rendered once and handed to both channels.
+ *
+ * It used to be rendered inside the mailer. Now that two things want it,
+ * rendering it twice would double the slowest part of the request for no gain.
+ */
+async function agreementPdf(
+  row: OrderRow,
+  draft?: AgreementDraft,
+): Promise<{ filename: string; content: Buffer } | undefined> {
+  if (row.kind !== "agreement" || !draft?.id) return undefined;
+  try {
+    return {
+      filename: `${String(row.reference ?? "") || draft.id}.pdf`,
+      content: await renderAgreementPdf(draft),
+    };
+  } catch (error) {
+    // A deed that will not render must not sink the lead — the office can
+    // redraw it from the details in the message.
+    console.error("[orders] could not render the agreement PDF", error);
+    return undefined;
+  }
+}
+
+/** Buzzes the order desk. Never throws; the mail is the durable copy. */
+async function notifyTelegram(
+  row: OrderRow,
+  pdf?: { filename: string; content: Buffer },
+): Promise<boolean> {
+  try {
+    const who = String(row.contactName ?? "Someone");
+    const phone = String(row.contactPhone ?? "");
+    const heading =
+      row.kind === "agreement"
+        ? `NEW AGREEMENT — ${who}, ${phone}`
+        : `NEW ENQUIRY — ${who}, ${phone}`;
+    return await sendTelegramNotice({
+      text: `${heading}\n\n${orderEmailText(row)}`,
+      document: pdf,
+    });
+  } catch (error) {
+    console.error("[orders] telegram notification failed", error);
+    return false;
+  }
 }
 
 /** Emails the order, with the drafted agreement attached when there is one. */
-async function mailOrder(row: OrderRow, draft?: AgreementDraft): Promise<boolean> {
+async function mailOrder(
+  row: OrderRow,
+  pdf?: { filename: string; content: Buffer },
+): Promise<boolean> {
   try {
     const ref = String(row.reference ?? "");
     const who = String(row.contactName ?? "Someone");
     const phone = String(row.contactPhone ?? "");
-    const isAgreement = row.kind === "agreement";
-
-    const attachment =
-      isAgreement && draft?.id
-        ? { filename: `${ref || draft.id}.pdf`, content: await renderAgreementPdf(draft) }
-        : undefined;
 
     return await sendOrderMail({
-      subject: isAgreement
-        ? `Agreement ${ref} — ${who}, ${phone}`
-        : `Enquiry — ${who}, ${phone}`,
+      subject:
+        row.kind === "agreement"
+          ? `Agreement ${ref} — ${who}, ${phone}`
+          : `Enquiry — ${who}, ${phone}`,
       text: orderEmailText(row),
-      attachment,
+      attachment: pdf,
     });
   } catch (error) {
     console.error("[orders] order email failed", error);
