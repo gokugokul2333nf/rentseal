@@ -64,13 +64,17 @@ next working day in the major cities, and two to three working days elsewhere.
 These are on the site as commitments, so they need to be ones the operation can
 actually keep. The 2pm cut-off in particular.
 
-## 5. The order sheet — blocks launch
+## 5. The order mailbox — blocks launch
 
-The site takes no payment. Every enquiry and every drafted agreement is posted
-to a Google Sheet that the team works from.
+The site takes no payment. Every enquiry and every drafted agreement is emailed
+to the office, a drafted agreement with the deed attached as a PDF. That mail is
+the only record — there is no spreadsheet behind it — so if SMTP is not
+configured the site cannot take an order at all.
 
-- Who owns the sheet, and who gets notified when a row lands
-- Deployment URL for `SHEETS_WEBHOOK_URL` (see `docs/google-sheet-webhook.md`)
+- The sending account, and a 16-character Gmail App Password for `SMTP_PASS`
+  (see `docs/order-email.md`)
+- Every address that should receive leads, for `ORDER_EMAIL` — it takes a
+  comma-separated list
 - Who makes the confirming call, and within what time — the site currently
   promises 30 minutes during working hours
 - How payment is collected on that call: UPI, bank transfer, or cash on delivery

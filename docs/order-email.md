@@ -4,10 +4,11 @@ Every lead is emailed — an enquiry from the short form and a completed draft
 alike. A drafted agreement arrives with the deed attached as a PDF, ready to
 print onto stamp paper of the right value, get signed, and courier.
 
-The mail and the order sheet are independent. A lead is safe if it reached
-either one, and the form only tells the customer to ring us if it reached
-neither — so mail keeps working when the sheet is down or unconfigured, and
-vice versa.
+Mail is the whole record. There was a Google Sheet alongside it, written
+through an Apps Script webhook; it has been removed. Because the mail is now
+the only copy, it carries every field the order has — the parties, the
+property, the terms, which sheet to buy and what date to put on it, and each
+line of the quote — rather than a summary pointing at a spreadsheet.
 
 **Nothing is sent to the customer.** The finished instrument is the thing being
 paid for, and emailing it before the confirming call would give it away — the
@@ -59,11 +60,14 @@ attachment, because there is no drafted agreement yet.
 
 ## If mail fails
 
-The order is **not** lost. The Google Sheet is written first and is the durable
-record; the email is best-effort on top. A failed send returns
-`{"ok":true,"emailed":false}` — the customer still sees success, because their
-order genuinely did go through — and logs the reason with a `[mail]` prefix.
+The order **is** lost, so the request fails loudly rather than quietly. A failed
+send returns `502 {"ok":false,"error":"unreachable"}`, the form tells the
+customer to call or WhatsApp instead, and the reason is logged with a `[mail]`
+prefix.
 
-Watch for `emailed:false` in the logs: it means the sheet has orders the office
-has not been emailed about.
+This is the trade for having one record instead of two: nothing can go missing
+between them, but SMTP being down means the site cannot take an order. If
+`mailConfigured` is false — any of `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` or a
+recipient missing — **every submission fails**. Check the logs for
+`SMTP is not configured` after any deploy that touches environment variables.
 

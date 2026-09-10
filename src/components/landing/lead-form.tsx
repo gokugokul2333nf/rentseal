@@ -117,7 +117,7 @@ export function LeadForm() {
       setSending(false);
       setSent(true);
     } catch {
-      // Saying "thank you" for an enquiry that never reached the sheet would
+      // Saying "thank you" for an enquiry that never reached the office would
       // leave someone waiting for a call that is never going to come.
       setSending(false);
       setError(

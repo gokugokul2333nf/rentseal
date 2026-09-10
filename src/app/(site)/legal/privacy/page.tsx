@@ -65,7 +65,6 @@ const SECTIONS: LegalSection[] = [
     list: [
       "The licensed e-Sign Application Service Provider, to obtain signatures",
       "The authorised e-stamping channel, to procure and affix the stamp certificate",
-      "Google Sheets, where your enquiry or draft is recorded so that our team can call you back",
       "Email, SMS and WhatsApp providers, to deliver your document and notifications",
       "Cloud hosting in the ap-south-1 (Mumbai) region, where the platform runs",
       "The notary public attesting the signatures — who sees the document, as they must, in order to attest it",

@@ -9,11 +9,12 @@ import type { AgreementDraft } from "./types";
 /**
  * One flat row per submission.
  *
- * The sheet is the order book, so everything an operator needs to make the
- * confirming phone call has to survive the trip — no nested objects, no arrays,
- * nothing that reads as "[object Object]" in a spreadsheet cell.
+ * The email is the order book now, so everything an operator needs to make the
+ * confirming phone call has to survive the trip. It stays flat — no nested
+ * objects, no arrays — because orderEmailText below walks it key by key, and a
+ * value that stringifies to "[object Object]" is a fact nobody can act on.
  */
-export interface SheetRow {
+export interface OrderRow {
   kind: "enquiry" | "agreement";
   reference: string;
   contactName: string;
@@ -34,8 +35,8 @@ export interface SheetRow {
 const joinTruthy = (...parts: Array<string | undefined | null>) =>
   parts.filter((p) => p && String(p).trim()).join(" · ");
 
-/** A drafted agreement, flattened for the order sheet. */
-export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
+/** A drafted agreement, flattened for the order email. */
+export function agreementRow(draft: AgreementDraft, notes = ""): OrderRow {
   // An affidavit is sworn or it is nothing, so the counter must not read the
   // notary column as a customer preference it can skip.
   const notaryRequired = isNotaryMandatory(draft.templateId);
@@ -51,6 +52,8 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     templateId: draft.templateId,
     stampPaperValue: draft.options.stampPaperValue,
     documentPages: draft.options.documentPages,
+    extraPrintedCopies: draft.options.extraPrintedCopies,
+    softCopy: draft.options.softCopy,
   });
   const meta = AGREEMENT_TYPES.find((t) => t.id === draft.type);
   // Which of the twenty-four was drawn. "Commercial Rental Agreement" does not
@@ -114,7 +117,9 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
     stampPaperValue: String(draft.options.stampPaperValue),
     stampPaperFee: String(breakdown.stampPaperFee),
     documentPages: String(draft.options.documentPages),
-    platformFee: String(breakdown.platformFee),
+    // platformFee includes the document's own price; the email lists that
+    // separately, so this is the plan's uplift on top of it and nothing else.
+    planFee: String(breakdown.platformFee - breakdown.documentFee),
     gst: String(breakdown.gst),
     registrationRequired: draft.options.registrationRequired ? "yes" : "no",
     notaryFee: String(breakdown.lawyerFee),
@@ -136,7 +141,7 @@ export function agreementRow(draft: AgreementDraft, notes = ""): SheetRow {
   };
 }
 
-/** The short "tell us what you need" form, flattened for the same sheet. */
+/** The short "tell us what you need" form, flattened the same way. */
 export function enquiryRow(fields: {
   need: string;
   name: string;
@@ -150,7 +155,7 @@ export function enquiryRow(fields: {
   stampDate?: string;
   agreementType?: string;
   message?: string;
-}): SheetRow {
+}): OrderRow {
   return {
     kind: "enquiry",
     reference: "",
@@ -167,8 +172,8 @@ export function enquiryRow(fields: {
       fields.agreementType ?? "",
     ),
     notes: fields.message ?? "",
-    // An enquiry has no drafted deed behind it, but the sheet's columns must
-    // line up across both kinds of row.
+    // An enquiry has no drafted deed behind it. The keys still line up across
+    // both kinds of row so one renderer can read either.
     template: "",
     clausesChanged: "",
     need: fields.need,
@@ -177,4 +182,122 @@ export function enquiryRow(fields: {
     stampDate: fields.stampDate ?? "",
     agreementType: fields.agreementType ?? "",
   };
+}
+
+
+/* ═══════════════════════ The order email ═══════════════════════ */
+
+/**
+ * The row, written out for a person to read.
+ *
+ * This used to be six lines — name, phone, summary, city, estimate, notes —
+ * because the forty-odd other fields were going to a spreadsheet and the mail
+ * was only a nudge to go and look at it. With the sheet gone the mail is the
+ * whole record, so everything the row carries has to be in it or it is lost:
+ * who the parties are, what the property is, every fee that makes up the
+ * quote, which sheet to buy and what date to put on it.
+ *
+ * Empty fields are dropped rather than printed blank. An operator scanning for
+ * the deposit should not have to read past eleven "—" lines to find it.
+ */
+const LABELS: Record<string, string> = {
+  contactName: "Name",
+  contactPhone: "Phone",
+  contactEmail: "Email",
+  city: "City",
+  need: "Wants",
+  denomination: "Denomination",
+  notary: "Notary",
+  stampDate: "Date wanted",
+  agreementType: "Document",
+  template: "Template",
+  plan: "Plan",
+  clausesChanged: "Clauses",
+  monthlyRent: "Monthly rent",
+  securityDeposit: "Deposit",
+  depositAlreadyPaid: "Deposit already paid",
+  durationMonths: "Term (months)",
+  startDate: "Starts",
+  executionDate: "Signed on",
+  executionPlace: "Signed at",
+  propertyKind: "Property type",
+  propertyAddress: "Address",
+  portion: "Portion let",
+  pincode: "PIN",
+  district: "District",
+  landlordName: "Landlord",
+  landlordPhone: "Landlord phone",
+  landlordEmail: "Landlord email",
+  tenantName: "Tenant",
+  tenantPhone: "Tenant phone",
+  tenantEmail: "Tenant email",
+  stampPaperValue: "Stamp paper (face value)",
+  stampPaperFee: "Stamp paper charge",
+  stampPaperDate: "Date on the paper",
+  backdatingMonths: "Back-dated (months)",
+  backdatingFee: "Back-dating charge",
+  documentPages: "Sheets",
+  extraPrintedCopies: "Extra printed copies",
+  printedCopiesFee: "Printed copies charge",
+  softCopy: "Soft copy",
+  softCopyFee: "Soft copy charge",
+  documentFee: "Drafting fee",
+  planFee: "Plan service fee",
+  stampDuty: "Stamp duty",
+  registrationFee: "Registration fee",
+  registrationRequired: "Registration required",
+  notaryFee: "Notary fee",
+  lawyerReview: "Notary attestation",
+  gst: "GST",
+  estimate: "ESTIMATE",
+};
+
+const GROUPS: Array<{ title: string; keys: string[] }> = [
+  { title: "Who to call", keys: ["contactName", "contactPhone", "contactEmail", "city"] },
+  { title: "What they want", keys: ["need", "denomination", "notary", "stampDate", "agreementType", "template", "plan", "clausesChanged"] },
+  { title: "Terms", keys: ["monthlyRent", "securityDeposit", "depositAlreadyPaid", "durationMonths", "startDate", "executionDate", "executionPlace"] },
+  { title: "Property", keys: ["propertyKind", "propertyAddress", "portion", "pincode", "district"] },
+  { title: "Parties", keys: ["landlordName", "landlordPhone", "landlordEmail", "tenantName", "tenantPhone", "tenantEmail"] },
+  // Facts here, money below. A section headed "the quote" whose lines do not
+  // add up to the estimate printed under them is a section an operator has to
+  // check with a calculator, so every rupee lives in one list and that list
+  // sums to the total.
+  { title: "Paper and copies", keys: ["stampPaperValue", "stampPaperDate", "backdatingMonths", "documentPages", "extraPrintedCopies", "softCopy", "registrationRequired", "lawyerReview"] },
+  { title: "The quote", keys: ["documentFee", "planFee", "stampPaperFee", "stampDuty", "registrationFee", "notaryFee", "backdatingFee", "printedCopiesFee", "softCopyFee", "gst", "estimate"] },
+];
+
+/** Values that mean "nothing to say" rather than a fact worth printing. */
+const EMPTY = new Set(["", "0", "no", "none"]);
+
+export function orderEmailText(row: OrderRow): string {
+  const isAgreement = row.kind === "agreement";
+  const out: string[] = [];
+
+  out.push(row.summary || (isAgreement ? "Drafted agreement" : "Enquiry"));
+  if (row.reference) out.push(`Reference ${row.reference}`);
+  out.push("");
+
+  for (const group of GROUPS) {
+    const lines = group.keys
+      .filter((k) => {
+        const v = String(row[k] ?? "").trim();
+        // The estimate is worth printing even at zero; a zero deposit is not.
+        return v && (!EMPTY.has(v.toLowerCase()) || k === "estimate");
+      })
+      .map((k) => `  ${LABELS[k].padEnd(24)} ${row[k]}`);
+    if (!lines.length) continue;
+    out.push(group.title.toUpperCase(), ...lines, "");
+  }
+
+  if (row.notes) out.push("NOTES", `  ${row.notes}`, "");
+
+  out.push(
+    isAgreement
+      ? "The drafted agreement is attached. Print it on stamp paper of the value above, get it signed, and courier it."
+      : "This is an enquiry, not a drafted agreement. Call to find out what they need.",
+    "",
+    `Submitted ${new Date().toLocaleString("en-IN")}.`,
+  );
+
+  return out.join("\n");
 }

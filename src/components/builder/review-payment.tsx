@@ -188,7 +188,7 @@ function SendBlock({
       if (!response.ok) throw new Error(String(response.status));
       onSent();
     } catch {
-      // Never claim it landed. An order that quietly failed to reach the sheet
+      // Never claim it landed. An order that quietly failed to reach the office
       // is an order nobody will ever call about.
       setFailed(
         "We could not send that just now. Please call or WhatsApp us and we will take it down — your draft is safe on this device.",
