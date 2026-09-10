@@ -29,7 +29,7 @@ import { DENOMINATIONS } from "@/lib/stamp-paper";
 import { TEMPLATES } from "@/lib/templates";
 import { BACKDATE_FEE_PER_MONTH, backdateLabel, stampPaperDateOf } from "@/lib/backdating";
 import { TEMPLATE_SPECS } from "@/lib/agreement-templates";
-import { collectsExecutionDate } from "@/lib/template-fields";
+import { collectsExecutionDate, fieldsForTemplate } from "@/lib/template-fields";
 import { COPY_PAGE_FEE, printedCopyUnitPrice } from "@/lib/copies";
 import { Stepper } from "@/components/ui/stepper";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -48,19 +48,49 @@ export function ReviewAndSendStep({ onSent }: { onSent: () => void }) {
   const [failed, setFailed] = useState("");
   const [notes, setNotes] = useState("");
 
+  /*
+    What is missing depends on the deed, not on a fixed letting shape.
+
+    This list was written for the four lettings and applied to all sixty-two.
+    An affidavit was told it still needed a tenant's name, a tenant's mobile
+    number, a monthly rent, a deposit and a property address — none of which it
+    contains or ever asks for — under a heading saying the agreement "is not
+    valid until they are filled". Worst of all was the tenant's mobile: the
+    verbatim deeds collect one contact number, on landlord.phone, so
+    tenant.phone had no input anywhere and could never be satisfied.
+
+    So the required set is derived from the questions the builder actually
+    asked. A letting keeps every check it had; a verbatim deed is held only to
+    the fields its own wording prints.
+  */
+  const spec = TEMPLATE_SPECS[draft.templateId];
+  const isLetting = !spec?.body?.length;
+  const asks = new Set(isLetting ? [] : fieldsForTemplate(spec).map((f) => f.path));
+  const wants = (path: string) => isLetting || asks.has(path);
+
   const missing: string[] = [];
-  if (!draft.landlord.fullName) missing.push("Landlord's full name");
-  if (!draft.tenant.fullName) missing.push("Tenant's full name");
-  if (!draft.property.doorNo && !draft.property.street) missing.push("Property address");
-  if (!draft.terms.monthlyRent) missing.push("Monthly rent");
-  if (!draft.terms.securityDeposit) missing.push("Security deposit");
-  if (!draft.landlord.phone) missing.push("Landlord's mobile number");
-  if (!draft.tenant.phone) missing.push("Tenant's mobile number");
+  if (!draft.landlord.fullName) missing.push(`${isLetting ? "Landlord's" : spec.roleA} full name`);
+  if (wants("tenant.fullName") && !draft.tenant.fullName) {
+    missing.push(`${isLetting ? "Tenant's" : spec.roleB || "Second party"} full name`);
+  }
+  if (wants("property") && !draft.property.doorNo && !draft.property.street) {
+    missing.push("Property address");
+  }
+  if (wants("terms.monthlyRent") && !draft.terms.monthlyRent) missing.push("Monthly rent");
+  if (wants("terms.securityDeposit") && !draft.terms.securityDeposit) {
+    missing.push("Security deposit");
+  }
+  // One number to ring is the requirement. A letting signs both parties with an
+  // OTP each, so it needs both; a deed collects a single contact.
+  if (!draft.landlord.phone) missing.push(isLetting ? "Landlord's mobile number" : "Mobile number");
+  if (isLetting && !draft.tenant.phone) missing.push("Tenant's mobile number");
   // A wrong PIN is worse than a blank one — it looks filled in, and it is what
-  // the rider goes by.
-  const pin = checkPincode(draft.property.pincode, draft.property.district);
-  if (pin.status === "empty") missing.push("PIN code");
-  else if (pin.status !== "ok") missing.push(`PIN code — ${pin.message}`);
+  // the rider goes by. Only asked where the deed carries an address at all.
+  if (wants("property")) {
+    const pin = checkPincode(draft.property.pincode, draft.property.district);
+    if (pin.status === "empty") missing.push("PIN code");
+    else if (pin.status !== "ok") missing.push(`PIN code — ${pin.message}`);
+  }
 
   return (
     <>
